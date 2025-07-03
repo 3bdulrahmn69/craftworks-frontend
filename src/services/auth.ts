@@ -2,7 +2,7 @@ import { api } from './api';
 import type { User, AuthResponse } from '../types';
 
 interface RegisterData {
-  name: string;
+  full_name: string;
   email: string;
   password: string;
   role: 'client' | 'craftsman';
@@ -21,15 +21,15 @@ export const authService = {
   },
 
   async getCurrentUser(): Promise<{ user: User }> {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/users/me');
     return response.data;
   },
 
   async updateProfile(data: {
-    name?: string;
+    full_name?: string;
     email?: string;
   }): Promise<{ user: User }> {
-    const response = await api.put('/auth/profile', data);
+    const response = await api.put('/users/me', data);
     return response.data;
   },
 

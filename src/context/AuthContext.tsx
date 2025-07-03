@@ -10,7 +10,7 @@ interface AuthState {
 }
 
 interface RegisterData {
-  name: string;
+  full_name: string;
   email: string;
   password: string;
   role: 'client' | 'craftsman';
@@ -68,24 +68,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const token = authService.getToken();
-      if (!token) {
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
-
+    const initUser = async () => {
       try {
-        const { user } = await authService.getCurrentUser();
-        dispatch({ type: 'SET_USER', payload: user });
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        if (user) {
+          authService.setToken(user.token); // Assuming user object contains token
+          dispatch({ type: 'SET_USER', payload: user });
+        } else {
+          dispatch({ type: 'SET_USER', payload: null });
+        }
       } catch (error) {
-        console.error('Auth initialization error:', error);
-        authService.logout();
-        dispatch({ type: 'LOGOUT' });
+        console.error('Error initializing user:', error);
+        dispatch({ type: 'SET_USER', payload: null });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
-    initAuth();
+    initUser();
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
       const { token, user } = await authService.login(email, password);
       authService.setToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
       dispatch({ type: 'SET_USER', payload: user });
       toast.success('Login successful!');
     } catch (error: any) {
@@ -108,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
       const { token, user } = await authService.register(data);
       authService.setToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
       dispatch({ type: 'SET_USER', payload: user });
       toast.success('Account created successfully!');
     } catch (error: any) {
@@ -156,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Logout error:', error);
     } finally {
       authService.clearToken();
+      localStorage.removeItem('user');
       dispatch({ type: 'LOGOUT' });
       toast.success('Logged out successfully');
     }

@@ -1,8 +1,10 @@
 export interface User {
-  id: string;
+  _id: string;
+  full_name: string;
   email: string;
-  name: string;
   role: 'client' | 'craftsman';
+  rating?: number;
+  rating_count?: number;
 }
 
 export interface AuthResponse {
