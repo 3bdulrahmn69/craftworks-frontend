@@ -1,23 +1,133 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #fafbfc;
-  --color-foreground: #1a1d21;
-  --color-muted: #f1f3f5;
+  /* Light mode colors - Professional palette */
+  --color-background: #f5f7fa;
+  --color-foreground: #23272f;
+  --color-muted: #e9ecef;
   --color-muted-foreground: #6c757d;
   --color-popover: #ffffff;
-  --color-popover-foreground: #1a1d21;
+  --color-popover-foreground: #23272f;
   --color-card: #ffffff;
-  --color-card-foreground: #1a1d21;
-  --color-border: #dee2e6;
-  --color-input: #f8f9fa;
-  --color-primary: #2563eb;
+  --color-card-foreground: #23272f;
+  --color-border: #d1d5db;
+  --color-input: #f8fafc;
+  --color-primary: #2563eb; /* refined blue */
   --color-primary-foreground: #ffffff;
-  --color-secondary: #e7f3ff;
-  --color-secondary-foreground: #1a1d21;
-  --color-accent: #dbeafe;
-  --color-accent-foreground: #1e40af;
-  --color-destructive: #dc2626;
+  --color-secondary: #f3f4f6;
+  --color-secondary-foreground: #23272f;
+  --color-accent: #e0e7ef;
+  --color-accent-foreground: #23272f;
+  --color-destructive: #e11d48;
   --color-destructive-foreground: #ffffff;
+  --color-success: #16a34a;
+  --color-success-foreground: #ffffff;
+  --color-warning: #f59e42;
+  --color-warning-foreground: #23272f;
+  --color-info: #2563eb;
+  --color-info-foreground: #ffffff;
   --color-ring: #2563eb;
+  --color-selection: #c7d2fe;
+
+  /* Dark mode colors - Professional palette */
+  --color-dark-background: #181a20;
+  --color-dark-foreground: #f5f7fa;
+  --color-dark-muted: #23272f;
+  --color-dark-muted-foreground: #a0aec0;
+  --color-dark-popover: #23272f;
+  --color-dark-popover-foreground: #f5f7fa;
+  --color-dark-card: #23272f;
+  --color-dark-card-foreground: #f5f7fa;
+  --color-dark-border: #31343b;
+  --color-dark-input: #23272f;
+  --color-dark-primary: #3b82f6;
+  --color-dark-primary-foreground: #ffffff;
+  --color-dark-secondary: #23272f;
+  --color-dark-secondary-foreground: #f5f7fa;
+  --color-dark-accent: #31343b;
+  --color-dark-accent-foreground: #f5f7fa;
+  --color-dark-destructive: #e11d48;
+  --color-dark-destructive-foreground: #ffffff;
+  --color-dark-success: #22c55e;
+  --color-dark-success-foreground: #ffffff;
+  --color-dark-warning: #fbbf24;
+  --color-dark-warning-foreground: #23272f;
+  --color-dark-info: #3b82f6;
+  --color-dark-info-foreground: #ffffff;
+  --color-dark-ring: #3b82f6;
+  --color-dark-selection: #1e3a8a;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: var(--transition-colors);
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+/* Manual dark mode toggle class */
+.dark {
+  --color-background: var(--color-dark-background);
+  --color-foreground: var(--color-dark-foreground);
+  --color-muted: var(--color-dark-muted);
+  --color-muted-foreground: var(--color-dark-muted-foreground);
+  --color-popover: var(--color-dark-popover);
+  --color-popover-foreground: var(--color-dark-popover-foreground);
+  --color-card: var(--color-dark-card);
+  --color-card-foreground: var(--color-dark-card-foreground);
+  --color-border: var(--color-dark-border);
+  --color-input: var(--color-dark-input);
+  --color-primary: var(--color-dark-primary);
+  --color-primary-foreground: var(--color-dark-primary-foreground);
+  --color-secondary: var(--color-dark-secondary);
+  --color-secondary-foreground: var(--color-dark-secondary-foreground);
+  --color-accent: var(--color-dark-accent);
+  --color-accent-foreground: var(--color-dark-accent-foreground);
+  --color-destructive: var(--color-dark-destructive);
+  --color-destructive-foreground: var(--color-dark-destructive-foreground);
+  --color-success: var(--color-dark-success);
+  --color-success-foreground: var(--color-dark-success-foreground);
+  --color-warning: var(--color-dark-warning);
+  --color-warning-foreground: var(--color-dark-warning-foreground);
+  --color-info: var(--color-dark-info);
+  --color-info-foreground: var(--color-dark-info-foreground);
+  --color-ring: var(--color-dark-ring);
+  --color-selection: var(--color-dark-selection);
+}
+
+/* Selection styles */
+::selection {
+  background-color: var(--color-selection);
+  color: var(--color-foreground);
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted-foreground);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-foreground);
 }

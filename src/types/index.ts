@@ -1,0 +1,11 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'client' | 'craftsman';
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}

@@ -1,0 +1,10 @@
+{
+  "nav": {
+    "home": "Home",
+    "login": "Login",
+    "register": "Register"
+  },
+  "greeting": "Welcome to Craftworks!",
+  "Profile": "Profile",
+  "Logout": "Logout"
+}
