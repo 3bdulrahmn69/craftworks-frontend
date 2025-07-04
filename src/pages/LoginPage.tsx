@@ -23,12 +23,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-8 bg-white dark:bg-dark-card rounded shadow">
+    <div className="max-w-md mx-auto mt-16 p-8 bg-card rounded shadow">
       <h2 className="text-2xl font-bold mb-6 text-center">{t('nav.login')}</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
-          placeholder={t('Email') || 'Email'}
+          placeholder={t('Email')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="px-4 py-2 border rounded"
@@ -36,16 +36,16 @@ const LoginPage = () => {
         />
         <input
           type="password"
-          placeholder={t('Password') || 'Password'}
+          placeholder={t('Password')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="px-4 py-2 border rounded"
           required
         />
-        {error && <div className="text-red-600 text-sm">{error}</div>}
+        {error && <div className="text-destructive text-sm">{error}</div>}
         <button
           type="submit"
-          className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary-700 transition-colors"
           disabled={isLoading}
         >
           {isLoading ? t('Loading...') : t('nav.login')}

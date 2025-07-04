@@ -1,10 +1,25 @@
 {
   "nav": {
     "home": "الرئيسية",
+    "about": "حول",
+    "howitworks": "كيف يعمل",
+    "contact": "اتصل",
+    "faq": "الأسئلة الشائعة",
     "login": "تسجيل الدخول",
     "register": "إنشاء حساب"
   },
   "greeting": "مرحبًا بك في كرافت وركس!",
   "Profile": "الملف الشخصي",
-  "Logout": "تسجيل الخروج"
+  "Logout": "تسجيل الخروج",
+  "Email": "البريد الإلكتروني",
+  "Password": "كلمة المرور",
+  "Loading...": "جار التحميل...",
+  "Login failed": "فشل تسجيل الدخول",
+  "Registration failed": "فشل التسجيل",
+  "Full Name": "الاسم الكامل",
+  "Client": "عميل",
+  "Craftsman": "حرفي",
+  "Already have an account?": "هل لديك حساب بالفعل؟",
+  "Don't have an account?": "ليس لديك حساب؟",
+  "ProfilePage": "صفحة الملف الشخصي"
 }

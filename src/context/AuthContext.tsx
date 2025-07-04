@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -60,6 +61,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 
 const initialState: AuthState = {
   user: null,
+  token: null,
   isLoading: true,
   isAuthenticated: false,
 };
@@ -71,8 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initUser = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user') || 'null');
-        if (user) {
-          authService.setToken(user.token); // Assuming user object contains token
+        const token = localStorage.getItem('token');
+        if (user && token) {
+          authService.setToken(token);
           dispatch({ type: 'SET_USER', payload: user });
         } else {
           dispatch({ type: 'SET_USER', payload: null });

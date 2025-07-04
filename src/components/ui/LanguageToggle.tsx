@@ -1,22 +1,25 @@
 import { useTranslation } from 'react-i18next';
+import { Languages } from 'lucide-react';
 
 const LanguageToggle = () => {
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
 
   const toggleLanguage = () => {
-    i18n.changeLanguage(currentLang === 'en' ? 'ar' : 'en');
-    // Optionally, persist language selection
-    localStorage.setItem('lang', currentLang === 'en' ? 'ar' : 'en');
+    const newLang = currentLang === 'en' ? 'ar' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('lang', newLang);
+    document.dir = newLang === 'ar' ? 'rtl' : 'ltr';
   };
 
   return (
     <button
       onClick={toggleLanguage}
-      className="px-3 py-2 rounded transition-colors bg-secondary text-secondary-foreground ml-2"
+      className="p-2 rounded-md hover:bg-accent/20 transition-colors"
       aria-label="Toggle language"
+      title={`Switch to ${currentLang === 'en' ? 'Arabic' : 'English'}`}
     >
-      {currentLang === 'en' ? '🇬🇧 EN' : '🇸🇦 AR'}
+      <Languages size={18} />
     </button>
   );
 };

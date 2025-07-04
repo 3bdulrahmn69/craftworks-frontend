@@ -55,14 +55,12 @@ export const authService = {
     try {
       await api.post('/auth/logout');
     } catch (error) {
-      // Ignore errors during logout
       console.warn('Logout API call failed:', error);
     }
   },
 
   setToken(token: string) {
     localStorage.setItem('token', token);
-    // Update API default headers
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   },
 
@@ -72,7 +70,6 @@ export const authService = {
 
   clearToken() {
     localStorage.removeItem('token');
-    // Remove from API default headers
     delete api.defaults.headers.common['Authorization'];
   },
 

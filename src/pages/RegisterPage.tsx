@@ -11,11 +11,15 @@ const RegisterPage = () => {
     full_name: '',
     email: '',
     password: '',
+    phone: '',
+    country: '',
     role: 'client',
   });
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -24,7 +28,7 @@ const RegisterPage = () => {
     setError(null);
     try {
       await register({
-        name: form.full_name,
+        full_name: form.full_name,
         email: form.email,
         password: form.password,
         role: form.role as 'client' | 'craftsman',
@@ -36,13 +40,15 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-8 bg-white dark:bg-dark-card rounded shadow">
-      <h2 className="text-2xl font-bold mb-6 text-center">{t('nav.register')}</h2>
+    <div className="max-w-md mx-auto mt-16 p-8 bg-card rounded shadow">
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {t('nav.register')}
+      </h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           name="full_name"
           type="text"
-          placeholder={t('Full Name') || 'Full Name'}
+          placeholder={t('Full Name')}
           value={form.full_name}
           onChange={handleChange}
           className="px-4 py-2 border rounded"
@@ -51,7 +57,7 @@ const RegisterPage = () => {
         <input
           name="email"
           type="email"
-          placeholder={t('Email') || 'Email'}
+          placeholder={t('Email')}
           value={form.email}
           onChange={handleChange}
           className="px-4 py-2 border rounded"
@@ -60,7 +66,7 @@ const RegisterPage = () => {
         <input
           name="password"
           type="password"
-          placeholder={t('Password') || 'Password'}
+          placeholder={t('Password')}
           value={form.password}
           onChange={handleChange}
           className="px-4 py-2 border rounded"
@@ -72,20 +78,23 @@ const RegisterPage = () => {
           onChange={handleChange}
           className="px-4 py-2 border rounded"
         >
-          <option value="client">{t('Client') || 'Client'}</option>
-          <option value="craftsman">{t('Craftsman') || 'Craftsman'}</option>
+          <option value="client">{t('Client')}</option>
+          <option value="craftsman">{t('Craftsman')}</option>
         </select>
-        {error && <div className="text-red-600 text-sm">{error}</div>}
+        {error && <div className="text-destructive text-sm">{error}</div>}
         <button
           type="submit"
-          className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary-700 transition-colors"
           disabled={isLoading}
         >
           {isLoading ? t('Loading...') : t('nav.register')}
         </button>
       </form>
       <div className="mt-4 text-center text-sm">
-        {t('Already have an account?')} <Link to="/auth/login" className="text-primary underline">{t('nav.login')}</Link>
+        {t('Already have an account?')}{' '}
+        <Link to="/auth/login" className="text-primary underline">
+          {t('nav.login')}
+        </Link>
       </div>
     </div>
   );

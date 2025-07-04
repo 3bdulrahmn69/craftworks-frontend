@@ -1,10 +1,25 @@
 {
   "nav": {
     "home": "Home",
+    "about": "About",
+    "howitworks": "How it works",
+    "contact": "Contact",
+    "faq": "FAQ",
     "login": "Login",
     "register": "Register"
   },
   "greeting": "Welcome to Craftworks!",
   "Profile": "Profile",
-  "Logout": "Logout"
+  "Logout": "Logout",
+  "Email": "Email",
+  "Password": "Password",
+  "Loading...": "Loading...",
+  "Login failed": "Login failed",
+  "Registration failed": "Registration failed",
+  "Full Name": "Full Name",
+  "Client": "Client",
+  "Craftsman": "Craftsman",
+  "Already have an account?": "Already have an account?",
+  "Don't have an account?": "Don't have an account?",
+  "ProfilePage": "Profile Page"
 }
