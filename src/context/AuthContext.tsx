@@ -14,6 +14,8 @@ interface RegisterData {
   full_name: string;
   email: string;
   password: string;
+  phone: string;
+  country: string;
   role: 'client' | 'craftsman';
   clientId?: string;
 }
