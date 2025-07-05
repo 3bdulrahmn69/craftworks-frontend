@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 /* Pages */
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ThemedToastContainer from './components/ui/ThemedToastContainer';
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/auth/login" element={<LoginPage />} />
             <Route path="/auth/register" element={<RegisterPage />} />
           </Routes>

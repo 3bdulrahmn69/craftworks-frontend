@@ -97,6 +97,33 @@
   --z-modal: 1050;
   --z-popover: 1060;
   --z-tooltip: 1070;
+
+  /* Animation utilities */
+  --animate-fadeIn: fadeIn 0.2s ease-out;
+
+  --animate-fadeOut: fadeOut 0.2s ease-in;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+  }
 }
 
 /* Manual dark mode toggle class */
@@ -239,4 +266,17 @@ body {
 
 button {
   cursor: pointer;
+}
+
+/* Profile picture styles */
+.profile-picture {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Ensure images don't break layout */
+img {
+  max-width: 100%;
+  height: auto;
 }

@@ -9,7 +9,7 @@ import ThemeToggle from './ui/ThemeToggle';
 import LanguageToggle from './ui/LanguageToggle';
 import type { User } from '../types';
 import type { TFunction } from 'i18next';
-import { IoIosClose, IoIosLogOut, IoMdMenu } from 'react-icons/io';
+import { IoIosClose, IoMdMenu } from 'react-icons/io';
 
 interface NavLink {
   key: string;
@@ -50,18 +50,17 @@ function HeaderDesktop({
       </nav>
 
       {/* Right side actions */}
-      <div className="hidden md:flex items-center gap-2">
+      <div className="hidden md:flex items-center gap-3">
         <ThemeToggle />
         <LanguageToggle />
 
         <hr className="border-border/20 h-6 w-0.5 bg-accent mx-2" />
 
         {/* User menu or auth buttons */}
-
         {isAuthenticated ? (
           <UserMenu />
         ) : (
-          <div className="flex gap-2 ml-2">
+          <div className="flex gap-2">
             <Link to="/auth/login">
               <Button
                 variant="secondary"
@@ -84,14 +83,21 @@ function HeaderDesktop({
         )}
       </div>
 
-      {/* Mobile menu button */}
-      <button
-        className="md:hidden p-2 rounded-lg hover:bg-accent/50 text-foreground transition-all duration-200 hover:scale-105"
-        onClick={user?.toggleMobileMenu}
-        aria-label="Toggle menu"
-      >
-        {user?.mobileMenuOpen ? <IoIosClose /> : <IoMdMenu />}
-      </button>
+      {/* Mobile header actions */}
+      <div className="md:hidden flex items-center gap-2">
+        {isAuthenticated && <UserMenu />}
+        <button
+          className="p-2 rounded-lg hover:bg-accent/50 text-foreground transition-all duration-200 hover:scale-105"
+          onClick={user?.toggleMobileMenu}
+          aria-label="Toggle menu"
+        >
+          {user?.mobileMenuOpen ? (
+            <IoIosClose size={24} />
+          ) : (
+            <IoMdMenu size={24} />
+          )}
+        </button>
+      </div>
     </div>
   );
 }
@@ -110,8 +116,6 @@ function HeaderMobile({
   navLinks,
   isAuthenticated,
   t,
-  user,
-  logout,
   mobileMenuOpen,
   closeMobileMenu,
 }: HeaderMobileProps) {
@@ -167,42 +171,6 @@ function HeaderMobile({
                   ))}
                 </ul>
               </nav>
-
-              {/* User info if authenticated */}
-              {isAuthenticated && user && (
-                <div className="p-6 border-b border-border">
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center text-white font-semibold">
-                        {user.full_name?.charAt(0) ||
-                          user.email?.charAt(0) ||
-                          'U'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate">
-                          {user.full_name}
-                        </p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="inline-block px-2 py-1 text-xs bg-primary/20 text-primary rounded-full capitalize">
-                      {user.role}
-                    </span>
-                    <button
-                      onClick={() => {
-                        logout();
-                        closeMobileMenu();
-                      }}
-                      className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all duration-200"
-                    >
-                      <IoIosLogOut />
-                      {t('Logout')}
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* Auth buttons for mobile */}
               {!isAuthenticated && (

@@ -3,8 +3,7 @@ export interface User {
   full_name: string;
   email: string;
   role: 'client' | 'craftsman';
-  rating?: number;
-  rating_count?: number;
+  profile_image?: string;
 }
 
 export interface AuthResponse {
