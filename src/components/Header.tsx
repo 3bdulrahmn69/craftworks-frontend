@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import useAuth from '../hooks/useAuth';
 import Button from './ui/Button';
 import { useState } from 'react';
-import { Menu, X, LogOut } from 'lucide-react';
 import ThemeToggle from './ui/ThemeToggle';
 import LanguageToggle from './ui/LanguageToggle';
 import type { User } from '../types';
 import type { TFunction } from 'i18next';
+import { IoIosClose, IoIosLogOut, IoMdMenu } from 'react-icons/io';
 
 interface NavLink {
   key: string;
@@ -90,7 +90,7 @@ function HeaderDesktop({
         onClick={user?.toggleMobileMenu}
         aria-label="Toggle menu"
       >
-        {user?.mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        {user?.mobileMenuOpen ? <IoIosClose /> : <IoMdMenu />}
       </button>
     </div>
   );
@@ -140,7 +140,7 @@ function HeaderMobile({
                 onClick={closeMobileMenu}
                 className="p-2 rounded-lg hover:bg-accent/50 transition-all duration-200 hover:scale-105"
               >
-                <X size={22} />
+                <IoIosClose />
               </button>
             </div>
             {/* Content */}
@@ -197,7 +197,7 @@ function HeaderMobile({
                       }}
                       className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all duration-200"
                     >
-                      <LogOut size={18} />
+                      <IoIosLogOut />
                       {t('Logout')}
                     </button>
                   </div>

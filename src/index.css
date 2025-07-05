@@ -212,12 +212,6 @@ body {
   font-size: var(--font-size-base);
 }
 
-/* Selection styles */
-::selection {
-  background-color: var(--color-selection);
-  color: var(--color-foreground);
-}
-
 /* Focus styles */
 :focus-visible {
   outline: 2px solid var(--color-ring);

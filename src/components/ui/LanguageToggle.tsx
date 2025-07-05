@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Languages } from 'lucide-react';
+import { LuLanguages } from 'react-icons/lu';
 
 const LanguageToggle = () => {
   const { i18n } = useTranslation();
@@ -19,7 +19,7 @@ const LanguageToggle = () => {
       aria-label="Toggle language"
       title={`Switch to ${currentLang === 'en' ? 'Arabic' : 'English'}`}
     >
-      <Languages size={18} />
+      <LuLanguages size={18} />
     </button>
   );
 };

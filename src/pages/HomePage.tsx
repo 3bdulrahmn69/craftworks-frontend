@@ -1,13 +1,22 @@
 import Header from '../components/Header';
-import { useTranslation } from 'react-i18next';
+import Footer from '../components/Footer';
+import HeroSection from '../components/sections/HeroSection';
+import HowItWorksSection from '../components/sections/HowItWorksSection';
+import CategoriesSection from '../components/sections/CategoriesSection';
+import TestimonialsSection from '../components/sections/TestimonialsSection';
+import CTASection from '../components/sections/CTASection';
 
 const HomePage = () => {
-  const { t } = useTranslation();
   return (
-    <div>
+    <>
       <Header />
-      <h1 className="text-2xl font-bold mt-8 text-center">{t('greeting')}</h1>
-    </div>
+      <HeroSection />
+      <HowItWorksSection />
+      <CategoriesSection />
+      <TestimonialsSection />
+      <CTASection />
+      <Footer />
+    </>
   );
 };
 

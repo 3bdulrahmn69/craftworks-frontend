@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router';
 import useAuth from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/ui/Button';
-import { ArrowLeft, CheckCircle, User, Briefcase } from 'lucide-react';
+import { FaArrowLeft, FaBriefcase, FaUser } from 'react-icons/fa6';
 import {
   validateName,
   validateEmail,
@@ -11,6 +11,7 @@ import {
   validatePhone,
 } from '../utils/validation';
 import Input from '../components/ui/Input';
+import { FaCheckCircle } from 'react-icons/fa';
 
 const roles = [
   {
@@ -32,8 +33,27 @@ const RegisterPage = () => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language || 'en';
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<'client' | 'craftsman' | ''>('');
+
+  // Check for role parameter in URL
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam === 'client' || roleParam === 'craftsman') {
+      setRole(roleParam);
+      setForm((prev) => ({
+        ...prev,
+        role: roleParam,
+        full_name: '',
+        email: '',
+        phone: '',
+        password: '',
+        country: 'Egypt',
+      }));
+      setStep(2);
+    }
+  }, [searchParams]);
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -70,6 +90,9 @@ const RegisterPage = () => {
       country: 'Egypt',
       role: selectedRole,
     });
+
+    // Update URL with the selected role
+    setSearchParams({ role: selectedRole });
     setStep(2);
   };
 
@@ -202,9 +225,9 @@ const RegisterPage = () => {
                   >
                     <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex-shrink-0">
                       {r.value === 'client' ? (
-                        <User className="w-8 h-8 text-primary" />
+                        <FaUser className="w-8 h-8 text-primary" />
                       ) : (
-                        <Briefcase className="w-8 h-8 text-primary" />
+                        <FaBriefcase className="w-8 h-8 text-primary" />
                       )}
                     </div>
 
@@ -225,7 +248,7 @@ const RegisterPage = () => {
                       }`}
                     >
                       {role === r.value && (
-                        <CheckCircle className="w-4 h-4 text-primary-foreground" />
+                        <FaCheckCircle className="w-4 h-4 text-primary-foreground" />
                       )}
                     </div>
                   </button>
@@ -250,17 +273,20 @@ const RegisterPage = () => {
               <div className="flex items-center gap-4 mb-6">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => {
+                    setStep(1);
+                    setSearchParams({});
+                  }}
                   className="p-2 rounded-lg hover:bg-accent transition-colors"
                   aria-label="Go back"
                 >
                   {lang === 'en' ? (
-                    <ArrowLeft className="w-6 h-6 text-muted-foreground" />
+                    <FaArrowLeft className="w-6 h-6 text-muted-foreground" />
                   ) : (
-                    <ArrowLeft className="w-6 h-6 text-muted-foreground transform rotate-180" />
+                    <FaArrowLeft className="w-6 h-6 text-muted-foreground transform rotate-180" />
                   )}
                 </button>
-                <div>
+                <div className="flex-1">
                   <h2 className="text-2xl font-bold text-foreground">
                     {t('Complete Registration')}
                   </h2>
@@ -347,7 +373,7 @@ const RegisterPage = () => {
                     id="terms"
                     name="terms"
                     checked={termsAccepted}
-                    onChange={e => setTermsAccepted(e.target.checked)}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
                     className="h-4 w-4 text-primary border-border rounded focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                   />
                   <label

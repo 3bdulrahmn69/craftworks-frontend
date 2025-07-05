@@ -1,5 +1,5 @@
 import useTheme from '../../hooks/useTheme';
-import { Sun, Moon } from 'lucide-react';
+import { FaMoon, FaSun } from 'react-icons/fa6';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
@@ -10,7 +10,7 @@ const ThemeToggle = () => {
       aria-label="Toggle theme"
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
-      {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+      {theme === 'dark' ? <FaSun size={18} /> : <FaMoon size={18} />}
     </button>
   );
 };
