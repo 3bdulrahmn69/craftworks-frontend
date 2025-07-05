@@ -33,21 +33,23 @@ function HeaderDesktop({
 }: HeaderDesktopProps) {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <Logo />
+      <div className="flex items-center gap-8">
+        <Logo />
 
-      {/* Desktop Navigation */}
-      <nav className="hidden md:flex items-center space-x-2 flex-1 justify-center">
-        {navLinks.map((link) => (
-          <Link
-            key={link.key}
-            to={link.href}
-            className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-accent/50 text-foreground hover:scale-105 relative group"
-          >
-            {t(`nav.${link.key}`)}
-            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
-          </Link>
-        ))}
-      </nav>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-2">
+          {navLinks.map((link) => (
+            <Link
+              key={link.key}
+              to={link.href}
+              className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-accent/50 text-foreground hover:scale-105 relative group"
+            >
+              {t(`nav.${link.key}`)}
+              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+            </Link>
+          ))}
+        </nav>
+      </div>
 
       {/* Right side actions */}
       <div className="hidden md:flex items-center gap-3">

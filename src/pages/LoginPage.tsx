@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router';
 import useAuth from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/ui/Button';
-import { validateEmail, validatePassword } from '../utils/validation';
+import { validateEmail } from '../utils/validation';
 import Input from '../components/ui/Input';
 
 const LoginPage = () => {
@@ -13,17 +13,15 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' });
+  const [fieldErrors, setFieldErrors] = useState({ email: '' });
 
   const validateForm = () => {
     const emailResult = validateEmail(email);
-    const passwordResult = validatePassword(password);
     const errors = {
       email: emailResult.isValid ? '' : emailResult.message,
-      password: passwordResult.isValid ? '' : passwordResult.message,
     };
     setFieldErrors(errors);
-    return emailResult.isValid && passwordResult.isValid;
+    return emailResult.isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +32,8 @@ const LoginPage = () => {
       await login(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(err?.response?.data?.error || t('Login failed'));
+      console.error('Login error:', err);
+      setError(err?.response?.data?.message || t('Login failed'));
     }
   };
 
@@ -108,7 +107,6 @@ const LoginPage = () => {
                   setPassword(e.target.value);
                   setFieldErrors((prev) => ({ ...prev, password: '' }));
                 }}
-                error={fieldErrors.password}
                 showPasswordToggle
                 autoComplete="current-password"
                 required

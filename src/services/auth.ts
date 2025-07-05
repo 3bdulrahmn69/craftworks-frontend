@@ -6,7 +6,6 @@ interface RegisterData {
   email: string;
   password: string;
   role: 'client' | 'craftsman';
-  clientId?: string;
 }
 
 export const authService = {
@@ -49,14 +48,6 @@ export const authService = {
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     await api.post('/auth/reset-password', { token, newPassword });
-  },
-
-  async logout(): Promise<void> {
-    try {
-      await api.post('/auth/logout');
-    } catch (error) {
-      console.warn('Logout API call failed:', error);
-    }
   },
 
   setToken(token: string) {

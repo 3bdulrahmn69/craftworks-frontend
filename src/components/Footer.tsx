@@ -10,7 +10,8 @@ import { IoLogoAndroid } from 'react-icons/io';
 import { Link } from 'react-router';
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || 'en';
 
   const currentYear = new Date().getFullYear();
 
@@ -114,7 +115,11 @@ const Footer = () => {
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-all duration-200 flex items-center group"
                   >
-                    <FaArrowRight className="w-3 h-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                    <FaArrowRight
+                      className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                        lang === 'ar' ? 'rotate-180 ml-2' : 'mr-2'
+                      }`}
+                    />
                     {link.name}
                   </Link>
                 </li>
@@ -134,7 +139,11 @@ const Footer = () => {
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-all duration-200 flex items-center group"
                   >
-                    <FaArrowRight className="w-3 h-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                    <FaArrowRight
+                      className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                        lang === 'ar' ? 'rotate-180 ml-2' : 'mr-2'
+                      }`}
+                    />
                     {link.name}
                   </Link>
                 </li>
@@ -154,7 +163,11 @@ const Footer = () => {
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-all duration-200 flex items-center group"
                   >
-                    <FaArrowRight className="w-3 h-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                    <FaArrowRight
+                      className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                        lang === 'ar' ? 'rotate-180 ml-2' : 'mr-2'
+                      }`}
+                    />
                     {link.name}
                   </Link>
                 </li>
@@ -174,7 +187,11 @@ const Footer = () => {
                     to={link.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-all duration-200 flex items-center group"
                   >
-                    <FaArrowRight className="w-3 h-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                    <FaArrowRight
+                      className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                        lang === 'ar' ? 'rotate-180 ml-2' : 'mr-2'
+                      }`}
+                    />
                     {link.name}
                   </Link>
                 </li>

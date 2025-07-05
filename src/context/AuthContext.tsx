@@ -157,16 +157,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      authService.clearToken();
-      localStorage.removeItem('user');
-      dispatch({ type: 'LOGOUT' });
-      toast.success('Logged out successfully');
-    }
+    authService.clearToken();
+    localStorage.removeItem('user');
+    dispatch({ type: 'LOGOUT' });
+    toast.success('Logged out successfully');
   };
 
   const value: AuthContextType = {
