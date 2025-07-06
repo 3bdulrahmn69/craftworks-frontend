@@ -36,7 +36,6 @@
   --color-info: oklch(62% 0.19 255);
   --color-info-foreground: oklch(100% 0 0);
   --color-ring: oklch(62% 0.19 255);
-  --color-selection: oklch(90% 0.1 255);
 
   /* Gradients */
   --color-gradient-primary: linear-gradient(
@@ -162,7 +161,6 @@
   --color-info: oklch(72% 0.16 255);
   --color-info-foreground: oklch(22% 0.01 240);
   --color-ring: oklch(72% 0.16 255);
-  --color-selection: oklch(32% 0.1 255);
 
   /* Gradients */
   --color-gradient-primary: linear-gradient(
@@ -229,6 +227,11 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+html[lang='ar'] {
+  font-family: 'Cairo', sans-serif;
 }
 
 body {

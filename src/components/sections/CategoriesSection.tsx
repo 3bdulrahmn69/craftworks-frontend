@@ -1,37 +1,26 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Button from '../ui/Button';
 import Container from '../ui/Container';
+import { useQuery } from '@tanstack/react-query';
+import servicesService from '../../services/services';
+import type { Category } from '../../types';
 
 const CategoriesSection = () => {
   const { t } = useTranslation();
+  const {
+    data: categoriesData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['categories'],
+    queryFn: servicesService.getAllCategories,
+  });
 
-  const categories = [
-    {
-      icon: (
-        <svg
-          className="w-12 h-12"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
-        </svg>
-      ),
-      title: t('categories.electrician', 'Electrician'),
-      description: t(
-        'categories.electrician.description',
-        'Electrical installations, repairs, and maintenance'
-      ),
-      count: '150+',
-      color: 'blue',
-    },
-    {
-      icon: (
+  // Icon mapping for different category icons
+  const getCategoryIcon = (iconName: string) => {
+    const iconMap: { [key: string]: React.JSX.Element } = {
+      'hammer-icon': (
         <svg
           className="w-12 h-12"
           fill="none"
@@ -46,16 +35,7 @@ const CategoriesSection = () => {
           />
         </svg>
       ),
-      title: t('categories.carpenter', 'Carpenter'),
-      description: t(
-        'categories.carpenter.description',
-        'Woodwork, furniture, and construction'
-      ),
-      count: '120+',
-      color: 'amber',
-    },
-    {
-      icon: (
+      'faucet-icon': (
         <svg
           className="w-12 h-12"
           fill="none"
@@ -70,16 +50,22 @@ const CategoriesSection = () => {
           />
         </svg>
       ),
-      title: t('categories.plumber', 'Plumber'),
-      description: t(
-        'categories.plumber.description',
-        'Plumbing repairs and installations'
+      'lightbulb-icon': (
+        <svg
+          className="w-12 h-12"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          />
+        </svg>
       ),
-      count: '95+',
-      color: 'cyan',
-    },
-    {
-      icon: (
+      'paintbrush-icon': (
         <svg
           className="w-12 h-12"
           fill="none"
@@ -94,40 +80,7 @@ const CategoriesSection = () => {
           />
         </svg>
       ),
-      title: t('categories.painter', 'Painter'),
-      description: t(
-        'categories.painter.description',
-        'Interior and exterior painting services'
-      ),
-      count: '80+',
-      color: 'purple',
-    },
-    {
-      icon: (
-        <svg
-          className="w-12 h-12"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          />
-        </svg>
-      ),
-      title: t('categories.security', 'Security'),
-      description: t(
-        'categories.security.description',
-        'Security systems and installations'
-      ),
-      count: '45+',
-      color: 'red',
-    },
-    {
-      icon: (
+      'broom-icon': (
         <svg
           className="w-12 h-12"
           fill="none"
@@ -148,15 +101,36 @@ const CategoriesSection = () => {
           />
         </svg>
       ),
-      title: t('categories.cleaner', 'Cleaner'),
-      description: t(
-        'categories.cleaner.description',
-        'House cleaning and maintenance'
+      'leaf-icon': (
+        <svg
+          className="w-12 h-12"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"
+          />
+        </svg>
       ),
-      count: '200+',
-      color: 'green',
-    },
-  ];
+    };
+    return iconMap[iconName] || iconMap['hammer-icon']; // Default fallback
+  };
+
+  // Color mapping for different categories
+  const getCategoryColor = (index: number) => {
+    const colors = ['blue', 'amber', 'cyan', 'purple', 'green', 'red'];
+    return colors[index % colors.length];
+  };
 
   const getColorClasses = (color: string) => {
     const colorMap = {
@@ -172,6 +146,62 @@ const CategoriesSection = () => {
     };
     return colorMap[color as keyof typeof colorMap] || colorMap.blue;
   };
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-muted">
+        <Container>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              {t('categories.title', 'Popular Categories')}
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              {t(
+                'categories.subtitle',
+                'Browse craftsmen by category. Find the perfect professional for your specific needs.'
+              )}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {[...Array(6)].map((_, index) => (
+              <div
+                key={index}
+                className="bg-card rounded-xl p-6 shadow-lg border border-border animate-pulse"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-muted rounded-lg"></div>
+                  <div className="w-16 h-6 bg-muted rounded-full"></div>
+                </div>
+                <div className="h-6 bg-muted rounded mb-2"></div>
+                <div className="h-4 bg-muted rounded mb-4"></div>
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20 bg-muted">
+        <Container>
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              {t('categories.title', 'Popular Categories')}
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              {t(
+                'categories.error',
+                'Failed to load categories. Please try again later.'
+              )}
+            </p>
+          </div>
+        </Container>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-muted">
@@ -189,31 +219,56 @@ const CategoriesSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {categories.map((category, index) => (
+          {categoriesData?.map((category: Category, index: number) => (
             <div
-              key={index}
+              key={category.id}
               className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer group border border-border"
             >
               <div className="flex items-start justify-between mb-4">
                 <div
                   className={`p-3 rounded-lg ${getColorClasses(
-                    category.color
+                    getCategoryColor(index)
                   )}`}
                 >
-                  {category.icon}
+                  {getCategoryIcon(category.icon)}
                 </div>
                 <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                  {category.count}
+                  {category.subcategories?.length || 0}+
                 </span>
               </div>
 
               <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-                {category.title}
+                {category.name}
               </h3>
 
               <p className="text-muted-foreground mb-4">
                 {category.description}
               </p>
+
+              {category.subcategories && category.subcategories.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {t('categories.services', 'Services:')}
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {category.subcategories
+                      .slice(0, 3)
+                      .map((subcategory: string, subIndex: number) => (
+                        <span
+                          key={subIndex}
+                          className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
+                        >
+                          {subcategory}
+                        </span>
+                      ))}
+                    {category.subcategories.length > 3 && (
+                      <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
+                        +{category.subcategories.length - 3}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center text-sm text-primary font-medium">
                 {t('categories.browse', 'Browse craftsmen')}

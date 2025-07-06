@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Button from '../components/ui/Button';
 import { validateEmail } from '../utils/validation';
 import Input from '../components/ui/Input';
+import { FaHome } from 'react-icons/fa';
 
 const LoginPage = () => {
   const { login, isLoading } = useAuth();
@@ -38,7 +39,16 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 relative">
+      {/* Home Button */}
+      <button
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 z-50 p-3 bg-card/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-border/50 group"
+        aria-label={t('Go to home')}
+      >
+        <FaHome className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+      </button>
+
       <div className="w-full max-w-5xl bg-card rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row backdrop-blur-lg border border-border/50">
         {/* Illustration Section */}
         <div className="lg:w-1/2 flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/15 p-8 lg:p-12 relative overflow-hidden">

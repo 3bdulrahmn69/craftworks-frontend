@@ -18,10 +18,11 @@ const CTASection = () => {
         <div className="text-center space-y-8 mb-16">
           <div className="space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
-              {t('cta.title', 'Ready to Transform Your Experience?')}
+              Ready to Transform Your Experience?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              {t('cta.subtitle', 'Join thousands of satisfied clients and skilled craftsmen who are already part of our growing community. Whether you need quality work done or want to showcase your expertise, we\'ve got you covered.')}
+              Join thousands of satisfied clients and skilled craftsmen who are already part of our growing community. 
+              Whether you need quality work done or want to showcase your expertise, we've got you covered.
             </p>
           </div>
         </div>
@@ -36,23 +37,23 @@ const CTASection = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-card-foreground">{t('cta.forClients.title', 'For Clients')}</h3>
-                <p className="text-muted-foreground">{t('cta.forClients.subtitle', 'Find trusted professionals')}</p>
+                <h3 className="text-2xl font-bold text-card-foreground">For Clients</h3>
+                <p className="text-muted-foreground">Find trusted professionals</p>
               </div>
             </div>
             
             <div className="space-y-4 mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forClients.feature1', 'Access verified craftsmen with ratings')}</span>
+                <span className="text-card-foreground">Access verified craftsmen with ratings</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forClients.feature2', 'Get quotes and compare prices')}</span>
+                <span className="text-card-foreground">Get quotes and compare prices</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forClients.feature3', 'Secure payment and project tracking')}</span>
+                <span className="text-card-foreground">Secure payment and project tracking</span>
               </div>
             </div>
 
@@ -62,7 +63,7 @@ const CTASection = () => {
                 size="lg" 
                 className="w-full text-lg py-4"
               >
-                {t('cta.forClients.button', 'Find a Craftsman')}
+                Find a Craftsman
               </Button>
             </Link>
           </div>
@@ -77,23 +78,23 @@ const CTASection = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-card-foreground">{t('cta.forCraftsmen.title', 'For Craftsmen')}</h3>
-                <p className="text-muted-foreground">{t('cta.forCraftsmen.subtitle', 'Showcase your expertise')}</p>
+                <h3 className="text-2xl font-bold text-card-foreground">For Craftsmen</h3>
+                <p className="text-muted-foreground">Showcase your expertise</p>
               </div>
             </div>
             
             <div className="space-y-4 mb-6">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forCraftsmen.feature1', 'Create your professional profile')}</span>
+                <span className="text-card-foreground">Create your professional profile</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forCraftsmen.feature2', 'Connect with potential clients')}</span>
+                <span className="text-card-foreground">Connect with potential clients</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-card-foreground">{t('cta.forCraftsmen.feature3', 'Grow your business and reputation')}</span>
+                <span className="text-card-foreground">Grow your business and reputation</span>
               </div>
             </div>
 
@@ -103,7 +104,7 @@ const CTASection = () => {
                 size="lg" 
                 className="w-full text-lg py-4"
               >
-                {t('cta.forCraftsmen.button', 'Join as Craftsman')}
+                Join as Craftsman
               </Button>
             </Link>
           </div>
@@ -116,24 +117,24 @@ const CTASection = () => {
               <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{t('cta.trust.verifiedCraftsmen', '1000+ Verified Craftsmen')}</span>
+              <span>1000+ Verified Craftsmen</span>
             </div>
             <div className="flex items-center space-x-2">
               <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{t('cta.trust.completedProjects', '5000+ Completed Projects')}</span>
+              <span>5000+ Completed Projects</span>
             </div>
             <div className="flex items-center space-x-2">
               <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{t('cta.trust.averageRating', '4.8★ Average Rating')}</span>
+              <span>4.8★ Average Rating</span>
             </div>
           </div>
           
           <p className="text-sm text-muted-foreground">
-            {t('cta.trust.footer', 'Join our community today and experience the difference quality craftsmanship makes')}
+            Join our community today and experience the difference quality craftsmanship makes
           </p>
         </div>
       </Container>
