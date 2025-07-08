@@ -237,7 +237,6 @@ html[lang='ar'] {
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  transition: var(--transition-colors);
   font-feature-settings: 'rlig' 1, 'calt' 1;
   font-size: var(--font-size-base);
 }

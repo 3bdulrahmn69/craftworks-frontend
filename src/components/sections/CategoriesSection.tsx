@@ -184,23 +184,7 @@ const CategoriesSection = () => {
   }
 
   if (error) {
-    return (
-      <section className="py-20 bg-muted">
-        <Container>
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t('categories.title', 'Popular Categories')}
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              {t(
-                'categories.error',
-                'Failed to load categories. Please try again later.'
-              )}
-            </p>
-          </div>
-        </Container>
-      </section>
-    );
+    return null;
   }
 
   return (
