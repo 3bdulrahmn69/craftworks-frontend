@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import Button from '../../components/ui/button';
 import Input from '../../components/ui/input';
@@ -12,6 +13,7 @@ import { FaHome } from 'react-icons/fa';
 import Image from 'next/image';
 
 export default function LoginPage() {
+  const t = useTranslations('auth-pages.login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -58,7 +60,7 @@ export default function LoginPage() {
       <button
         onClick={() => router.push('/')}
         className="absolute top-6 left-6 z-50 p-3 bg-card/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-border/50 group"
-        aria-label="Go to home"
+        aria-label={t('goToHome')}
       >
         <FaHome className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
       </button>
@@ -85,10 +87,10 @@ export default function LoginPage() {
               />
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-              Welcome back!
+              {t('welcomeBack')}
             </h1>
             <p className="text-muted-foreground text-lg">
-              Sign in to your account to continue
+              {t('signInToContinue')}
             </p>
           </div>
         </div>
@@ -97,9 +99,9 @@ export default function LoginPage() {
         <div className="lg:w-1/2 w-full p-8 lg:p-12 flex flex-col justify-center">
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-2">Login</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h2>
               <p className="text-muted-foreground">
-                Enter your credentials to access your account
+                {t('subtitle')}
               </p>
             </div>
 
@@ -108,8 +110,8 @@ export default function LoginPage() {
               <Input
                 name="email"
                 type="email"
-                label="Email"
-                placeholder="Enter your email address"
+                label={t('email')}
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -124,8 +126,8 @@ export default function LoginPage() {
               <Input
                 name="password"
                 type="password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t('password')}
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -152,22 +154,22 @@ export default function LoginPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                    Signing in...
+                    {t('signingIn')}
                   </div>
                 ) : (
-                  'Login'
+                  t('loginButton')
                 )}
               </Button>
 
               {/* Register Link */}
               <div className="text-center pt-4">
                 <p className="text-sm text-muted-foreground">
-                  Don&apos;t have an account?{' '}
+                  {t('noAccount')}{' '}
                   <Link
                     href="/auth/register"
                     className="text-primary hover:text-primary/80 font-semibold transition-colors"
                   >
-                    Register
+                    {t('registerLink')}
                   </Link>
                 </p>
               </div>

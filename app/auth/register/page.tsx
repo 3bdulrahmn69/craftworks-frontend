@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
+import { useLocale, useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import Button from '../../components/ui/button';
 import Input from '../../components/ui/input';
@@ -23,24 +24,27 @@ import {
 } from 'react-icons/fa';
 import Image from 'next/image';
 
-const roles = [
-  {
-    value: 'client',
-    label: 'Client',
-    illustration: '/illustration/Team work-cuate.svg',
-    desc: 'I want to hire skilled craftsmen for my projects.',
-  },
-  {
-    value: 'craftsman',
-    label: 'Craftsman',
-    illustration: '/illustration/Construction worker-pana.svg',
-    desc: 'I am a craftsman looking for new opportunities.',
-  },
-];
-
 export default function RegisterPage() {
+  const t = useTranslations('auth-pages.register');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
+
+  const roles = [
+    {
+      value: 'client',
+      label: t('roles.client.label'),
+      illustration: '/illustration/Team work-cuate.svg',
+      desc: t('roles.client.description'),
+    },
+    {
+      value: 'craftsman',
+      label: t('roles.craftsman.label'),
+      illustration: '/illustration/Construction worker-pana.svg',
+      desc: t('roles.craftsman.description'),
+    },
+  ];
+
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<'client' | 'craftsman' | ''>('');
   const [form, setForm] = useState({
@@ -155,8 +159,9 @@ export default function RegisterPage() {
       const response = await authAPI.register({
         full_name: form.full_name,
         email: form.email,
+        phone: form.phone,
         password: form.password,
-        confirm_password: form.confirm_password,
+        role: form.role,
       });
       tokenUtils.setToken(response.token);
       tokenUtils.setUserData(response.user);
@@ -181,8 +186,8 @@ export default function RegisterPage() {
   };
 
   const getCurrentTitle = () => {
-    if (step === 1) return 'Choose your role';
-    return role === 'client' ? 'Join as Client' : 'Join as Craftsman';
+    if (step === 1) return t('chooseRole');
+    return role === 'client' ? t('joinAsClient') : t('joinAsCraftsman');
   };
 
   return (
@@ -191,7 +196,7 @@ export default function RegisterPage() {
       <button
         onClick={() => router.push('/')}
         className="absolute top-6 left-6 z-50 p-3 bg-card/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-border/50 group"
-        aria-label="Go to home"
+        aria-label={t('goToHome')}
       >
         <FaHome className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
       </button>
@@ -222,14 +227,12 @@ export default function RegisterPage() {
             </h1>
             {step === 1 && (
               <p className="text-muted-foreground text-lg">
-                Select your role to get started
+                {t('selectRoleToStart')}
               </p>
             )}
             {step === 2 && (
               <p className="text-muted-foreground">
-                {role === 'client'
-                  ? 'Connect with skilled craftsmen for your projects'
-                  : 'Showcase your skills and find new opportunities'}
+                {role === 'client' ? t('clientDesc') : t('craftsmanDesc')}
               </p>
             )}
           </div>
@@ -242,11 +245,9 @@ export default function RegisterPage() {
             <div className="space-y-8">
               <div className="text-center">
                 <h2 className="text-3xl font-bold text-foreground mb-2">
-                  Get Started
+                  {t('title')}
                 </h2>
-                <p className="text-muted-foreground">
-                  Choose how you want to use our platform
-                </p>
+                <p className="text-muted-foreground">{t('subtitle')}</p>
               </div>
 
               <div className="space-y-4">
@@ -271,7 +272,11 @@ export default function RegisterPage() {
                       )}
                     </div>
 
-                    <div className="flex-1 text-left min-h-0">
+                    <div
+                      className={`flex-1 ${
+                        locale === 'ar' ? 'text-right' : 'text-left'
+                      } min-h-0`}
+                    >
                       <div className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
                         {r.label}
                       </div>
@@ -297,12 +302,12 @@ export default function RegisterPage() {
 
               <div className="text-center pt-4">
                 <p className="text-sm text-muted-foreground">
-                  Already have an account?{' '}
+                  {t('alreadyHaveAccount')}{' '}
                   <Link
                     href="/auth/login"
                     className="text-primary hover:text-primary/80 font-semibold transition-colors"
                   >
-                    Login
+                    {t('loginLink')}
                   </Link>
                 </p>
               </div>
@@ -315,17 +320,19 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setStep(1)}
                   className="p-2 rounded-lg hover:bg-accent transition-colors"
-                  aria-label="Go back"
+                  aria-label={t('goBack')}
                 >
-                  <FaArrowLeft className="w-6 h-6 text-muted-foreground" />
+                  <FaArrowLeft
+                    className={`w-6 h-6 text-muted-foreground ${
+                      locale === 'ar' ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-foreground">
-                    Complete Registration
+                    {t('completeRegistration')}
                   </h2>
-                  <p className="text-muted-foreground">
-                    Fill in your details to create your account
-                  </p>
+                  <p className="text-muted-foreground">{t('fillDetails')}</p>
                 </div>
               </div>
 
@@ -334,8 +341,8 @@ export default function RegisterPage() {
                 <Input
                   name="full_name"
                   type="text"
-                  label="Full Name"
-                  placeholder="Enter your full name"
+                  label={t('fullName')}
+                  placeholder={t('fullNamePlaceholder')}
                   value={form.full_name}
                   onChange={handleChange}
                   error={fieldErrors.full_name}
@@ -346,8 +353,8 @@ export default function RegisterPage() {
                 <Input
                   name="email"
                   type="email"
-                  label="Email"
-                  placeholder="Enter your email address"
+                  label={t('email')}
+                  placeholder={t('emailPlaceholder')}
                   value={form.email}
                   onChange={handleChange}
                   error={fieldErrors.email}
@@ -357,9 +364,9 @@ export default function RegisterPage() {
                 {/* Phone Field */}
                 <Input
                   name="phone"
-                  type="tel"
-                  label="Phone"
-                  placeholder="Enter your phone number"
+                  type="text"
+                  label={t('phone')}
+                  placeholder={t('phonePlaceholder')}
                   value={form.phone}
                   onChange={handleChange}
                   error={fieldErrors.phone}
@@ -370,8 +377,8 @@ export default function RegisterPage() {
                 <Input
                   name="password"
                   type="password"
-                  label="Password"
-                  placeholder="Create a strong password"
+                  label={t('password')}
+                  placeholder={t('passwordPlaceholder')}
                   value={form.password}
                   onChange={handleChange}
                   error={fieldErrors.password}
@@ -383,8 +390,8 @@ export default function RegisterPage() {
                 <Input
                   name="confirm_password"
                   type="password"
-                  label="Confirm Password"
-                  placeholder="Confirm your password"
+                  label={t('confirmPassword')}
+                  placeholder={t('confirmPasswordPlaceholder')}
                   value={form.confirm_password}
                   onChange={handleChange}
                   error={fieldErrors.confirm_password}
@@ -395,18 +402,22 @@ export default function RegisterPage() {
                 {/* Country Field */}
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-foreground block mb-1">
-                    Country
+                    {t('country')}
                   </label>
                   <div className="flex items-center gap-3 px-4 py-3 rounded-xl border bg-muted text-muted-foreground border-border cursor-not-allowed select-none relative">
                     <span className="font-semibold text-foreground">
-                      {form.country}
+                      {locale === 'ar' ? 'مصر' : 'Egypt'}
                     </span>
-                    <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                      Default
+                    <span
+                      className={`text-xs bg-primary/10 text-primary px-2 py-1 rounded-full ${
+                        locale === 'ar' ? 'mr-auto' : 'ml-auto'
+                      }`}
+                    >
+                      {t('default')}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Currently supported country. More countries coming soon!
+                    {t('supportedCountry')}
                   </p>
                 </div>
 
@@ -424,12 +435,12 @@ export default function RegisterPage() {
                     htmlFor="terms"
                     className="text-sm text-muted-foreground cursor-pointer"
                   >
-                    I agree to the{' '}
+                    {t('termsAgreement')}{' '}
                     <Link
                       href="/terms"
                       className="text-primary hover:text-primary/80 font-semibold transition-colors"
                     >
-                      Terms and Conditions
+                      {t('termsLink')}
                     </Link>
                   </label>
                 </div>
@@ -453,22 +464,22 @@ export default function RegisterPage() {
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                      Creating Account...
+                      {t('creatingAccount')}
                     </div>
                   ) : (
-                    'Create Account'
+                    t('createAccount')
                   )}
                 </Button>
 
                 {/* Login Link */}
                 <div className="text-center pt-4">
                   <p className="text-sm text-muted-foreground">
-                    Already have an account?{' '}
+                    {t('alreadyHaveAccount')}{' '}
                     <Link
                       href="/auth/login"
                       className="text-primary hover:text-primary/80 font-semibold transition-colors"
                     >
-                      Login
+                      {t('loginLink')}
                     </Link>
                   </p>
                 </div>

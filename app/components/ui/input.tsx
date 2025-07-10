@@ -1,6 +1,9 @@
+'use client'
+
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa6';
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import { useLocale } from 'next-intl';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -23,6 +26,8 @@ const Input = ({
       ? 'text'
       : 'password'
     : type;
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
 
   return (
     <div className="space-y-2 w-full">
@@ -33,12 +38,16 @@ const Input = ({
       )}
       <div className="relative flex items-center">
         {icon && (
-          <span className="absolute left-3 text-muted-foreground">{icon}</span>
+          <span className={`absolute text-muted-foreground ${
+            isRTL ? 'right-3' : 'left-3'
+          }`}>
+            {icon}
+          </span>
         )}
         <input
           type={inputType}
           className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/30 bg-background text-foreground transition-all duration-200 ${
-            icon ? 'pl-10' : ''
+            icon ? (isRTL ? 'pr-10' : 'pl-10') : ''
           } ${
             error
               ? 'border-destructive focus:border-destructive'
@@ -51,7 +60,9 @@ const Input = ({
             type="button"
             tabIndex={-1}
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className={`absolute top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${
+              isRTL ? 'left-3' : 'right-3'
+            }`}
           >
             {showPassword ? (
               <FaEyeSlash className="w-5 h-5" />

@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from './api';
 
 export interface LoginCredentials {
   email: string;
@@ -8,8 +8,9 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
   full_name: string;
   email: string;
+  phone: string;
   password: string;
-  confirm_password: string;
+  role: string;
 }
 
 export interface AuthResponse {
@@ -25,7 +26,10 @@ export interface AuthResponse {
 export const authAPI = {
   // Login user
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post('/auth/login', {
+      ...credentials,
+      type: 'clients', // Assuming 'clients' is the default type for the website login
+    });
     return response.data;
   },
 
@@ -38,7 +42,7 @@ export const authAPI = {
   // Logout user
   async logout(): Promise<void> {
     try {
-      await api.post('/api/auth/logout');
+      await api.post('/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -52,13 +56,15 @@ export const authAPI = {
 
   // Get current user profile
   async getProfile(): Promise<AuthResponse['user']> {
-    const response = await api.get('/api/auth/profile');
+    const response = await api.get('/auth/profile');
     return response.data;
   },
 
   // Update user profile
-  async updateProfile(data: Partial<AuthResponse['user']>): Promise<AuthResponse['user']> {
-    const response = await api.put('/api/auth/profile', data);
+  async updateProfile(
+    data: Partial<AuthResponse['user']>
+  ): Promise<AuthResponse['user']> {
+    const response = await api.put('/auth/profile', data);
     return response.data;
   },
 };
@@ -108,4 +114,4 @@ export const tokenUtils = {
     this.removeToken();
     this.removeUserData();
   },
-}; 
+};

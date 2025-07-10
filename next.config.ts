@@ -4,7 +4,14 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const nextIntlConfig = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'randomuser.me',
+      },
+    ],
+  },
 };
 
 export default nextIntlConfig(nextConfig);

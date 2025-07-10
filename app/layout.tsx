@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { Roboto, Cairo } from 'next/font/google';
 import Providers from './providers';
 import './globals.css';
+import ThemeToastContainer from './components/ui/theme-toast-container';
 
 const roboto = Roboto({
   variable: '--font-roboto',
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <Providers>
+              <ThemeToastContainer />
               {children}
             </Providers>
           </ThemeProvider>
