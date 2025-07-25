@@ -37,11 +37,15 @@ export const useAuth = () => {
 
     // Helper functions
     getUserRole: () => user?.role || localUserData?.role,
-    getUserName: () => user?.name || localUserData?.full_name,
-    getUserEmail: () => user?.email,
+    getUserName: () => user?.name || localUserData?.fullName,
+    getUserEmail: () => user?.email || localUserData?.email,
     getUserId: () => user?.id || localUserData?.id,
     getUserProfileImage: (): string =>
-      user?.profile_image || (localUserData?.profile_image as string),
+      user?.profile_image || localUserData?.profilePicture || '',
+    getUserPhone: () => localUserData?.phone,
+    getUserAddress: () => localUserData?.address,
+    getUserRating: () => localUserData?.rating,
+    getUserRatingCount: () => localUserData?.ratingCount,
 
     // Check if user has specific role
     hasRole: (role: string) => {

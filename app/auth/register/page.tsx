@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import Button from '../../components/ui/button';
-import Input from '../../components/ui/input';
+import Input from '../../components/auth/input';
 import {
   validateName,
   validateEmail,
@@ -48,7 +48,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [role, setRole] = useState<'client' | 'craftsman' | ''>('');
   const [form, setForm] = useState({
-    full_name: '',
+    fullName: '',
     email: '',
     phone: '',
     password: '',
@@ -58,7 +58,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState({
-    full_name: '',
+    fullName: '',
     email: '',
     phone: '',
     password: '',
@@ -75,7 +75,7 @@ export default function RegisterPage() {
       setForm((prev) => ({
         ...prev,
         role: roleParam,
-        full_name: '',
+        fullName: '',
         email: '',
         phone: '',
         password: '',
@@ -91,7 +91,7 @@ export default function RegisterPage() {
     setForm((prev) => ({ ...prev, role: selectedRole }));
     setError(null);
     setFieldErrors({
-      full_name: '',
+      fullName: '',
       email: '',
       phone: '',
       password: '',
@@ -99,7 +99,7 @@ export default function RegisterPage() {
     });
     setForm({
       ...form,
-      full_name: '',
+      fullName: '',
       email: '',
       phone: '',
       password: '',
@@ -118,7 +118,7 @@ export default function RegisterPage() {
   };
 
   const validateForm = () => {
-    const nameResult = validateName(form.full_name);
+    const nameResult = validateName(form.fullName);
     const emailResult = validateEmail(form.email);
     const passwordResult = validatePassword(form.password);
     const confirmPasswordResult = validatePasswordMatch(
@@ -127,7 +127,7 @@ export default function RegisterPage() {
     );
     const phoneResult = validatePhone(form.phone);
     const errors = {
-      full_name: nameResult.isValid ? '' : nameResult.message,
+      fullName: nameResult.isValid ? '' : nameResult.message,
       email: emailResult.isValid ? '' : emailResult.message,
       password: passwordResult.isValid ? '' : passwordResult.message,
       confirm_password: confirmPasswordResult.isValid
@@ -157,7 +157,7 @@ export default function RegisterPage() {
     try {
       // Register with backend
       const response = await authAPI.register({
-        full_name: form.full_name,
+        fullName: form.fullName,
         email: form.email,
         phone: form.phone,
         password: form.password,
@@ -339,13 +339,13 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Full Name Field */}
                 <Input
-                  name="full_name"
+                  name="fullName"
                   type="text"
                   label={t('fullName')}
                   placeholder={t('fullNamePlaceholder')}
-                  value={form.full_name}
+                  value={form.fullName}
                   onChange={handleChange}
-                  error={fieldErrors.full_name}
+                  error={fieldErrors.fullName}
                   autoComplete="name"
                 />
 

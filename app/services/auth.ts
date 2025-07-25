@@ -1,4 +1,5 @@
 import { api } from './api';
+import { ApiResponse, User } from '../types/user';
 
 export interface LoginCredentials {
   email: string;
@@ -6,7 +7,7 @@ export interface LoginCredentials {
 }
 
 export interface RegisterCredentials {
-  full_name: string;
+  fullName: string;
   email: string;
   phone: string;
   password: string;
@@ -15,28 +16,26 @@ export interface RegisterCredentials {
 
 export interface AuthResponse {
   token: string;
-  user: {
-    id: string;
-    full_name: string;
-    role: string;
-    profile_image: string;
-  };
+  user: User;
 }
 
 export const authAPI = {
   // Login user
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/login', {
+    const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', {
       ...credentials,
-      type: 'clients', // Assuming 'clients' is the default type for the website login
+      type: 'public', // Assuming 'public' is the default type for the website login
     });
-    return response.data;
+    return response.data.data;
   },
 
   // Register user
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/register', credentials);
-    return response.data;
+    const response = await api.post<ApiResponse<AuthResponse>>(
+      '/auth/register',
+      credentials
+    );
+    return response.data.data;
   },
 
   // Logout user
@@ -55,17 +54,15 @@ export const authAPI = {
   },
 
   // Get current user profile
-  async getProfile(): Promise<AuthResponse['user']> {
-    const response = await api.get('/auth/profile');
-    return response.data;
+  async getProfile(): Promise<User> {
+    const response = await api.get<ApiResponse<User>>('/auth/profile');
+    return response.data.data;
   },
 
   // Update user profile
-  async updateProfile(
-    data: Partial<AuthResponse['user']>
-  ): Promise<AuthResponse['user']> {
-    const response = await api.put('/auth/profile', data);
-    return response.data;
+  async updateProfile(data: Partial<User>): Promise<User> {
+    const response = await api.put<ApiResponse<User>>('/auth/profile', data);
+    return response.data.data;
   },
 };
 
@@ -90,13 +87,13 @@ export const tokenUtils = {
     }
   },
 
-  setUserData(user: AuthResponse['user']) {
+  setUserData(user: User) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('user-data', JSON.stringify(user));
     }
   },
 
-  getUserData(): AuthResponse['user'] | null {
+  getUserData(): User | null {
     if (typeof window !== 'undefined') {
       const data = localStorage.getItem('user-data');
       return data ? JSON.parse(data) : null;

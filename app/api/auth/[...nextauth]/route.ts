@@ -15,24 +15,31 @@ const handler = NextAuth({
         try {
           // Make a request to your Node.js backend to authenticate
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/login`,
+            `${
+              process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+            }/auth/login`,
             {
               email: credentials?.email,
               password: credentials?.password,
-              type: 'clients',
+              type: 'public', // Assuming 'public' is the default type for the website login
             }
           );
 
-          const { token, user } = response.data;
+          const responseData = response.data;
 
-          if (user && token) {
+          if (
+            responseData.success &&
+            responseData.data.token &&
+            responseData.data.user
+          ) {
+            const { token, user } = responseData.data;
             // Return user object with token to be stored in JWT
             return {
               id: user.id,
               email: user.email,
-              name: user.full_name,
+              name: user.fullName,
               role: user.role,
-              profile_image: user.profile_image,
+              profile_image: user.profilePicture,
               token: token,
             };
           } else {

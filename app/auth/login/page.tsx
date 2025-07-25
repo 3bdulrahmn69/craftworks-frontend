@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import Button from '../../components/ui/button';
-import Input from '../../components/ui/input';
+import Input from '../../components/auth/input';
 import { validateEmail } from '../../utils/validation';
 import { FaHome } from 'react-icons/fa';
 import Image from 'next/image';
@@ -99,10 +99,10 @@ export default function LoginPage() {
         <div className="lg:w-1/2 w-full p-8 lg:p-12 flex flex-col justify-center">
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h2>
-              <p className="text-muted-foreground">
-                {t('subtitle')}
-              </p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">
+                {t('title')}
+              </h2>
+              <p className="text-muted-foreground">{t('subtitle')}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
