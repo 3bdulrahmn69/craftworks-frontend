@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 
@@ -192,16 +192,19 @@ const Header = () => {
   const t = useTranslations('header');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { key: 'home', href: '/' },
-    { key: 'about', href: '/about' },
-    { key: 'howitworks', href: '/how-it-works' },
-    { key: 'contact', href: '/contact' },
-    { key: 'faq', href: '/faq' },
-  ];
+  const navLinks = useMemo(
+    () => [
+      { key: 'home', href: '/' },
+      { key: 'about', href: '/about' },
+      { key: 'howitworks', href: '/how-it-works' },
+      { key: 'contact', href: '/contact' },
+      { key: 'faq', href: '/faq' },
+    ],
+    []
+  );
 
-  const closeMobileMenu = () => setMobileMenuOpen(false);
-  const toggleMobileMenu = () => setMobileMenuOpen((v) => !v);
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+  const toggleMobileMenu = useCallback(() => setMobileMenuOpen((v) => !v), []);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-card/80 border-b border-border transition-all duration-300 backdrop-blur-lg supports-[backdrop-filter]:bg-card/60">

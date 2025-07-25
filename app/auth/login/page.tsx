@@ -5,32 +5,53 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { loginWithNextAuth } from '../../services/session';
-import Button from '../../components/ui/button';
+import PrimaryButton from '../../components/ui/primary-button';
+import AuthLayout from '../../components/auth/auth-layout';
+import ErrorMessage from '../../components/ui/error-message';
 import Input from '../../components/auth/input';
-import { validateEmail } from '../../utils/validation';
-import { FaHome } from 'react-icons/fa';
-import Image from 'next/image';
+import PhoneInput from '../../components/auth/phone-input';
+import { validateEmail, validatePhone } from '../../utils/validation';
 
 export default function LoginPage() {
   const t = useTranslations('auth-pages.login');
+  const [loginType, setLoginType] = useState<'email' | 'phone'>('email');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({ email: '' });
+  const [fieldErrors, setFieldErrors] = useState({
+    email: '',
+    phone: '',
+  });
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    // Only validate email
-    const emailResult = validateEmail(email);
-    setFieldErrors({ email: emailResult.isValid ? '' : emailResult.message });
-    if (!emailResult.isValid) return;
+
+    // Validate based on login type
+    let isValid = true;
+    const newFieldErrors = { email: '', phone: '' };
+
+    if (loginType === 'email') {
+      const emailResult = validateEmail(email);
+      newFieldErrors.email = emailResult.isValid ? '' : emailResult.message;
+      isValid = emailResult.isValid;
+    } else {
+      const phoneResult = validatePhone(phone);
+      newFieldErrors.phone = phoneResult.isValid ? '' : phoneResult.message;
+      isValid = phoneResult.isValid;
+    }
+
+    setFieldErrors(newFieldErrors);
+    if (!isValid) return;
+
     setIsLoading(true);
     try {
-      // Use the new helper function for login
-      const result = await loginWithNextAuth(email, password);
+      // Use email or phone for login
+      const identifier = loginType === 'email' ? email : phone;
+      const result = await loginWithNextAuth(identifier, password, loginType);
 
       if (result.success) {
         router.push('/');
@@ -45,128 +66,121 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 relative">
-      {/* Home Button */}
-      <button
-        onClick={() => router.push('/')}
-        className="absolute top-6 left-6 z-50 p-3 bg-card/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-border/50 group"
-        aria-label={t('goToHome')}
-      >
-        <FaHome className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
-      </button>
+    <AuthLayout
+      illustration="/illustration/Team work-cuate.svg"
+      illustrationAlt="Login illustration"
+      welcomeTitle={t('welcomeBack')}
+      welcomeSubtitle={t('signInToContinue')}
+      homeButtonLabel={t('goToHome')}
+    >
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
+            {t('title')}
+          </h2>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
+        </div>
 
-      <div className="w-full max-w-5xl bg-card rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row backdrop-blur-lg border border-border/50">
-        {/* Illustration Section */}
-        <div className="lg:w-1/2 flex flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/15 p-8 lg:p-12 relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-primary rounded-full"></div>
-            <div className="absolute bottom-20 right-15 w-16 h-16 bg-secondary rounded-full"></div>
-            <div className="absolute top-1/2 right-10 w-12 h-12 bg-primary/50 rounded-full"></div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Login Type Toggle */}
+          <div className="flex items-center justify-center space-x-1 bg-muted rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => setLoginType('email')}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                loginType === 'email'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('email')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginType('phone')}
+              className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                loginType === 'phone'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('phone')}
+            </button>
           </div>
 
-          <div className="relative z-10 text-center">
-            <div className="w-64 h-64 lg:w-80 lg:h-80 flex items-center justify-center mb-6">
-              <Image
-                width={320}
-                height={320}
-                src="/illustration/Team work-cuate.svg"
-                alt="Login illustration"
-                className="w-full h-full object-contain drop-shadow-2xl"
-                loading="lazy"
-              />
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-              {t('welcomeBack')}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {t('signInToContinue')}
+          {/* Email or Phone Field */}
+          {loginType === 'email' ? (
+            <Input
+              name="email"
+              type="email"
+              label={t('email')}
+              placeholder={t('emailPlaceholder')}
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, email: '' }));
+              }}
+              error={fieldErrors.email}
+              autoComplete="email"
+              required
+            />
+          ) : (
+            <PhoneInput
+              name="phone"
+              label={t('phone')}
+              placeholder={t('phonePlaceholder')}
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, phone: '' }));
+              }}
+              error={fieldErrors.phone}
+              countryCode="+20"
+              required
+            />
+          )}
+
+          {/* Password Field */}
+          <Input
+            name="password"
+            type="password"
+            label={t('password')}
+            placeholder={t('passwordPlaceholder')}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+            showPasswordToggle
+          />
+
+          {/* Error Message */}
+          <ErrorMessage message={error} />
+
+          {/* Submit Button */}
+          <PrimaryButton
+            type="submit"
+            size="lg"
+            isLoading={isLoading}
+            loadingText={t('signingIn')}
+            disabled={isLoading}
+          >
+            {t('loginButton')}
+          </PrimaryButton>
+
+          {/* Register Link */}
+          <div className="text-center pt-4">
+            <p className="text-sm text-muted-foreground">
+              {t('noAccount')}{' '}
+              <Link
+                href="/auth/register"
+                className="text-primary hover:text-primary/80 font-semibold transition-colors"
+              >
+                {t('registerLink')}
+              </Link>
             </p>
           </div>
-        </div>
-
-        {/* Form Section */}
-        <div className="lg:w-1/2 w-full p-8 lg:p-12 flex flex-col justify-center">
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-2">
-                {t('title')}
-              </h2>
-              <p className="text-muted-foreground">{t('subtitle')}</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email Field */}
-              <Input
-                name="email"
-                type="email"
-                label={t('email')}
-                placeholder={t('emailPlaceholder')}
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, email: '' }));
-                }}
-                error={fieldErrors.email}
-                autoComplete="email"
-                required
-              />
-
-              {/* Password Field */}
-              <Input
-                name="password"
-                type="password"
-                label={t('password')}
-                placeholder={t('passwordPlaceholder')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-                showPasswordToggle
-              />
-
-              {/* Error Message */}
-              {error && (
-                <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
-                  <p className="text-destructive text-sm font-medium">
-                    {error}
-                  </p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-gradient-to-r from-primary to-primary-600 text-primary-foreground py-4 rounded-xl hover:from-primary-600 hover:to-primary-700 focus:ring-4 focus:ring-primary/20 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                    {t('signingIn')}
-                  </div>
-                ) : (
-                  t('loginButton')
-                )}
-              </Button>
-
-              {/* Register Link */}
-              <div className="text-center pt-4">
-                <p className="text-sm text-muted-foreground">
-                  {t('noAccount')}{' '}
-                  <Link
-                    href="/auth/register"
-                    className="text-primary hover:text-primary/80 font-semibold transition-colors"
-                  >
-                    {t('registerLink')}
-                  </Link>
-                </p>
-              </div>
-            </form>
-          </div>
-        </div>
+        </form>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

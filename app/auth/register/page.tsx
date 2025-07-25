@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import { createSessionFromAuthData } from '../../services/session';
-import Button from '../../components/ui/button';
+import PrimaryButton from '../../components/ui/primary-button';
+import HomeButton from '../../components/ui/home-button';
+import ErrorMessage from '../../components/ui/error-message';
 import Input from '../../components/auth/input';
 import {
   validateName,
@@ -19,7 +21,6 @@ import {
   FaArrowLeft,
   FaBriefcase,
   FaUser,
-  FaHome,
   FaCheckCircle,
 } from 'react-icons/fa';
 import Image from 'next/image';
@@ -88,7 +89,6 @@ export default function RegisterPage() {
 
   const handleRoleSelect = (selectedRole: 'client' | 'craftsman') => {
     setRole(selectedRole);
-    setForm((prev) => ({ ...prev, role: selectedRole }));
     setError(null);
     setFieldErrors({
       fullName: '',
@@ -98,7 +98,6 @@ export default function RegisterPage() {
       confirm_password: '',
     });
     setForm({
-      ...form,
       fullName: '',
       email: '',
       phone: '',
@@ -195,13 +194,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 relative">
       {/* Home Button */}
-      <button
-        onClick={() => router.push('/')}
-        className="absolute top-6 left-6 z-50 p-3 bg-card/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-border/50 group"
-        aria-label={t('goToHome')}
-      >
-        <FaHome className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
-      </button>
+      <HomeButton label={t('goToHome')} />
 
       <div className="w-full max-w-5xl bg-card rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row backdrop-blur-lg border border-border/50">
         {/* Illustration Section */}
@@ -448,30 +441,18 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Error Message */}
-                {error && (
-                  <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20">
-                    <p className="text-destructive text-sm font-medium">
-                      {error}
-                    </p>
-                  </div>
-                )}
+                <ErrorMessage message={error} />
 
                 {/* Submit Button */}
-                <Button
+                <PrimaryButton
                   type="submit"
                   size="lg"
-                  className="w-full bg-gradient-to-r from-primary to-primary-600 text-primary-foreground py-4 rounded-xl hover:from-primary-600 hover:to-primary-700 focus:ring-4 focus:ring-primary/20 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  isLoading={isLoading}
+                  loadingText={t('creatingAccount')}
                   disabled={isLoading}
                 >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                      {t('creatingAccount')}
-                    </div>
-                  ) : (
-                    t('createAccount')
-                  )}
-                </Button>
+                  {t('createAccount')}
+                </PrimaryButton>
 
                 {/* Login Link */}
                 <div className="text-center pt-4">

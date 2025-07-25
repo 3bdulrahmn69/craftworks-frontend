@@ -2,9 +2,9 @@
 
 import { useTheme } from 'next-themes';
 import { FaMoon, FaSun } from 'react-icons/fa6';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useCallback } from 'react';
 
-const ThemeToggle = () => {
+const ThemeToggle = memo(function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -13,28 +13,41 @@ const ThemeToggle = () => {
     setMounted(true);
   }, []);
 
+  const handleToggle = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
+
   if (!mounted) {
     return (
       <button
         className="p-2 rounded-md hover:bg-accent/20 transition-colors"
         aria-label="Toggle theme"
+        aria-pressed="false"
         suppressHydrationWarning
       >
-        <FaMoon size={18} />
+        <FaMoon size={18} aria-hidden="true" />
       </button>
     );
   }
 
+  const isDark = theme === 'dark';
+  const nextTheme = isDark ? 'light' : 'dark';
+
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-md hover:bg-accent/20 transition-colors"
-      aria-label="Toggle theme"
-      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      onClick={handleToggle}
+      className="p-2 rounded-md hover:bg-accent/20 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      aria-label={`Switch to ${nextTheme} mode`}
+      aria-pressed={isDark}
+      title={`Switch to ${nextTheme} mode`}
     >
-      {theme === 'dark' ? <FaSun size={18} /> : <FaMoon size={18} />}
+      {isDark ? (
+        <FaSun size={18} aria-hidden="true" />
+      ) : (
+        <FaMoon size={18} aria-hidden="true" />
+      )}
     </button>
   );
-};
+});
 
 export default ThemeToggle;

@@ -3,7 +3,7 @@
 import Container from '@/app/components/ui/container';
 import Input from '@/app/components/auth/input';
 import Button from '@/app/components/ui/button';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { sendEmail } from '@/app/services/email';
 import { toast } from 'react-toastify';
 import { FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
@@ -14,26 +14,31 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setForm((prev) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await sendEmail(form.name, form.email, form.message);
-      setForm({ name: '', email: '', message: '' });
-      toast.success(t('success'));
-    } catch (error) {
-      console.error(error);
-      toast.error(t('error'));
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setSubmitting(true);
+      try {
+        await sendEmail(form.name, form.email, form.message);
+        setForm({ name: '', email: '', message: '' });
+        toast.success(t('success'));
+      } catch (error) {
+        console.error(error);
+        toast.error(t('error'));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [form.name, form.email, form.message, t]
+  );
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 overflow-hidden">

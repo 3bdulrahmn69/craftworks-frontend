@@ -3,8 +3,9 @@ import Link from 'next/link';
 import Button from '../ui/button';
 import Container from '@/app/components/ui/container';
 import { CiUser, CiCircleCheck, CiClock1 } from 'react-icons/ci';
+import { memo } from 'react';
 
-const HeroSection = () => {
+const HeroSection = memo(function HeroSection() {
   const t = useTranslations('homepage sections.hero section');
   const locale = useLocale();
 
@@ -100,6 +101,6 @@ const HeroSection = () => {
       </Container>
     </section>
   );
-};
+});
 
 export default HeroSection;

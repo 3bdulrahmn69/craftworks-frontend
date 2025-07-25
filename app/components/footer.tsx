@@ -1,50 +1,53 @@
 import { useTranslations } from 'next-intl';
 import { FaFacebook, FaTwitter } from 'react-icons/fa';
-import {
-  FaApple,
-  FaInstagram,
-  FaLinkedin,
-} from 'react-icons/fa6';
+import { FaApple, FaInstagram, FaLinkedin } from 'react-icons/fa6';
 import { IoLogoAndroid } from 'react-icons/io';
 import Link from 'next/link';
+import { memo, useMemo } from 'react';
 
-const Footer = () => {
+const Footer = memo(function Footer() {
   const t = useTranslations('footer');
 
-  const currentYear = new Date().getFullYear();
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
-  const forClients = [
-    { name: t('howToHire'), href: '/how-to-hire' },
-    {
-      name: t('talentMarketplace'),
-      href: '/talent',
-    },
-    { name: t('projectCatalog'), href: '/projects' },
-    { name: t('hiringGuide'), href: '/hiring-guide' },
-    {
-      name: t('enterprise'),
-      href: '/enterprise',
-    },
-    { name: t('payroll'), href: '/payroll' },
-  ];
+  const forClients = useMemo(
+    () => [
+      { name: t('howToHire'), href: '/how-to-hire' },
+      {
+        name: t('talentMarketplace'),
+        href: '/talent',
+      },
+      { name: t('projectCatalog'), href: '/projects' },
+      { name: t('hiringGuide'), href: '/hiring-guide' },
+      {
+        name: t('enterprise'),
+        href: '/enterprise',
+      },
+      { name: t('payroll'), href: '/payroll' },
+    ],
+    [t]
+  );
 
-  const forCraftsmen = [
-    {
-      name: t('howToFindWork'),
-      href: '/how-to-find-work',
-    },
-    {
-      name: t('createProfile'),
-      href: '/create-profile',
-    },
-    { name: t('portfolio'), href: '/portfolio' },
-    { name: t('earnings'), href: '/earnings' },
-    {
-      name: t('certifications'),
-      href: '/certifications',
-    },
-    { name: t('learning'), href: '/learning' },
-  ];
+  const forCraftsmen = useMemo(
+    () => [
+      {
+        name: t('howToFindWork'),
+        href: '/how-to-find-work',
+      },
+      {
+        name: t('createProfile'),
+        href: '/create-profile',
+      },
+      { name: t('portfolio'), href: '/portfolio' },
+      { name: t('earnings'), href: '/earnings' },
+      {
+        name: t('certifications'),
+        href: '/certifications',
+      },
+      { name: t('learning'), href: '/learning' },
+    ],
+    [t]
+  );
 
   const resources = [
     { name: t('helpCenter'), href: '/help' },
@@ -182,9 +185,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
           {/* Social Media */}
           <div className="flex flex-col md:flex-row md:items-center space-x-3">
-            <span className="text-muted-foreground">
-              {t('followUs')}
-            </span>
+            <span className="text-muted-foreground">{t('followUs')}</span>
             <div className="flex space-x-3">
               {socialLinks.map((social) => (
                 <a
@@ -203,9 +204,7 @@ const Footer = () => {
 
           {/* App Download */}
           <div className="flex flex-col md:flex-row md:items-center space-x-3">
-            <span className="text-muted-foreground">
-              {t('mobileApp')}
-            </span>
+            <span className="text-muted-foreground">{t('mobileApp')}</span>
             <div className="flex space-x-3">
               <button className="hover:bg-muted-foreground/10 transition-colors duration-200 flex items-center p-2 rounded-full">
                 <FaApple size={24} />
@@ -254,6 +253,6 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
+});
 
 export default Footer;

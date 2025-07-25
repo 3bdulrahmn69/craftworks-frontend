@@ -3,7 +3,7 @@
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import {
   FaRegLightbulb,
@@ -19,14 +19,45 @@ export default function FAQ() {
     idx: number;
   } | null>(null);
 
-  const clientFaqs = t.raw('clients.questions') as {
-    question: string;
-    answer: string;
-  }[];
-  const craftsmanFaqs = t.raw('craftsmen.questions') as {
-    question: string;
-    answer: string;
-  }[];
+  const clientFaqs = useMemo(
+    () =>
+      t.raw('clients.questions') as {
+        question: string;
+        answer: string;
+      }[],
+    [t]
+  );
+
+  const craftsmanFaqs = useMemo(
+    () =>
+      t.raw('craftsmen.questions') as {
+        question: string;
+        answer: string;
+      }[],
+    [t]
+  );
+
+  const toggleAccordion = useCallback(
+    (section: 'clients' | 'craftsmen', idx: number) => {
+      setOpenIndex((prev) =>
+        prev && prev.section === section && prev.idx === idx
+          ? null
+          : { section, idx }
+      );
+    },
+    []
+  );
+
+  const isExpanded = useCallback(
+    (section: 'clients' | 'craftsmen', idx: number) => {
+      return !!(
+        openIndex &&
+        openIndex.section === section &&
+        openIndex.idx === idx
+      );
+    },
+    [openIndex]
+  );
 
   const clientSideContent = (
     <div className="flex flex-col gap-6">
@@ -96,42 +127,28 @@ export default function FAQ() {
               className="border-b border-border last:border-b-0"
             >
               <button
-                className="w-full flex justify-between items-center py-5 text-lg font-medium text-foreground focus:outline-none transition-colors hover:bg-muted"
-                onClick={() =>
-                  setOpenIndex(
-                    openIndex &&
-                      openIndex.section === section &&
-                      openIndex.idx === idx
-                      ? null
-                      : { section, idx }
-                  )
-                }
-                aria-expanded={
-                  !!(
-                    openIndex &&
-                    openIndex.section === section &&
-                    openIndex.idx === idx
-                  )
-                }
+                className="w-full flex justify-between items-center py-5 text-lg font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg transition-colors hover:bg-muted"
+                onClick={() => toggleAccordion(section, idx)}
+                aria-expanded={isExpanded(section, idx)}
+                aria-controls={`faq-${section}-${idx}`}
+                id={`faq-button-${section}-${idx}`}
               >
                 <span>{faq.question}</span>
                 <span
                   className={`ml-4 transition-transform ${
-                    openIndex &&
-                    openIndex.section === section &&
-                    openIndex.idx === idx
-                      ? 'rotate-180'
-                      : ''
+                    isExpanded(section, idx) ? 'rotate-180' : ''
                   }`}
+                  aria-hidden="true"
                 >
                   <IoIosArrowDown size={24} />
                 </span>
               </button>
               <div
+                id={`faq-${section}-${idx}`}
+                role="region"
+                aria-labelledby={`faq-button-${section}-${idx}`}
                 className={`overflow-hidden transition-all duration-300 ${
-                  openIndex &&
-                  openIndex.section === section &&
-                  openIndex.idx === idx
+                  isExpanded(section, idx)
                     ? 'max-h-40 opacity-100'
                     : 'max-h-0 opacity-0'
                 }`}

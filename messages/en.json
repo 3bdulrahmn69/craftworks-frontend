@@ -211,6 +211,8 @@
       "signInToContinue": "Sign in to your account to continue",
       "email": "Email",
       "emailPlaceholder": "Enter your email address",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter your phone number",
       "password": "Password",
       "passwordPlaceholder": "Enter your password",
       "signingIn": "Signing in...",

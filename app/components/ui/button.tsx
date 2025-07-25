@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { cn } from '@/app/utils/cn';
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -20,21 +20,23 @@ const sizeClasses = {
   lg: 'px-6 py-3 text-lg',
 };
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'default', ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          'rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
-          variantClasses[variant],
-          sizeClasses[size],
-          className
-        )}
-        {...props}
-      />
-    );
-  }
+export const Button = memo(
+  React.forwardRef<HTMLButtonElement, ButtonProps>(
+    ({ className, variant = 'primary', size = 'default', ...props }, ref) => {
+      const computedClassName = useMemo(
+        () =>
+          cn(
+            'rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+            variantClasses[variant],
+            sizeClasses[size],
+            className
+          ),
+        [variant, size, className]
+      );
+
+      return <button ref={ref} className={computedClassName} {...props} />;
+    }
+  )
 );
 Button.displayName = 'Button';
 

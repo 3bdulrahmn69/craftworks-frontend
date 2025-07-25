@@ -7,7 +7,7 @@ export const sendEmail = async (
   message: string
 ) => {
   try {
-    const response = await api.post<ApiResponse<any>>('/send-emails', {
+    const response = await api.post<ApiResponse<any>>('/send-email', {
       email,
       name,
       message,

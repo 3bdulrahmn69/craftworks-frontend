@@ -74,7 +74,7 @@ export const authAPI = {
   },
 };
 
-// Utility functions for token management
+// Utility functions for user data management (only user data, no tokens)
 export const tokenUtils = {
   setUserData(user: User) {
     if (typeof window !== 'undefined') {

@@ -9,7 +9,9 @@ const handler = NextAuth({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
+        phone: { label: 'Phone', type: 'text' },
         password: { label: 'Password', type: 'password' },
+        loginType: { label: 'Login Type', type: 'text' },
         // Add support for pre-authenticated data (for register flow)
         token: { label: 'Token', type: 'text' },
         userData: { label: 'User Data', type: 'text' },
@@ -36,7 +38,9 @@ const handler = NextAuth({
             }/auth/login`,
             {
               email: credentials?.email,
+              phone: credentials?.phone,
               password: credentials?.password,
+              loginType: credentials?.loginType || 'email',
               type: 'public',
             }
           );

@@ -211,6 +211,8 @@
       "signInToContinue": "سجل دخولك للمتابعة",
       "email": "البريد الإلكتروني",
       "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "أدخل رقم هاتفك",
       "password": "كلمة المرور",
       "passwordPlaceholder": "أدخل كلمة المرور",
       "signingIn": "جاري تسجيل الدخول...",

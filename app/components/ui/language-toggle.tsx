@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useCallback } from 'react';
 import { LuLanguages } from 'react-icons/lu';
 
-const LanguageToggle = () => {
+const LanguageToggle = memo(function LanguageToggle() {
   const [currentLang, setCurrentLang] = useState<'en' | 'ar'>('en');
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -26,35 +26,39 @@ const LanguageToggle = () => {
     }
   }, [router]);
 
-  const toggleLanguage = () => {
+  const toggleLanguage = useCallback(() => {
     const newLang = currentLang === 'en' ? 'ar' : 'en';
     setCurrentLang(newLang);
     document.cookie = `CRAFTWORKS_LOCALE=${newLang}; path=/;`;
     router.refresh();
-  };
+  }, [currentLang, router]);
 
   if (!mounted) {
     return (
       <button
         className="p-2 rounded-md hover:bg-accent/20 transition-colors"
         aria-label="Toggle language"
+        aria-pressed="false"
         suppressHydrationWarning
       >
-        <LuLanguages size={18} />
+        <LuLanguages size={18} aria-hidden="true" />
       </button>
     );
   }
 
+  const nextLang = currentLang === 'en' ? 'Arabic' : 'English';
+
   return (
     <button
       onClick={toggleLanguage}
-      className="p-2 rounded-md hover:bg-accent/20 transition-colors"
-      aria-label="Toggle language"
-      title={`Switch to ${currentLang === 'en' ? 'Arabic' : 'English'}`}
+      className="p-2 rounded-md hover:bg-accent/20 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      aria-label={`Switch to ${nextLang}`}
+      aria-pressed={currentLang === 'ar'}
+      title={`Switch to ${nextLang}`}
     >
-      <LuLanguages size={18} />
+      <LuLanguages size={18} aria-hidden="true" />
     </button>
   );
-};
+});
 
 export default LanguageToggle;

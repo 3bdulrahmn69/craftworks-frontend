@@ -9,8 +9,7 @@ export async function createSessionFromAuthData(
   authData: AuthResponse
 ): Promise<boolean> {
   try {
-    // Store token and user data locally first
-    tokenUtils.setToken(authData.token);
+    // Store user data locally for fallback
     tokenUtils.setUserData(authData.user);
 
     // Create NextAuth session with the existing auth data
@@ -37,20 +36,35 @@ export async function createSessionFromAuthData(
  * Login using NextAuth only (no duplicate API calls)
  */
 export async function loginWithNextAuth(
-  email: string,
-  password: string
+  identifier: string,
+  password: string,
+  loginType: 'email' | 'phone' = 'email'
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const credentials: any = {
+      password,
+      loginType,
+    };
+
+    // Set the appropriate field based on login type
+    if (loginType === 'email') {
+      credentials.email = identifier;
+    } else {
+      credentials.phone = identifier;
+    }
+
     const result = await signIn('credentials', {
       redirect: false,
-      email,
-      password,
+      ...credentials,
     });
 
     if (result?.error) {
       return {
         success: false,
-        error: 'Invalid email or password. Please try again.',
+        error:
+          loginType === 'email'
+            ? 'Invalid email or password. Please try again.'
+            : 'Invalid phone or password. Please try again.',
       };
     }
 
