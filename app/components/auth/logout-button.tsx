@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { authAPI, tokenUtils } from '../../services/auth';
+import { useAuth } from '../../hooks/useAuth';
 
 interface LogoutButtonProps {
   className?: string;
@@ -18,13 +19,16 @@ export default function LogoutButton({
 }: LogoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { token } = useAuth();
 
   const handleLogout = async () => {
     setIsLoading(true);
 
     try {
-      // Logout from our backend
-      await authAPI.logout();
+      // Logout from our backend with token
+      if (token) {
+        await authAPI.logout(token);
+      }
 
       // Clear local storage
       tokenUtils.clearAll();

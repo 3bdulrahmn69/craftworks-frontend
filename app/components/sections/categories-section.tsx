@@ -20,7 +20,7 @@ async function fetchCategories(): Promise<Category[]> {
   try {
     const link = `${
       process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-    }/services/categories`;
+    }/services/`;
     const res = await fetch(link, {
       next: { revalidate: 60 },
     });

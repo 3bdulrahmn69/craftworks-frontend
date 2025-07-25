@@ -19,7 +19,6 @@ export const useAuth = () => {
 
   // Get user data from localStorage as fallback (only on client)
   const localUserData = mounted ? tokenUtils.getUserData() : null;
-  const localToken = mounted ? tokenUtils.getToken() : null;
 
   return {
     // Session data
@@ -33,7 +32,6 @@ export const useAuth = () => {
 
     // Local storage data (fallback)
     localUserData,
-    localToken,
 
     // Helper functions
     getUserRole: () => user?.role || localUserData?.role,
@@ -41,7 +39,7 @@ export const useAuth = () => {
     getUserEmail: () => user?.email || localUserData?.email,
     getUserId: () => user?.id || localUserData?.id,
     getUserProfileImage: (): string =>
-      user?.profile_image || localUserData?.profilePicture || '',
+      user?.profilePicture || localUserData?.profilePicture || '',
     getUserPhone: () => localUserData?.phone,
     getUserAddress: () => localUserData?.address,
     getUserRating: () => localUserData?.rating,

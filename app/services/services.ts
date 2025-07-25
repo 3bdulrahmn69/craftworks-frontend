@@ -3,7 +3,7 @@ import { ApiResponse } from '../types/user';
 
 const servicesAPI = {
   getAllCategories: async (): Promise<any> => {
-    const response = await api.get<ApiResponse<any>>('/services/categories');
+    const response = await api.get<ApiResponse<any>>('/services');
     return response.data.data;
   },
 };

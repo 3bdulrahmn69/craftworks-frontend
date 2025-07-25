@@ -10,12 +10,7 @@ export const api = axios.create({
 
 // Add request interceptor to include auth token
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth-token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
+  // Token will be added manually where needed, not from localStorage
   return config;
 });
 
@@ -35,12 +30,9 @@ api.interceptors.response.use(
         error.message = errorData.message;
       }
 
-      // If it's an authentication error, clear stored tokens
+      // If it's an authentication error, no need to clear tokens since we don't store them
       if (error.response.status === 401) {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth-token');
-          localStorage.removeItem('user-data');
-        }
+        // Handle unauthorized access
       }
     }
     return Promise.reject(error);

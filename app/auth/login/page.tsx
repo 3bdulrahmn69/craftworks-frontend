@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { authAPI, tokenUtils } from '../../services/auth';
+import { loginWithNextAuth } from '../../services/session';
 import Button from '../../components/ui/button';
 import Input from '../../components/auth/input';
 import { validateEmail } from '../../utils/validation';
@@ -30,25 +29,16 @@ export default function LoginPage() {
     if (!emailResult.isValid) return;
     setIsLoading(true);
     try {
-      // Authenticate with backend
-      const response = await authAPI.login({ email, password });
-      tokenUtils.setToken(response.token);
-      tokenUtils.setUserData(response.user);
-      // Authenticate with NextAuth
-      const result = await signIn('credentials', {
-        redirect: false,
-        email,
-        password,
-      });
-      if (result?.error) {
-        setError('Authentication failed. Please try again.');
-        tokenUtils.clearAll();
-      } else {
+      // Use the new helper function for login
+      const result = await loginWithNextAuth(email, password);
+
+      if (result.success) {
         router.push('/');
+      } else {
+        setError(result.error || 'Login failed');
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Login failed');
-      tokenUtils.clearAll();
+    } catch {
+      setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

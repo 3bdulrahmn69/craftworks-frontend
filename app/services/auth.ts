@@ -39,54 +39,43 @@ export const authAPI = {
   },
 
   // Logout user
-  async logout(): Promise<void> {
+  async logout(token?: string): Promise<void> {
     try {
-      await api.post('/auth/logout');
+      const config = token
+        ? {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        : {};
+      await api.post('/auth/logout', {}, config);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage regardless of server response
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth-token');
         localStorage.removeItem('user-data');
       }
     }
   },
 
   // Get current user profile
-  async getProfile(): Promise<User> {
-    const response = await api.get<ApiResponse<User>>('/auth/profile');
+  async getProfile(token: string): Promise<User> {
+    const response = await api.get<ApiResponse<User>>('/auth/profile', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data.data;
   },
 
   // Update user profile
-  async updateProfile(data: Partial<User>): Promise<User> {
-    const response = await api.put<ApiResponse<User>>('/auth/profile', data);
+  async updateProfile(data: Partial<User>, token: string): Promise<User> {
+    const response = await api.put<ApiResponse<User>>('/auth/profile', data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data.data;
   },
 };
 
 // Utility functions for token management
 export const tokenUtils = {
-  setToken(token: string) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth-token', token);
-    }
-  },
-
-  getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth-token');
-    }
-    return null;
-  },
-
-  removeToken() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth-token');
-    }
-  },
-
   setUserData(user: User) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('user-data', JSON.stringify(user));
@@ -108,7 +97,6 @@ export const tokenUtils = {
   },
 
   clearAll() {
-    this.removeToken();
     this.removeUserData();
   },
 };

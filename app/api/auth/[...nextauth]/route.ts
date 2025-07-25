@@ -10,10 +10,26 @@ const handler = NextAuth({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        // Add support for pre-authenticated data (for register flow)
+        token: { label: 'Token', type: 'text' },
+        userData: { label: 'User Data', type: 'text' },
       },
       async authorize(credentials) {
         try {
-          // Make a request to your Node.js backend to authenticate
+          // If token and userData are provided (register flow), use them directly
+          if (credentials?.token && credentials?.userData) {
+            const user = JSON.parse(credentials.userData);
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.fullName,
+              role: user.role,
+              profilePicture: user.profilePicture,
+              token: credentials.token,
+            };
+          }
+
+          // Otherwise, make a login request to the backend
           const response = await axios.post(
             `${
               process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -21,7 +37,7 @@ const handler = NextAuth({
             {
               email: credentials?.email,
               password: credentials?.password,
-              type: 'public', // Assuming 'public' is the default type for the website login
+              type: 'public',
             }
           );
 
@@ -33,17 +49,16 @@ const handler = NextAuth({
             responseData.data.user
           ) {
             const { token, user } = responseData.data;
-            // Return user object with token to be stored in JWT
             return {
               id: user.id,
               email: user.email,
               name: user.fullName,
               role: user.role,
-              profile_image: user.profilePicture,
+              profilePicture: user.profilePicture,
               token: token,
             };
           } else {
-            return null; // Return null if authentication fails
+            return null;
           }
         } catch (error) {
           console.error('Authentication error:', error);
@@ -58,7 +73,7 @@ const handler = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.profile_image = user.profile_image;
+        token.profilePicture = user.profilePicture;
         token.accessToken = user.token;
       }
       return token;
@@ -68,7 +83,7 @@ const handler = NextAuth({
       if (token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
-        session.user.profile_image = token.profile_image as string;
+        session.user.profilePicture = token.profilePicture as string;
         session.accessToken = token.accessToken as string;
       }
       return session;

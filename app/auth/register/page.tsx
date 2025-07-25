@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
+import { createSessionFromAuthData } from '../../services/session';
 import Button from '../../components/ui/button';
 import Input from '../../components/auth/input';
 import {
@@ -163,17 +163,19 @@ export default function RegisterPage() {
         password: form.password,
         role: form.role,
       });
-      tokenUtils.setToken(response.token);
-      tokenUtils.setUserData(response.user);
-      // Authenticate with NextAuth
-      await signIn('credentials', {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      });
-      router.push('/');
+
+      // Create NextAuth session directly with the register response data
+      const sessionCreated = await createSessionFromAuthData(response);
+
+      if (sessionCreated) {
+        router.push('/');
+      } else {
+        setError(
+          'Registration successful but failed to create session. Please try logging in.'
+        );
+      }
     } catch (err: any) {
-      setError(err?.response?.data?.error || 'Registration failed');
+      setError(err?.response?.data?.message || 'Registration failed');
       tokenUtils.clearAll();
     } finally {
       setIsLoading(false);
