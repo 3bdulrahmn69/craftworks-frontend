@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { loginWithNextAuth } from '../../services/session';
-import PrimaryButton from '../../components/ui/primary-button';
+import Button from '../../components/ui/button';
 import AuthLayout from '../../components/auth/auth-layout';
 import ErrorMessage from '../../components/ui/error-message';
 import Input from '../../components/auth/input';
@@ -157,15 +157,16 @@ export default function LoginPage() {
           <ErrorMessage message={error} />
 
           {/* Submit Button */}
-          <PrimaryButton
+          <Button
             type="submit"
             size="lg"
             isLoading={isLoading}
             loadingText={t('signingIn')}
             disabled={isLoading}
+            className="w-full"
           >
             {t('loginButton')}
-          </PrimaryButton>
+          </Button>
 
           {/* Register Link */}
           <div className="text-center pt-4">

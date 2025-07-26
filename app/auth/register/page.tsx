@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { authAPI, tokenUtils } from '../../services/auth';
 import { createSessionFromAuthData } from '../../services/session';
-import PrimaryButton from '../../components/ui/primary-button';
+import Button from '../../components/ui/button';
 import HomeButton from '../../components/ui/home-button';
 import ErrorMessage from '../../components/ui/error-message';
 import Input from '../../components/auth/input';
@@ -444,15 +444,16 @@ export default function RegisterPage() {
                 <ErrorMessage message={error} />
 
                 {/* Submit Button */}
-                <PrimaryButton
+                <Button
                   type="submit"
                   size="lg"
                   isLoading={isLoading}
                   loadingText={t('creatingAccount')}
                   disabled={isLoading}
+                  className="w-full"
                 >
                   {t('createAccount')}
-                </PrimaryButton>
+                </Button>
 
                 {/* Login Link */}
                 <div className="text-center pt-4">

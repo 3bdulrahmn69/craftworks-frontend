@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 
@@ -188,20 +188,13 @@ function HeaderMobile({
   );
 }
 
-const Header = () => {
+const Header = ({
+  navLinks,
+}: {
+  navLinks: { key: string; href: string }[];
+}) => {
   const t = useTranslations('header');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navLinks = useMemo(
-    () => [
-      { key: 'home', href: '/' },
-      { key: 'about', href: '/about' },
-      { key: 'howitworks', href: '/how-it-works' },
-      { key: 'contact', href: '/contact' },
-      { key: 'faq', href: '/faq' },
-    ],
-    []
-  );
 
   const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
   const toggleMobileMenu = useCallback(() => setMobileMenuOpen((v) => !v), []);

@@ -10,7 +10,12 @@
       "contact": "اتصل",
       "faq": "الأسئلة الشائعة",
       "login": "تسجيل الدخول",
-      "register": "إنشاء حساب"
+      "register": "إنشاء حساب",
+      "jobs": "الوظائف",
+      "quotes": "عروض أسعاري",
+      "invitations": "الدعوات",
+      "messages": "الرسائل",
+      "notifications": "الإشعارات"
     }
   },
   "footer": {
@@ -287,6 +292,87 @@
       "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
       "goHome": "الذهاب للصفحة الرئيسية",
       "goBack": "العودة"
+    },
+    "jobs": {
+      "title": "الوظائف المتاحة",
+      "subtitle": "تصفح وتقدم للوظائف التي تناسب مهاراتك",
+      "noJobs": "لا توجد وظائف متاحة في الوقت الحالي",
+      "noJobsInCategory": "لم يتم العثور على وظائف في {category}",
+      "filterByService": "تصفية بالخدمة:",
+      "allServices": "جميع الخدمات",
+      "loadingServices": "جاري تحميل الخدمات...",
+      "refreshJobs": "تحديث الوظائف",
+      "submitQuote": "إرسال عرض سعر",
+      "applied": "تم التقدم",
+      "showingJobs": "عرض {current} من {total} وظيفة",
+      "pageInfo": "(الصفحة {page} من {totalPages})",
+      "totalJobs": "{count} وظيفة إجمالية",
+      "previous": "السابق",
+      "next": "التالي",
+      "postedOn": "نُشر في {date}",
+      "paymentType": "الدفع: {type}",
+      "location": "الموقع"
+    },
+    "quotes": {
+      "title": "عروض أسعاري",
+      "subtitle": "تتبع جميع عروض الأسعار المرسلة وحالتها",
+      "noQuotes": "لم ترسل أي عروض أسعار بعد",
+      "status": {
+        "submitted": "مرسل",
+        "accepted": "مقبول",
+        "rejected": "مرفوض"
+      },
+      "filterByStatus": "تصفية بالحالة:",
+      "allStatuses": "جميع الحالات",
+      "quotedPrice": "السعر المعروض: {price} جنيه",
+      "submittedOn": "تم الإرسال في {date}",
+      "viewJob": "عرض الوظيفة",
+      "jobTitle": "الوظيفة: {title}",
+      "client": "العميل: {name}",
+      "clientRating": "التقييم: {rating}★ ({count} تقييم)"
+    },
+    "invitations": {
+      "title": "دعوات الوظائف",
+      "subtitle": "راجع الدعوات من العملاء لخبرتك",
+      "noInvitations": "لم تتلق أي دعوات بعد",
+      "status": {
+        "pending": "معلق",
+        "accepted": "مقبول",
+        "rejected": "مرفوض"
+      },
+      "filterByStatus": "تصفية بالحالة:",
+      "allStatuses": "جميع الحالات",
+      "invitedOn": "تمت الدعوة في {date}",
+      "respond": "رد",
+      "accept": "قبول",
+      "reject": "رفض",
+      "viewJob": "عرض الوظيفة",
+      "jobTitle": "الوظيفة: {title}",
+      "client": "العميل: {name}",
+      "clientRating": "التقييم: {rating}★ ({count} تقييم)",
+      "paymentType": "الدفع: {type}",
+      "responding": "جاري الرد...",
+      "responseSuccess": "تم إرسال الرد بنجاح!",
+      "responseError": "فشل في إرسال الرد"
+    },
+    "modal": {
+      "submitQuote": {
+        "title": "إرسال عرض سعر",
+        "priceLabel": "سعر العرض (جنيه) *",
+        "pricePlaceholder": "أدخل سعر عرضك",
+        "notesLabel": "ملاحظات إضافية (اختياري)",
+        "notesPlaceholder": "أي تفاصيل إضافية حول عرضك...",
+        "cancel": "إلغاء",
+        "submit": "إرسال العرض",
+        "submitting": "جاري الإرسال..."
+      },
+      "respondInvitation": {
+        "title": "الرد على الدعوة",
+        "message": "كيف تريد أن ترد على دعوة الوظيفة هذه؟",
+        "cancel": "إلغاء",
+        "accept": "قبول الدعوة",
+        "reject": "رفض الدعوة"
+      }
     }
   },
   "faq": {

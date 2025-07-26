@@ -1,13 +1,19 @@
 import { api } from './api';
-import { ApiResponse } from '../types/user';
+import { ServicesApiResponse } from '../types/jobs';
 
 const servicesAPI = {
-  getAllCategories: async (token?: string): Promise<any> => {
+  getAllServices: async (token?: string): Promise<ServicesApiResponse> => {
     const config = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : {};
-    const response = await api.get<ApiResponse<any>>('/services', config);
-    return response.data.data;
+    const response = await api.get<ServicesApiResponse>('/services', config);
+    return response.data;
+  },
+
+  // Keep legacy method for backward compatibility
+  getAllCategories: async (token?: string): Promise<any> => {
+    const response = await servicesAPI.getAllServices(token);
+    return response.data;
   },
 };
 

@@ -1,9 +1,12 @@
 import React, { memo, useMemo } from 'react';
 import { cn } from '@/app/utils/cn';
+import LoadingSpinner from './loading-spinner';
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
   size?: 'default' | 'sm' | 'lg';
+  isLoading?: boolean;
+  loadingText?: string;
 };
 
 const variantClasses = {
@@ -22,7 +25,19 @@ const sizeClasses = {
 
 export const Button = memo(
   React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = 'primary', size = 'default', ...props }, ref) => {
+    (
+      {
+        className,
+        variant = 'primary',
+        size = 'default',
+        isLoading = false,
+        loadingText,
+        disabled,
+        children,
+        ...props
+      },
+      ref
+    ) => {
       const computedClassName = useMemo(
         () =>
           cn(
@@ -34,7 +49,24 @@ export const Button = memo(
         [variant, size, className]
       );
 
-      return <button ref={ref} className={computedClassName} {...props} />;
+      return (
+        <button
+          ref={ref}
+          className={computedClassName}
+          disabled={disabled || isLoading}
+          aria-busy={isLoading}
+          {...props}
+        >
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <LoadingSpinner size="sm" />
+              <span>{loadingText || 'Loading...'}</span>
+            </div>
+          ) : (
+            children
+          )}
+        </button>
+      );
     }
   )
 );

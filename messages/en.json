@@ -10,7 +10,12 @@
       "contact": "Contact",
       "faq": "FAQ",
       "login": "Login",
-      "register": "Register"
+      "register": "Register",
+      "jobs": "Jobs",
+      "quotes": "My Quotes",
+      "invitations": "Invitations",
+      "messages": "Messages",
+      "notifications": "Notifications"
     }
   },
   "footer": {
