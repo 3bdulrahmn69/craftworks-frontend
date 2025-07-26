@@ -2,7 +2,7 @@ export interface User {
   id: string;
   email: string;
   phone: string;
-  role: 'client' | 'craftsman';
+  role: 'client' | 'craftsman' | 'admin' | 'moderator';
   fullName: string;
   profilePicture: string;
   createdAt: string;
@@ -14,6 +14,19 @@ export interface User {
   };
   rating: number;
   ratingCount: number;
+  service?: {
+    _id: string;
+    name: string;
+    icon: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  craftsmanInfo?: {
+    skills: string[];
+    verificationStatus: 'pending' | 'verified' | 'rejected';
+    verificationDocuments?: string[];
+  };
 }
 
 // API Response wrapper interface
