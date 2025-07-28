@@ -463,30 +463,32 @@ const PersonalSettings = () => {
           </div>
 
           {/* Service Selection */}
-          <div className="border-t pt-4 mt-6">
-            <h3 className="text-md font-semibold text-foreground mb-4">
-              Service Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <DropdownSelector
-                  id="service-selector"
-                  label="Choose Your Service"
-                  options={services.map((service) => ({
-                    id: service._id,
-                    label: service.name,
-                    description: service.description,
-                  }))}
-                  value={formData.serviceId}
-                  onChange={handleServiceChange}
-                  placeholder="Select a service"
-                  helpText="Select the service you provide to customers"
-                  allowEmpty={true}
-                  emptyLabel="No service selected"
-                />
+          {user?.role === 'craftsman' && (
+            <div className="border-t pt-4 mt-6">
+              <h3 className="text-md font-semibold text-foreground mb-4">
+                Service Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <DropdownSelector
+                    id="service-selector"
+                    label="Choose Your Service"
+                    options={services.map((service) => ({
+                      id: service._id,
+                      label: service.name,
+                      description: service.description,
+                    }))}
+                    value={formData.serviceId}
+                    onChange={handleServiceChange}
+                    placeholder="Select a service"
+                    helpText="Select the service you provide to customers"
+                    allowEmpty={true}
+                    emptyLabel="No service selected"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex justify-between items-center pt-4">
             <div className="flex items-center gap-3">

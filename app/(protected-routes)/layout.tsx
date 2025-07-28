@@ -29,8 +29,8 @@ export default function ProtectedLayout({
   }
 
   if (!session) {
-    return null; 
+    return null;
   }
 
   return <>{children}</>;
-} 
+}

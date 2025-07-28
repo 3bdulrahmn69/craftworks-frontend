@@ -1,9 +1,4 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../hooks/useAuth';
-
+import Redirect from '../components/auth/redirect';
 import Footer from '../components/footer';
 import Header from '../components/header';
 
@@ -20,22 +15,9 @@ export default function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading, getUserRole } = useAuth();
-  const router = useRouter();
-  const userRole = getUserRole();
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      if (userRole === 'craftsman') {
-        router.replace('/jobs');
-      } else if (userRole === 'client') {
-        router.replace('/');
-      }
-    }
-  }, [isAuthenticated, isLoading, router, userRole]);
-
   return (
     <>
+      <Redirect />
       <Header navLinks={navLinks} />
       {children}
       <Footer />
