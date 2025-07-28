@@ -17,7 +17,7 @@ const LoadingSpinner = memo(function LoadingSpinner({
 
   return (
     <div
-      className={`${sizeClasses[size]} border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin ${className}`}
+      className={`${sizeClasses[size]} border-2 border-primary border-t-primary-foreground rounded-full animate-spin ${className}`}
       role="status"
       aria-label="Loading"
     />

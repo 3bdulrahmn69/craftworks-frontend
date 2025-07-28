@@ -13,6 +13,9 @@ import {
   FaBroom,
   FaLeaf,
   FaChevronRight,
+  FaBolt,
+  FaThermometerHalf,
+  FaBuilding,
 } from 'react-icons/fa';
 
 // Server utility to fetch categories
@@ -20,12 +23,12 @@ async function fetchCategories(): Promise<Category[]> {
   try {
     const link = `${
       process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-    }/services/`;
+    }/services`;
     const res = await fetch(link, {
       next: { revalidate: 60 },
     });
-    if (!res.ok) return [];
-    return res.json();
+    const data = await res.json();
+    return data.data;
   } catch (error) {
     console.warn('Failed to fetch categories:', error);
     return [];
@@ -38,8 +41,12 @@ const getCategoryIcon = (iconName: string) => {
     'faucet-icon': <FaHome className="w-12 h-12" />,
     'lightbulb-icon': <FaLightbulb className="w-12 h-12" />,
     'paintbrush-icon': <FaPaintBrush className="w-12 h-12" />,
+    'paint-icon': <FaPaintBrush className="w-12 h-12" />,
     'broom-icon': <FaBroom className="w-12 h-12" />,
     'leaf-icon': <FaLeaf className="w-12 h-12" />,
+    'bolt-icon': <FaBolt className="w-12 h-12" />,
+    'thermometer-icon': <FaThermometerHalf className="w-12 h-12" />,
+    'brick-icon': <FaBuilding className="w-12 h-12" />,
   };
   return iconMap[iconName] || iconMap['hammer-icon']; // Default fallback
 };
@@ -66,6 +73,9 @@ const CategoriesSection = async () => {
   const t = await getTranslations('homepage sections.categories');
   const locale = await getLocale();
   const categoriesData = await fetchCategories();
+  console.log('Fetched categories:', categoriesData);
+
+  if (!categoriesData) return null;
 
   return (
     <section className="py-20 bg-muted">
@@ -80,60 +90,31 @@ const CategoriesSection = async () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {categoriesData.length > 0 ? (
+          {categoriesData &&
             categoriesData.map((category: Category, index: number) => (
               <div
-                key={category.id}
+                key={category._id}
                 className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer group border border-border"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex flex-col items-center text-center mb-6">
                   <div
-                    className={`p-3 rounded-lg ${getColorClasses(
+                    className={`p-4 rounded-lg mb-4 ${getColorClasses(
                       getCategoryColor(index)
                     )}`}
                   >
                     {getCategoryIcon(category.icon)}
                   </div>
-                  <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                    {category.subcategories?.length || 0}+
-                  </span>
+
+                  <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
+                    {category.name}
+                  </h3>
+
+                  <p className="text-muted-foreground mb-4">
+                    {category.description}
+                  </p>
                 </div>
 
-                <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-                  {category.name}
-                </h3>
-
-                <p className="text-muted-foreground mb-4">
-                  {category.description}
-                </p>
-
-                {category.subcategories &&
-                  category.subcategories.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {t('services')}
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {category.subcategories
-                          .slice(0, 3)
-                          .map((subcategory: string, subIndex: number) => (
-                            <span
-                              key={subIndex}
-                              className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
-                            >
-                              {subcategory}
-                            </span>
-                          ))}
-                        {category.subcategories.length > 3 && (
-                          <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
-                            +{category.subcategories.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                <div className="flex items-center text-sm text-primary font-medium">
+                <div className="flex items-center justify-center text-sm text-primary font-medium">
                   {t('browse')}
                   <FaChevronRight
                     className={`w-4 h-4 transition-transform ${
@@ -144,14 +125,7 @@ const CategoriesSection = async () => {
                   />
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                {t('noCategories')}
-              </p>
-            </div>
-          )}
+            ))}
         </div>
 
         <div className="text-center">

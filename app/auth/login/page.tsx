@@ -8,7 +8,7 @@ import { loginWithNextAuth } from '../../services/session';
 import Button from '../../components/ui/button';
 import AuthLayout from '../../components/auth/auth-layout';
 import ErrorMessage from '../../components/ui/error-message';
-import Input from '../../components/auth/input';
+import Input from '../../components/ui/input';
 import PhoneInput from '../../components/auth/phone-input';
 import { validateEmail, validatePhone } from '../../utils/validation';
 

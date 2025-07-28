@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
@@ -93,6 +93,7 @@ function HeaderMobile({
   closeMobileMenu,
 }: HeaderMobileProps) {
   const { isAuthenticated } = useAuth();
+  const local = useLocale();
 
   return (
     <>
@@ -105,7 +106,9 @@ function HeaderMobile({
 
       {mobileMenuOpen && (
         <div
-          className={`fixed inset-y-0 right-0 md:hidden bg-card/95 backdrop-blur-lg border-l border-border shadow-2xl w-80 max-w-[85vw] h-screen transform transition-transform duration-300 ease-out z-50 ${
+          className={`fixed inset-y-0 ${
+            local === 'en' ? 'right-0' : 'left-0'
+          } md:hidden bg-card/95 backdrop-blur-lg border-l border-border shadow-2xl w-80 max-w-[85vw] h-screen transform transition-transform duration-300 ease-out z-50 ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >

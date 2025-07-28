@@ -38,11 +38,7 @@
   --color-ring: #2563eb;
 
   /* Gradients */
-  --color-gradient-primary: linear-gradient(
-    90deg,
-    #2563eb 0%,
-    #6366f1 100%
-  );
+  --color-gradient-primary: linear-gradient(90deg, #2563eb 0%, #6366f1 100%);
 
   /* Font sizes */
   --font-size-xs: 0.75rem;
@@ -175,6 +171,12 @@
   }
 }
 
+@layer base {
+  button {
+    cursor: pointer;
+  }
+}
+
 /* Manual dark mode toggle class */
 [data-theme='dark'] {
   --color-background: #181a20;
@@ -213,11 +215,7 @@
   --color-ring: #818cf8;
 
   /* Gradients */
-  --color-gradient-primary: linear-gradient(
-    90deg,
-    #6366f1 0%,
-    #2563eb 100%
-  );
+  --color-gradient-primary: linear-gradient(90deg, #6366f1 0%, #2563eb 100%);
 }
 
 html {
@@ -256,10 +254,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-foreground);
-}
-
-button {
-  cursor: pointer;
 }
 
 /* Profile picture styles */

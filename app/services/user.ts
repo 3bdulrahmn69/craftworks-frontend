@@ -10,6 +10,7 @@ export interface UpdateUserData {
     city: string;
     street: string;
   };
+  serviceId?: string;
 }
 
 export interface ChangePasswordData {
@@ -34,7 +35,7 @@ export const userService = {
     token: string,
     userData: UpdateUserData
   ): Promise<User> => {
-    const response = await api.put<ApiResponse<User>>('/me', userData, {
+    const response = await api.put<ApiResponse<User>>('/users/me', userData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,13 +60,22 @@ export const userService = {
     const formData = new FormData();
     formData.append('profilePicture', file);
 
-    const response = await api.post<ApiResponse<User>>(
-      '/me/profile-picture',
-      formData,
+    const response = await api.put<ApiResponse<User>>('/users/me', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.data;
+  },
+
+  // Delete profile picture
+  deleteProfilePicture: async (token: string): Promise<User> => {
+    const response = await api.delete<ApiResponse<User>>(
+      '/users/me/profile-picture',
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
         },
       }
     );

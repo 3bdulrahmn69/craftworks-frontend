@@ -1,30 +1,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Button } from '@/app/components/ui/button';
-import { userService, UpdateUserData } from '@/app/services/user';
-import { User } from '@/app/types/user';
-import { HiCamera } from 'react-icons/hi2';
 import Image from 'next/image';
-
+import { useSession } from 'next-auth/react';
+import { toast } from 'react-toastify';
+import { Button } from '@/app/components/ui/button';
 import SettingsPageHeader from '@/app/components/settings/settings-page-header';
+import LoadingSpinner from '@/app/components/ui/loading-spinner';
+import { userService, UpdateUserData } from '@/app/services/user';
+import servicesAPI from '@/app/services/services';
+import { User } from '@/app/types/user';
+import { Category } from '@/app/types/services';
+
+import { HiCamera, HiTrash, HiUser } from 'react-icons/hi2';
+import Input from '@/app/components/ui/input';
+import DropdownSelector from '@/app/components/ui/dropdown-selector';
 
 const PersonalSettings = () => {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
+  const [services, setServices] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     address: {
-      country: '',
       state: '',
       city: '',
       street: '',
     },
+    serviceId: '',
   });
 
   useEffect(() => {
@@ -32,15 +41,26 @@ const PersonalSettings = () => {
       if (!session?.accessToken) return;
 
       try {
-        const userData = await userService.getMe(session.accessToken);
+        const [userData, servicesData] = await Promise.all([
+          userService.getMe(session.accessToken),
+          servicesAPI.getAllServices(session.accessToken),
+        ]);
+
         setUser(userData);
+        setServices(servicesData.data || []);
         setFormData({
           fullName: userData.fullName,
           phone: userData.phone,
-          address: userData.address,
+          address: {
+            state: userData.address.state,
+            city: userData.address.city,
+            street: userData.address.street,
+          },
+          serviceId: userData.service?._id || '',
         });
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        console.error('Failed to fetch data:', error);
+        toast.error('Failed to load user data');
       } finally {
         setLoading(false);
       }
@@ -49,11 +69,16 @@ const PersonalSettings = () => {
     fetchUserData();
   }, [session?.accessToken]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
+      // Skip country changes as it's not editable
+      if (addressField === 'country') return;
+
       setFormData((prev) => ({
         ...prev,
         address: {
@@ -67,18 +92,34 @@ const PersonalSettings = () => {
         [name]: value,
       }));
     }
+
+    setHasChanges(true);
+  };
+
+  const handleServiceChange = (serviceId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      serviceId,
+    }));
+    setHasChanges(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.accessToken) return;
+    if (!session?.accessToken || !user) return;
 
     setSaving(true);
     try {
       const updateData: UpdateUserData = {
         fullName: formData.fullName,
         phone: formData.phone,
-        address: formData.address,
+        address: {
+          country: user.address.country, // Keep original country from backend
+          state: formData.address.state,
+          city: formData.address.city,
+          street: formData.address.street,
+        },
+        serviceId: formData.serviceId || undefined,
       };
 
       const updatedUser = await userService.updateProfile(
@@ -86,10 +127,11 @@ const PersonalSettings = () => {
         updateData
       );
       setUser(updatedUser);
-      alert('Profile updated successfully!');
+      setHasChanges(false);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile. Please try again.');
+      toast.error('Failed to update profile. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -106,12 +148,30 @@ const PersonalSettings = () => {
         file
       );
       setUser(updatedUser);
-      alert('Profile picture updated successfully!');
+      toast.success('Profile picture updated successfully!');
     } catch (error) {
       console.error('Failed to upload image:', error);
-      alert('Failed to upload image. Please try again.');
+      toast.error('Failed to upload image. Please try again.');
     } finally {
       setUploadingImage(false);
+    }
+  };
+
+  const handleImageDelete = async () => {
+    if (!session?.accessToken || !user?.profilePicture) return;
+
+    setDeletingImage(true);
+    try {
+      const updatedUser = await userService.deleteProfilePicture(
+        session.accessToken
+      );
+      setUser(updatedUser);
+      toast.success('Profile picture deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      toast.error('Failed to delete image. Please try again.');
+    } finally {
+      setDeletingImage(false);
     }
   };
 
@@ -119,13 +179,18 @@ const PersonalSettings = () => {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
-          <div className="animate-pulse">
+          <div
+            className="animate-pulse"
+            role="status"
+            aria-label="Loading user data"
+          >
             <div className="h-8 bg-muted rounded w-1/3 mb-6"></div>
             <div className="space-y-4">
               <div className="h-4 bg-muted rounded"></div>
               <div className="h-4 bg-muted rounded w-3/4"></div>
               <div className="h-4 bg-muted rounded w-1/2"></div>
             </div>
+            <span className="sr-only">Loading your profile information...</span>
           </div>
         </div>
       </div>
@@ -136,8 +201,12 @@ const PersonalSettings = () => {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
-          <p className="text-center text-muted-foreground">
-            Failed to load user data.
+          <p
+            className="text-center text-muted-foreground"
+            role="alert"
+            aria-live="polite"
+          >
+            Failed to load user data. Please try refreshing the page.
           </p>
         </div>
       </div>
@@ -145,11 +214,18 @@ const PersonalSettings = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <main
+      className="max-w-2xl mx-auto space-y-6"
+      role="main"
+      aria-labelledby="page-title"
+    >
       <SettingsPageHeader
         title="Personal Information"
         description="Update your profile details and personal information"
       />
+      <div id="page-title" className="sr-only">
+        Personal Information Settings
+      </div>
 
       {/* Profile Picture Section */}
       <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
@@ -158,23 +234,75 @@ const PersonalSettings = () => {
         </h2>
         <div className="flex items-center gap-6">
           <div className="relative">
-            <Image
-              src={user.profilePicture}
-              alt="Profile picture"
-              width={80}
-              height={80}
-              className="w-20 h-20 rounded-full object-cover border-2 border-border"
-            />
-            <label className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-              <HiCamera className="w-6 h-6 text-white" />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                disabled={uploadingImage}
+            {user.profilePicture ? (
+              <Image
+                src={user.profilePicture}
+                alt={`Profile picture of ${user.fullName}`}
+                width={128}
+                height={128}
+                className="w-20 h-20 rounded-full object-cover border-2 border-border"
               />
-            </label>
+            ) : (
+              <div
+                className="w-20 h-20 rounded-full object-cover border-2 border-border flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20"
+                role="img"
+                aria-label="Default profile picture placeholder"
+              >
+                <HiUser
+                  className="w-12 h-12 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+            )}
+            {!user.profilePicture ? (
+              <label className="absolute inset-0 flex items-center justify-center bg-black/75 rounded-full opacity-0 hover:opacity-100 transition-opacity cursor-pointer focus-within:opacity-100">
+                <HiCamera className="w-6 h-6 text-white" aria-hidden="true" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="sr-only"
+                  disabled={uploadingImage}
+                  aria-label="Upload profile picture"
+                />
+              </label>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/75 rounded-full opacity-0 hover:opacity-100 transition-opacity focus-within:opacity-100">
+                <label className="cursor-pointer focus-within:outline-none focus-within:ring-2 focus-within:ring-white rounded">
+                  <HiCamera className="w-6 h-6 text-white" aria-hidden="true" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="sr-only"
+                    disabled={uploadingImage}
+                    aria-label="Change profile picture"
+                  />
+                </label>
+                <button
+                  aria-label="Delete profile picture"
+                  className="focus:outline-none focus:ring-2 focus:ring-white rounded"
+                  onClick={handleImageDelete}
+                  disabled={deletingImage}
+                >
+                  <HiTrash
+                    className={`w-6 h-6 text-red-500`}
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+            )}
+            {(deletingImage || uploadingImage) && (
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-black/75 rounded-full"
+                aria-live="polite"
+                aria-label={
+                  uploadingImage ? 'Uploading image...' : 'Deleting image...'
+                }
+              >
+                <LoadingSpinner size="lg" />
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm text-muted-foreground">
@@ -192,61 +320,77 @@ const PersonalSettings = () => {
         <h2 className="text-lg font-semibold text-foreground mb-4">
           Basic Information
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          aria-label="Personal information form"
+          noValidate
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Full Name
-              </label>
-              <input
+              <Input
+                id="full-name"
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                label="Full Name"
                 required
+                aria-describedby="fullname-validation"
               />
+              <div id="fullname-validation" className="sr-only">
+                {!formData.fullName && 'Full name is required'}
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Phone Number
-              </label>
-              <input
+              <Input
+                id="phone-number"
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                label="Phone Number"
                 required
+                aria-describedby="phone-validation"
               />
+              <div id="phone-validation" className="sr-only">
+                {!formData.phone && 'Phone number is required'}
+              </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Email
-              </label>
-              <input
+              <Input
+                id="email-address"
                 type="email"
                 value={user.email}
-                className="w-full px-4 py-3 border border-border rounded-xl bg-muted text-muted-foreground"
+                label="Email"
                 disabled
+                aria-describedby="email-help-text"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p
+                id="email-help-text"
+                className="text-xs text-muted-foreground mt-1"
+              >
                 Email cannot be changed
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Role
-              </label>
-              <input
+              <Input
+                id="user-role"
                 type="text"
                 value={user.role}
-                className="w-full px-4 py-3 border border-border rounded-xl bg-muted text-muted-foreground capitalize"
+                label="Role"
+                aria-describedby="role-help-text"
                 disabled
               />
+              <p
+                id="role-help-text"
+                className="text-xs text-muted-foreground mt-1 sr-only"
+              >
+                User role cannot be changed
+              </p>
             </div>
           </div>
 
@@ -257,112 +401,159 @@ const PersonalSettings = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Country
-                </label>
-                <input
-                  type="text"
-                  name="address.country"
-                  value={formData.address.country}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                  required
+                <DropdownSelector
+                  id="country-selector"
+                  label="Country"
+                  options={[
+                    { id: user.address.country, label: user.address.country },
+                  ]}
+                  value={user.address.country}
+                  onChange={() => {}}
+                  disabled={true}
+                  helpText="Country cannot be changed"
+                  allowEmpty={false}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  State
-                </label>
-                <input
+                <Input
+                  id="address-state"
                   type="text"
                   name="address.state"
                   value={formData.address.state}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  label="State"
                   required
+                  aria-describedby="state-validation"
                 />
+                <div id="state-validation" className="sr-only">
+                  {!formData.address.state && 'State is required'}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  City
-                </label>
-                <input
+                <Input
+                  id="address-city"
                   type="text"
                   name="address.city"
                   value={formData.address.city}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  label="City"
                   required
+                  aria-describedby="city-validation"
                 />
+                <div id="city-validation" className="sr-only">
+                  {!formData.address.city && 'City is required'}
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Street
-                </label>
-                <input
+                <Input
+                  id="address-street"
                   type="text"
                   name="address.street"
                   value={formData.address.street}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                  label="Street"
                   required
+                  aria-describedby="street-validation"
+                />
+                <div id="street-validation" className="sr-only">
+                  {!formData.address.street && 'Street is required'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Service Selection */}
+          <div className="border-t pt-4 mt-6">
+            <h3 className="text-md font-semibold text-foreground mb-4">
+              Service Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <DropdownSelector
+                  id="service-selector"
+                  label="Choose Your Service"
+                  options={services.map((service) => ({
+                    id: service._id,
+                    label: service.name,
+                    description: service.description,
+                  }))}
+                  value={formData.serviceId}
+                  onChange={handleServiceChange}
+                  placeholder="Select a service"
+                  helpText="Select the service you provide to customers"
+                  allowEmpty={true}
+                  emptyLabel="No service selected"
                 />
               </div>
             </div>
           </div>
 
-          {/* Service Information (for craftsmen) */}
-          {user.service && (
-            <div className="border-t pt-4 mt-6">
-              <h3 className="text-md font-semibold text-foreground mb-4">
-                Service Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Service
-                  </label>
-                  <input
-                    type="text"
-                    value={user.service.name}
-                    className="w-full px-4 py-3 border border-border rounded-xl bg-muted text-muted-foreground"
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
-                    Rating
-                  </label>
-                  <input
-                    type="text"
-                    value={`${user.rating} (${user.ratingCount} reviews)`}
-                    className="w-full px-4 py-3 border border-border rounded-xl bg-muted text-muted-foreground"
-                    disabled
-                  />
-                </div>
-              </div>
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={user.service.description}
-                  className="w-full px-4 py-3 border border-border rounded-xl bg-muted text-muted-foreground"
-                  disabled
-                />
-              </div>
+          <div className="flex justify-between items-center pt-4">
+            <div className="flex items-center gap-3">
+              {hasChanges && (
+                <>
+                  <span
+                    className="text-sm text-muted-foreground"
+                    aria-live="polite"
+                    role="status"
+                  >
+                    You have unsaved changes
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (user) {
+                        setFormData({
+                          fullName: user.fullName,
+                          phone: user.phone,
+                          address: {
+                            state: user.address.state,
+                            city: user.address.city,
+                            street: user.address.street,
+                          },
+                          serviceId: user.service?._id || '',
+                        });
+                        setHasChanges(false);
+                      }
+                    }}
+                    aria-describedby="reset-button-description"
+                  >
+                    Reset
+                  </Button>
+                  <span id="reset-button-description" className="sr-only">
+                    Reset all changes to original values
+                  </span>
+                </>
+              )}
             </div>
-          )}
-
-          <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
+            <Button
+              type="submit"
+              disabled={saving || !hasChanges}
+              className={!hasChanges ? 'opacity-50' : ''}
+              aria-describedby="save-button-description"
+            >
+              {saving ? (
+                <>
+                  <span className="sr-only">Saving changes...</span>
+                  <span aria-hidden="true">Saving...</span>
+                </>
+              ) : (
+                'Save Changes'
+              )}
             </Button>
+            <span id="save-button-description" className="sr-only">
+              {!hasChanges
+                ? 'No changes to save'
+                : saving
+                ? 'Currently saving your changes'
+                : 'Save your profile changes'}
+            </span>
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -49,7 +49,10 @@ const ProfilePage = () => {
   if (loading) {
     return (
       <Container className="flex items-center justify-center py-20">
-        <LoadingSpinner />
+        <div role="status" aria-label="Loading profile data">
+          <LoadingSpinner />
+          <span className="sr-only">Loading your profile information...</span>
+        </div>
       </Container>
     );
   }
@@ -57,7 +60,7 @@ const ProfilePage = () => {
   if (error || !user) {
     return (
       <Container className="flex items-center justify-center py-20">
-        <div className="text-center">
+        <div className="text-center" role="alert" aria-live="polite">
           <div className="text-red-500 text-lg font-medium mb-2">
             {error || 'Failed to load profile'}
           </div>
@@ -84,20 +87,22 @@ const ProfilePage = () => {
 
   return (
     <Container className="py-6 sm:py-8">
-      <div className="flex items-center gap-4 mb-6">
+      <nav aria-label="Breadcrumb">
         <Button
           variant="outline"
           size="sm"
           onClick={() => router.back()}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 mb-6"
+          aria-label="Go back to previous page"
         >
-          <HiArrowLeft className="w-4 h-4" />
+          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
           Back
         </Button>
-      </div>
-      <div className="space-y-6">
+      </nav>
+
+      <main className="space-y-6" role="main">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               Profile
@@ -108,12 +113,13 @@ const ProfilePage = () => {
           </div>
           <Link
             href="/settings/personal"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            aria-label="Edit your profile information"
           >
-            <HiCog className="w-4 h-4" />
+            <HiCog className="w-4 h-4" aria-hidden="true" />
             Edit Profile
           </Link>
-        </div>
+        </header>
 
         {/* Profile Card */}
         <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
@@ -131,14 +137,21 @@ const ProfilePage = () => {
                   {user.profilePicture ? (
                     <Image
                       src={user.profilePicture}
-                      alt={user.fullName}
+                      alt={`Profile picture of ${user.fullName}`}
                       width={128}
                       height={128}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                      <HiUser className="w-18 h-18 text-muted-foreground" />
+                    <div
+                      className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20"
+                      role="img"
+                      aria-label="Default profile picture placeholder"
+                    >
+                      <HiUser
+                        className="w-18 h-18 text-muted-foreground"
+                        aria-hidden="true"
+                      />
                     </div>
                   )}
                 </div>
@@ -146,18 +159,24 @@ const ProfilePage = () => {
             </div>
 
             {/* User Info */}
-            <div className="space-y-6">
+            <section className="space-y-6" aria-labelledby="user-info-heading">
+              <h2 id="user-info-heading" className="sr-only">
+                User Information
+              </h2>
+
               <div className="text-center md:text-left">
-                <h2 className="text-3xl font-bold text-foreground mb-2">
+                <h3 className="text-3xl font-bold text-foreground mb-2">
                   {user.fullName}
-                </h2>
+                </h3>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 text-muted-foreground">
                   <span className="text-lg capitalize font-medium">
                     {user.role}
                   </span>
                   {user.service && (
                     <>
-                      <span className="hidden md:inline">•</span>
+                      <span className="hidden md:inline" aria-hidden="true">
+                        •
+                      </span>
                       <span className="text-primary font-medium">
                         {user.service.name}
                       </span>
@@ -170,7 +189,13 @@ const ProfilePage = () => {
               {(user.rating > 0 ||
                 user.ratingCount > 0 ||
                 user.role === 'craftsman') && (
-                <div className="flex items-center justify-center md:justify-start gap-6 py-4 border-y border-border">
+                <section
+                  className="flex items-center justify-center md:justify-start gap-6 py-4 border-y border-border"
+                  aria-labelledby="stats-heading"
+                >
+                  <h4 id="stats-heading" className="sr-only">
+                    Profile Statistics
+                  </h4>
                   {(user.rating > 0 || user.ratingCount > 0) && (
                     <>
                       <div className="text-center">
@@ -178,7 +203,10 @@ const ProfilePage = () => {
                           <span className="text-2xl font-bold text-foreground">
                             {user.rating.toFixed(1)}
                           </span>
-                          <HiStar className="w-5 h-5 text-yellow-400 fill-current" />
+                          <HiStar
+                            className="w-5 h-5 text-yellow-400 fill-current"
+                            aria-label="stars"
+                          />
                         </div>
                         <p className="text-sm text-muted-foreground">Rating</p>
                       </div>
@@ -198,7 +226,7 @@ const ProfilePage = () => {
                       Member Since
                     </p>
                   </div>
-                </div>
+                </section>
               )}
 
               {/* Contact Information Grid */}
@@ -290,7 +318,7 @@ const ProfilePage = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </section>
           </div>
         </div>
 
@@ -315,7 +343,7 @@ const ProfilePage = () => {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </Container>
   );
 };

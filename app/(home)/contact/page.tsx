@@ -1,7 +1,7 @@
 'use client';
 
 import Container from '@/app/components/ui/container';
-import Input from '@/app/components/auth/input';
+import Input from '@/app/components/ui/input';
 import Button from '@/app/components/ui/button';
 import { useState, useCallback } from 'react';
 import { sendEmail } from '@/app/services/email';

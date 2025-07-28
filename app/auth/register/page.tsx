@@ -9,7 +9,7 @@ import { createSessionFromAuthData } from '../../services/session';
 import Button from '../../components/ui/button';
 import HomeButton from '../../components/ui/home-button';
 import ErrorMessage from '../../components/ui/error-message';
-import Input from '../../components/auth/input';
+import Input from '../../components/ui/input';
 import {
   validateName,
   validateEmail,
