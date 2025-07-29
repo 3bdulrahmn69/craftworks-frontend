@@ -1,12 +1,34 @@
 import { api } from './api';
 import {
-  Quote,
   Invitation,
   JobsApiResponse,
   JobApiResponse,
   QuoteApiResponse,
+  JobApplicationsApiResponse,
   Pagination,
 } from '@/app/types/jobs';
+
+// Helper function to flatten nested API responses
+const flattenResponse = (response: any): any => {
+  if (response.data?.data && response.data?.pagination) {
+    // Handle paginated responses
+    return {
+      success: response.success,
+      data: response.data.data,
+      pagination: response.data.pagination,
+      message: response.message,
+    };
+  } else if (response.data?.data) {
+    // Handle single item responses
+    return {
+      success: response.success,
+      data: response.data.data,
+      message: response.message,
+    };
+  }
+  // Return as-is if already flattened
+  return response;
+};
 
 export const jobsService = {
   // Get all jobs with optional filters
@@ -25,7 +47,7 @@ export const jobsService = {
       params,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Search jobs with optional filters
@@ -46,7 +68,7 @@ export const jobsService = {
       params,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Get job details
@@ -54,7 +76,7 @@ export const jobsService = {
     const response = await api.get(`/jobs/${jobId}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Submit a quote for a job (craftsman only)
@@ -66,18 +88,18 @@ export const jobsService = {
     const response = await api.post(`/jobs/${jobId}/quotes`, quoteData, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Get quotes for a job (client only)
   async getJobQuotes(
     jobId: string,
     token: string
-  ): Promise<{ success: boolean; data: Quote[] }> {
+  ): Promise<JobApplicationsApiResponse> {
     const response = await api.get(`/jobs/${jobId}/quotes`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Accept a quote (client only)
@@ -93,20 +115,77 @@ export const jobsService = {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+    return flattenResponse(response.data);
+  },
+
+  // Create a new job (client only)
+  async createJob(
+    jobData: FormData | object,
+    token: string
+  ): Promise<JobApiResponse> {
+    const response = await api.post('/jobs', jobData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(jobData instanceof FormData
+          ? {}
+          : { 'Content-Type': 'application/json' }),
+      },
+    });
+    return flattenResponse(response.data);
+  },
+
+  // Get jobs created by the current user (client only)
+  async getMyJobs(
+    params?: {
+      page?: number;
+      limit?: number;
+      status?: string;
+    },
+    token?: string
+  ): Promise<JobsApiResponse> {
+    const response = await api.get('/users/me/jobs', {
+      params,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return flattenResponse(response.data);
+  },
+
+  // Update a job (client only)
+  async updateJob(
+    jobId: string,
+    jobData: FormData | object,
+    token: string
+  ): Promise<JobApiResponse> {
+    const response = await api.put(`/jobs/${jobId}`, jobData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...(jobData instanceof FormData
+          ? {}
+          : { 'Content-Type': 'application/json' }),
+      },
+    });
+    return flattenResponse(response.data);
+  },
+
+  // Delete a job (client only)
+  async deleteJob(
+    jobId: string,
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const response = await api.delete(`/jobs/${jobId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return flattenResponse(response.data);
   },
 };
 
 export const quotesService = {
   // Get craftsman's quotes
-  async getMyQuotes(
-    queryParams: string,
-    token?: string
-  ): Promise<{ data: Quote[]; pagination: Pagination }> {
+  async getMyQuotes(queryParams: string, token?: string): Promise<any> {
     const response = await api.get(`/users/me/quotes?${queryParams}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 };
 
@@ -119,7 +198,7 @@ export const invitationsService = {
     const response = await api.get(`/users/me/invitations?${queryParams}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    return response.data;
+    return flattenResponse(response.data);
   },
 
   // Respond to an invitation
@@ -135,6 +214,6 @@ export const invitationsService = {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return apiResponse.data;
+    return flattenResponse(apiResponse.data);
   },
 };

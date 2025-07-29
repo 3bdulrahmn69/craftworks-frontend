@@ -8,6 +8,7 @@ import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { useSession } from 'next-auth/react';
 import { IoTicketSharp } from 'react-icons/io5';
+import { useRouter } from 'next/navigation';
 
 interface InvitationsPageState {
   invitations: Invitation[];
@@ -26,6 +27,7 @@ interface ResponseModalState {
 
 const InvitationsPage = () => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [state, setState] = useState<InvitationsPageState>({
     invitations: [],
@@ -70,8 +72,8 @@ const InvitationsPage = () => {
 
         setState((prev) => ({
           ...prev,
-          invitations: response.data,
-          pagination: response.pagination,
+          invitations: response.data || [],
+          pagination: response.pagination || prev.pagination,
           loading: false,
         }));
       } catch (error) {
@@ -410,9 +412,7 @@ const InvitationsPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        window.open(`/jobs/${invitation.job.id}`, '_blank')
-                      }
+                      onClick={() => router.push(`/jobs/${invitation.job._id}`)}
                     >
                       View Job
                     </Button>

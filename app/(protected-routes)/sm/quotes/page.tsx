@@ -54,10 +54,19 @@ const QuotesPage = () => {
           session?.accessToken
         );
 
+        console.log('Fetched quotes:', response);
+
         setState((prev) => ({
           ...prev,
-          quotes: response.data,
-          pagination: response.pagination,
+          quotes: response.data || [],
+          pagination: {
+            currentPage: response.pagination?.page || 1,
+            totalPages: response.pagination?.totalPages || 1,
+            totalItems: response.pagination?.totalItems || 0,
+            itemsPerPage: response.pagination?.limit || 10,
+            hasNext: response.pagination?.hasNextPage || false,
+            hasPrev: response.pagination?.hasPrevPage || false,
+          },
           loading: false,
         }));
       } catch (error) {
@@ -289,23 +298,36 @@ const QuotesPage = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Job: {quote.job.title}
+                      Job:{' '}
+                      {quote.job && typeof quote.job === 'object'
+                        ? quote.job.title
+                        : 'Job Deleted'}
                     </h3>
-                    <p className="text-muted-foreground mb-2">
-                      Client: {quote.job.client.name}
-                    </p>
-                    {quote.job.client.rating && (
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <svg
-                          className="w-4 h-4 mr-1 text-warning"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        {quote.job.client.rating.toFixed(1)} (
-                        {quote.job.client.reviewCount || 0} reviews)
-                      </div>
+                    {quote.job &&
+                    typeof quote.job === 'object' &&
+                    quote.job.client ? (
+                      <>
+                        <p className="text-muted-foreground mb-2">
+                          Client: {quote.job.client.fullName}
+                        </p>
+                        {quote.job.client.rating && (
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <svg
+                              className="w-4 h-4 mr-1 text-warning"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            {quote.job.client.rating.toFixed(1)} (
+                            {quote.job.client.ratingCount || 0} reviews)
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-muted-foreground mb-2">
+                        Client: Information not available
+                      </p>
                     )}
                   </div>
                   <div className="text-right">
@@ -362,11 +384,16 @@ const QuotesPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      window.open(`/jobs/${quote.job.id}`, '_blank')
-                    }
+                    onClick={() => {
+                      if (quote.job && typeof quote.job === 'object') {
+                        window.open(`/jobs/${quote.job._id}`, '_blank');
+                      }
+                    }}
+                    disabled={!quote.job || typeof quote.job !== 'object'}
                   >
-                    View Job
+                    {quote.job && typeof quote.job === 'object'
+                      ? 'View Job'
+                      : 'Job Unavailable'}
                   </Button>
                 </div>
               </div>

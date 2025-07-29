@@ -84,6 +84,8 @@ export const useJobs = ({ jobsPerPage = 9 }: UseJobsProps = {}) => {
 
         if (response.data) {
           // Filter only "Posted" jobs that craftsmen can apply to
+          console.log('Fetched jobs:', response);
+
           const availableJobs = response.data.filter(
             (job: Job) => job.status === 'Posted'
           );

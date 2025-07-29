@@ -325,12 +325,12 @@ const JobDetailsPage = () => {
                   toastService.success('Quote submitted successfully! 🎉');
                   setShowQuoteModal(false);
                   // Refresh job data to update applied status
-                  const updatedJobResponse = await jobsService.getJob(
+                  const updatedJobResponse2 = await jobsService.getJob(
                     jobId,
                     session.accessToken
                   );
-                  if (updatedJobResponse.success) {
-                    setJob(updatedJobResponse.data);
+                  if (updatedJobResponse2.success) {
+                    setJob(updatedJobResponse2.data);
                   }
                 } else {
                   toastService.error(

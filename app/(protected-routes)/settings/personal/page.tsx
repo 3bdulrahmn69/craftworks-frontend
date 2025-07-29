@@ -10,7 +10,7 @@ import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import { userService, UpdateUserData } from '@/app/services/user';
 import servicesAPI from '@/app/services/services';
 import { User } from '@/app/types/user';
-import { Category } from '@/app/types/services';
+import { Service } from '@/app/types/services';
 
 import { HiCamera, HiTrash, HiUser } from 'react-icons/hi2';
 import Input from '@/app/components/ui/input';
@@ -19,7 +19,7 @@ import DropdownSelector from '@/app/components/ui/dropdown-selector';
 const PersonalSettings = () => {
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
-  const [services, setServices] = useState<Category[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -43,7 +43,7 @@ const PersonalSettings = () => {
       try {
         const [userData, servicesData] = await Promise.all([
           userService.getMe(session.accessToken),
-          servicesAPI.getAllServices(session.accessToken),
+          servicesAPI.getAllServices(),
         ]);
 
         setUser(userData);
