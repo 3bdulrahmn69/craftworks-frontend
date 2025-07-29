@@ -5,10 +5,5 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <Redirect />
-      {children}
-    </>
-  );
+  return <Redirect>{children}</Redirect>;
 }

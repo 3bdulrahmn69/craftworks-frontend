@@ -16,10 +16,33 @@ export const jobsService = {
       status?: string;
       page?: number;
       limit?: number;
+      state?: string;
+      city?: string;
     },
     token?: string
   ): Promise<JobsApiResponse> {
     const response = await api.get('/jobs', {
+      params,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return response.data;
+  },
+
+  // Search jobs with optional filters
+  async searchJobs(
+    params?: {
+      q?: string;
+      category?: string;
+      status?: string;
+      page?: number;
+      limit?: number;
+      state?: string;
+      city?: string;
+      paymentType?: string;
+    },
+    token?: string
+  ): Promise<JobsApiResponse> {
+    const response = await api.get('/jobs/search', {
       params,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

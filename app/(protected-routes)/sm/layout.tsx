@@ -12,12 +12,11 @@ const navLinks = [
 
 const CraftsmanLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
-      <Redirect />
+    <Redirect requireAuth={true} allowedRoles={['craftsman']}>
       <Header navLinks={navLinks} />
       {children}
       <Footer />
-    </>
+    </Redirect>
   );
 };
 

@@ -3,9 +3,18 @@ export interface Job {
   _id: string;
   title: string;
   description: string;
-  category: string;
+  category: string; // Legacy field, keeping for backward compatibility
+  service?: Service; // New populated service object (API v1.3.0)
   photos?: string[];
-  address: string;
+  address:
+    | string
+    | {
+        // Address can be string or structured object
+        country: string;
+        state: string;
+        city: string;
+        street: string;
+      };
   location?: {
     type: 'Point';
     coordinates: [number, number];

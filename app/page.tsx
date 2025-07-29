@@ -1,7 +1,7 @@
 import Redirect from './components/auth/redirect';
 import Footer from './components/footer';
 import Header from './components/header';
-import CategoriesSection from './components/sections/categories-section';
+import CategoriesSection from './components/sections/services-section';
 import CTASection from './components/sections/cta-section';
 import HeroSection from './components/sections/hero-section';
 import HowItWorksSection from './components/sections/how-it-works-section';
@@ -17,8 +17,7 @@ const navLinks = [
 
 export default function Home() {
   return (
-    <>
-      <Redirect />
+    <Redirect>
       <Header navLinks={navLinks} />
       <HeroSection />
       <HowItWorksSection />
@@ -26,6 +25,6 @@ export default function Home() {
       <TestimonialsSection />
       <CTASection />
       <Footer />
-    </>
+    </Redirect>
   );
 }

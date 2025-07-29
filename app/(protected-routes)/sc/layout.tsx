@@ -11,12 +11,11 @@ const navLinks = [
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
-      <Redirect />
+    <Redirect requireAuth={true} allowedRoles={['client']}>
       <Header navLinks={navLinks} />
       {children}
       <Footer />
-    </>
+    </Redirect>
   );
 };
 

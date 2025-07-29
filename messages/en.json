@@ -180,13 +180,10 @@
         }
       }
     },
-    "categories": {
-      "title": "Browse Categories",
-      "subtitle": "Find the right service category for your needs.",
-      "services": "Services",
-      "browse": "Browse",
-      "viewAll": "View All",
-      "noCategories": "No categories available at the moment. Please check back later."
+    "services": {
+      "title": "Browse Services",
+      "subtitle": "Find the right service for your needs.",
+      "services": "Services"
     }
   },
   "nav": {

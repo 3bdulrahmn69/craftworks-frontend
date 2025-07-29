@@ -7,6 +7,7 @@ import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { useSession } from 'next-auth/react';
+import { IoTicketSharp } from 'react-icons/io5';
 
 interface InvitationsPageState {
   invitations: Invitation[];
@@ -240,14 +241,15 @@ const InvitationsPage = () => {
     <>
       <Container className="py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        <header className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
+            <IoTicketSharp className="inline-block mr-2 text-primary" />
             Job Invitations
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl">
-            Review invitations from clients for your expertise
+            Manage your job invitations and respond to clients
           </p>
-        </div>
+        </header>
 
         {/* Status Filter */}
         <div className="mb-8">

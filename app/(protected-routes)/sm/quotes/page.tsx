@@ -7,6 +7,7 @@ import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { useSession } from 'next-auth/react';
+import { TiDocumentText } from 'react-icons/ti';
 
 interface QuotesPageState {
   quotes: Quote[];
@@ -176,7 +177,8 @@ const QuotesPage = () => {
       <main role="main">
         {/* Header */}
         <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
+            <TiDocumentText className="inline-block mr-2 text-primary" />
             My Quotes
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl">

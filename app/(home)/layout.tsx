@@ -16,11 +16,10 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <Redirect />
+    <Redirect>
       <Header navLinks={navLinks} />
       {children}
       <Footer />
-    </>
+    </Redirect>
   );
 }

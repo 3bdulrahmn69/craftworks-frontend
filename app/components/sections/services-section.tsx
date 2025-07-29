@@ -1,9 +1,8 @@
-import { getLocale, getTranslations } from 'next-intl/server';
-import type { Category } from '@/app/types/services';
+import { getTranslations } from 'next-intl/server';
+import type { Service } from '@/app/types/services';
 
 /* components */
 import Container from '../ui/container';
-import Button from '../ui/button';
 
 import {
   FaHammer,
@@ -12,14 +11,13 @@ import {
   FaPaintBrush,
   FaBroom,
   FaLeaf,
-  FaChevronRight,
   FaBolt,
   FaThermometerHalf,
   FaBuilding,
 } from 'react-icons/fa';
 
-// Server utility to fetch categories
-async function fetchCategories(): Promise<Category[]> {
+// Server utility to fetch services
+async function fetchServices(): Promise<Service[]> {
   try {
     const link = `${
       process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -30,7 +28,7 @@ async function fetchCategories(): Promise<Category[]> {
     const data = await res.json();
     return data.data;
   } catch (error) {
-    console.warn('Failed to fetch categories:', error);
+    console.warn('Failed to fetch services:', error);
     return [];
   }
 }
@@ -48,7 +46,7 @@ const getCategoryIcon = (iconName: string) => {
     'thermometer-icon': <FaThermometerHalf className="w-12 h-12" />,
     'brick-icon': <FaBuilding className="w-12 h-12" />,
   };
-  return iconMap[iconName] || iconMap['hammer-icon']; // Default fallback
+  return iconMap[iconName] || iconMap['hammer-icon'];
 };
 
 const getCategoryColor = (index: number) => {
@@ -69,13 +67,11 @@ const getColorClasses = (color: string) => {
   return colorMap[color as keyof typeof colorMap] || colorMap.blue;
 };
 
-const CategoriesSection = async () => {
-  const t = await getTranslations('homepage sections.categories');
-  const locale = await getLocale();
-  const categoriesData = await fetchCategories();
-  console.log('Fetched categories:', categoriesData);
+const ServicesSection = async () => {
+  const t = await getTranslations('homepage sections.services');
+  const servicesData = await fetchServices();
 
-  if (!categoriesData) return null;
+  if (!servicesData) return null;
 
   return (
     <section className="py-20 bg-muted">
@@ -90,11 +86,11 @@ const CategoriesSection = async () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {categoriesData &&
-            categoriesData.map((category: Category, index: number) => (
+          {servicesData &&
+            servicesData.map((service: Service, index: number) => (
               <div
-                key={category._id}
-                className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer group border border-border"
+                key={service._id}
+                className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 group border border-border"
               >
                 <div className="flex flex-col items-center text-center mb-6">
                   <div
@@ -102,40 +98,23 @@ const CategoriesSection = async () => {
                       getCategoryColor(index)
                     )}`}
                   >
-                    {getCategoryIcon(category.icon)}
+                    {getCategoryIcon(service.icon)}
                   </div>
 
                   <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-                    {category.name}
+                    {service.name}
                   </h3>
 
                   <p className="text-muted-foreground mb-4">
-                    {category.description}
+                    {service.description}
                   </p>
-                </div>
-
-                <div className="flex items-center justify-center text-sm text-primary font-medium">
-                  {t('browse')}
-                  <FaChevronRight
-                    className={`w-4 h-4 transition-transform ${
-                      locale === 'ar'
-                        ? 'rotate-180 mr-1 group-hover:-translate-x-1 '
-                        : 'ml-1 group-hover:translate-x-1 '
-                    }`}
-                  />
                 </div>
               </div>
             ))}
-        </div>
-
-        <div className="text-center">
-          <Button variant="outline" size="lg">
-            {t('viewAll')}
-          </Button>
         </div>
       </Container>
     </section>
   );
 };
 
-export default CategoriesSection;
+export default ServicesSection;

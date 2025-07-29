@@ -1,0 +1,177 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { Job } from '@/app/types/jobs';
+import Button from '@/app/components/ui/button';
+import {
+  HiLocationMarker,
+  HiCash,
+  HiClock,
+  HiUsers,
+  HiCurrencyDollar,
+  HiEye,
+  HiTag,
+} from 'react-icons/hi';
+
+interface JobCardProps {
+  job: Job;
+  onQuoteClick: (job: Job) => void;
+  isApplied: boolean;
+}
+
+const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
+  const router = useRouter();
+
+  // According to API v1.3.0, jobs now include populated service objects
+  const serviceName = job.service?.name || job.category || 'General';
+
+  // Format address properly
+  const formatAddress = (address: any) => {
+    if (typeof address === 'string') return address;
+    if (typeof address === 'object' && address) {
+      const parts = [
+        address.street,
+        address.city,
+        address.state,
+        address.country,
+      ].filter(Boolean);
+      return parts.join(', ');
+    }
+    return 'Location not specified';
+  };
+
+  const handleQuoteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onQuoteClick(job);
+  };
+
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/jobs/${job._id}`);
+  };
+
+  return (
+    <div
+      onClick={() => router.push(`/jobs/${job._id}`)}
+      className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border group cursor-pointer w-full hover:border-primary/30 relative overflow-hidden"
+    >
+      {/* Gradient overlay for enhanced visual appeal */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px] pointer-events-none" />
+
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 relative">
+        <div className="flex-1">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="p-3 bg-primary/10 rounded-xl shrink-0 group-hover:bg-primary/20 transition-colors">
+              <HiTag className="w-6 h-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight mb-2">
+                {job.title}
+              </h3>
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors">
+                {serviceName}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Description */}
+      <div className="mb-6">
+        <p className="text-muted-foreground text-base leading-relaxed line-clamp-3">
+          {job.description}
+        </p>
+      </div>
+
+      {/* Enhanced Job Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors border border-transparent hover:border-primary/20">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <HiLocationMarker className="w-5 h-5 text-primary shrink-0" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">Location</p>
+            <p className="text-sm text-muted-foreground truncate">
+              {formatAddress(job.address)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors border border-transparent hover:border-primary/20">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <HiCash className="w-5 h-5 text-primary shrink-0" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Payment</p>
+            <p className="text-sm text-muted-foreground">{job.paymentType}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors border border-transparent hover:border-primary/20">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <HiClock className="w-5 h-5 text-primary shrink-0" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">Posted</p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(job.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
+          <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-xl hover:shadow-md transition-shadow">
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+              <HiUsers className="w-5 h-5 text-amber-600 shrink-0" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                Applications
+              </p>
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                {job.appliedCraftsmen.length} craftsmen applied
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Enhanced Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-3 relative">
+        <Button
+          onClick={handleViewDetails}
+          variant="outline"
+          className="flex-1 group/btn border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+        >
+          <HiEye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+          View Details
+        </Button>
+        <Button
+          onClick={handleQuoteClick}
+          className={`flex-1 font-medium transition-all duration-200 ${
+            isApplied
+              ? 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-300'
+              : 'bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
+          }`}
+          disabled={isApplied}
+          variant={isApplied ? 'outline' : 'primary'}
+        >
+          {isApplied ? (
+            <>
+              <HiUsers className="w-4 h-4 mr-2" />
+              Applied
+            </>
+          ) : (
+            <>
+              <HiCurrencyDollar className="w-4 h-4 mr-2" />
+              Submit Quote
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default JobCard;
