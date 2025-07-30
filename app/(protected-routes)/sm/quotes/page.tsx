@@ -1,13 +1,24 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Quote, Pagination } from '@/app/types/jobs';
 import { quotesService } from '@/app/services/jobs';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
+import DropdownSelector from '@/app/components/ui/dropdown-selector';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { useSession } from 'next-auth/react';
 import { TiDocumentText } from 'react-icons/ti';
+import {
+  FiAlertCircle,
+  FiFileText,
+  FiDollarSign,
+  FiCalendar,
+  FiStar,
+  FiRefreshCw,
+  FiEye,
+} from 'react-icons/fi';
 
 interface QuotesPageState {
   quotes: Quote[];
@@ -19,6 +30,8 @@ interface QuotesPageState {
 
 const QuotesPage = () => {
   const { data: session } = useSession();
+  const locale = useLocale();
+  const t = useTranslations('quotes');
 
   const [state, setState] = useState<QuotesPageState>({
     quotes: [],
@@ -100,39 +113,36 @@ const QuotesPage = () => {
     }));
   }, []);
 
-  const getStatusBadge = useCallback((status: string) => {
-    const statusClasses = {
-      submitted:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      accepted:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-    };
+  const getStatusBadge = useCallback(
+    (status: string) => {
+      const statusClasses = {
+        submitted:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+        accepted:
+          'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        rejected:
+          'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+      };
 
-    return (
-      <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${
-          statusClasses[status as keyof typeof statusClasses] ||
-          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-        }`}
-      >
-        {status === 'submitted'
-          ? 'Submitted'
-          : status === 'accepted'
-          ? 'Accepted'
-          : status === 'rejected'
-          ? 'Rejected'
-          : status}
-      </span>
-    );
-  }, []);
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            statusClasses[status as keyof typeof statusClasses] ||
+            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+          }`}
+        >
+          {t(`filters.status.${status}`)}
+        </span>
+      );
+    },
+    [t]
+  );
 
   const statusOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Statuses' },
-      { value: 'submitted', label: 'Submitted' },
-      { value: 'accepted', label: 'Accepted' },
-      { value: 'rejected', label: 'Rejected' },
+      { value: 'submitted', label: 'submitted' },
+      { value: 'accepted', label: 'accepted' },
+      { value: 'rejected', label: 'rejected' },
     ],
     []
   );
@@ -147,11 +157,12 @@ const QuotesPage = () => {
 
   if (state.loading && state.quotes.length === 0) {
     return (
-      <Container>
+      <Container className={locale === 'ar' ? 'rtl' : 'ltr'}>
         <div
           className="animate-pulse space-y-6"
           role="status"
-          aria-label="Loading quotes"
+          aria-label={t('loading.message')}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
         >
           <div className="h-10 bg-muted rounded-xl w-1/3"></div>
           <div className="h-6 bg-muted rounded-xl w-1/2"></div>
@@ -161,7 +172,11 @@ const QuotesPage = () => {
               key={i}
               className="bg-card rounded-xl p-6 border border-border space-y-4"
             >
-              <div className="flex justify-between">
+              <div
+                className={`flex justify-between ${
+                  locale === 'ar' ? 'flex-row-reverse' : ''
+                }`}
+              >
                 <div className="space-y-2 flex-1">
                   <div className="h-5 bg-muted rounded w-3/4"></div>
                   <div className="h-4 bg-muted rounded w-1/2"></div>
@@ -182,45 +197,47 @@ const QuotesPage = () => {
   }
 
   return (
-    <Container className="py-8">
-      <main role="main">
+    <Container className={`py-8 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <main role="main" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
-            <TiDocumentText className="inline-block mr-2 text-primary" />
-            My Quotes
+            <TiDocumentText
+              className={`text-primary ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+            />
+            {t('title')}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl">
-            Track all your submitted quotes and their status
+          <p
+            className={`text-xl text-muted-foreground max-w-3xl ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
+            {t('subtitle')}
           </p>
         </header>
 
         {/* Status Filter */}
         <section className="mb-8" aria-labelledby="filter-heading">
           <h2 id="filter-heading" className="sr-only">
-            Filter Quotes
+            {t('filters.heading')}
           </h2>
-          <label
-            htmlFor="status-filter"
-            className="block text-sm font-medium text-foreground mb-2"
-          >
-            Filter by Status:
-          </label>
-          <select
-            id="status-filter"
-            value={state.statusFilter}
-            onChange={(e) => handleStatusFilter(e.target.value)}
-            className="px-4 py-3 border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm hover:shadow-md transition-shadow"
-            aria-describedby="filter-description"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="w-64">
+            <DropdownSelector
+              id="status-filter"
+              label={t('filters.statusLabel')}
+              options={statusOptions.map((option) => ({
+                id: option.value,
+                value: option.value,
+                label: t(`filters.status.${option.value}`),
+              }))}
+              value={state.statusFilter}
+              onChange={handleStatusFilter}
+              placeholder={t('filters.selectStatus')}
+              className="w-full"
+            />
+          </div>
           <p id="filter-description" className="sr-only">
-            Filter quotes by their current status
+            {t('filters.description')}
           </p>
         </section>
 
@@ -228,17 +245,7 @@ const QuotesPage = () => {
         {state.error && (
           <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <svg
-                className="w-5 h-5 text-destructive"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <FiAlertCircle className="w-5 h-5 text-destructive" />
               <p className="text-destructive font-medium">{state.error}</p>
             </div>
             <Button
@@ -248,7 +255,7 @@ const QuotesPage = () => {
               variant="outline"
               className="mt-2"
             >
-              Try Again
+              {t('error.tryAgain')}
             </Button>
           </div>
         )}
@@ -257,34 +264,26 @@ const QuotesPage = () => {
         {state.quotes.length === 0 ? (
           <div className="text-center py-16">
             <div className="bg-card rounded-2xl shadow-lg p-8 border border-border max-w-md mx-auto">
-              <svg
-                className="w-16 h-16 text-muted-foreground mx-auto mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
+              <FiFileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                No quotes found
+                {t('emptyState.title')}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {state.statusFilter !== 'all'
-                  ? `No quotes with status "${state.statusFilter}"`
-                  : 'Start browsing jobs and submit your first quote!'}
+                  ? t('emptyState.filtered', {
+                      status: t(`filters.status.${state.statusFilter}`),
+                    })
+                  : t('emptyState.noQuotes')}
               </p>
               <Button
                 onClick={() =>
                   fetchQuotes(state.pagination.currentPage, state.statusFilter)
                 }
                 size="lg"
+                className="flex items-center gap-2"
               >
-                Refresh Quotes
+                <FiRefreshCw className="w-4 h-4" />
+                {t('emptyState.refresh')}
               </Button>
             </div>
           </div>
@@ -294,60 +293,81 @@ const QuotesPage = () => {
               <div
                 key={quote._id}
                 className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Job:{' '}
+                <div
+                  className={`flex items-start gap-4 mb-4 ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className={`text-lg font-semibold text-foreground mb-2 ${
+                        locale === 'ar' ? 'text-right' : 'text-left'
+                      }`}
+                    >
                       {quote.job && typeof quote.job === 'object'
                         ? quote.job.title
-                        : 'Job Deleted'}
+                        : t('quote.jobDeleted')}
                     </h3>
                     {quote.job &&
                     typeof quote.job === 'object' &&
                     quote.job.client ? (
                       <>
-                        <p className="text-muted-foreground mb-2">
-                          Client: {quote.job.client.fullName}
+                        <p
+                          className={`text-muted-foreground mb-2 ${
+                            locale === 'ar' ? 'text-right' : 'text-left'
+                          }`}
+                        >
+                          {quote.job.client.fullName}
                         </p>
                         {quote.job.client.rating && (
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <svg
-                              className="w-4 h-4 mr-1 text-warning"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                          <div
+                            className={`flex items-center text-sm text-muted-foreground ${
+                              locale === 'ar'
+                                ? 'flex-row-reverse justify-end'
+                                : ''
+                            }`}
+                          >
+                            <FiStar
+                              className={`w-4 h-4 text-warning fill-current ${
+                                locale === 'ar' ? 'ml-1' : 'mr-1'
+                              }`}
+                            />
                             {quote.job.client.rating.toFixed(1)} (
-                            {quote.job.client.ratingCount || 0} reviews)
+                            {quote.job.client.ratingCount || 0}{' '}
+                            {t('quote.reviews')})
                           </div>
                         )}
                       </>
                     ) : (
-                      <p className="text-muted-foreground mb-2">
-                        Client: Information not available
+                      <p
+                        className={`text-muted-foreground mb-2 ${
+                          locale === 'ar' ? 'text-right' : 'text-left'
+                        }`}
+                      >
+                        {t('quote.clientUnavailable')}
                       </p>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div
+                    className={`flex flex-col items-end gap-3 flex-shrink-0 ${
+                      locale === 'ar' ? 'order-first items-start' : 'order-last'
+                    }`}
+                  >
                     {getStatusBadge(quote.status)}
-                    <div className="flex items-center mt-3">
-                      <svg
-                        className="w-5 h-5 mr-2 text-primary"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                        />
-                      </svg>
+                    <div
+                      className={`flex items-center ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
+                      <FiDollarSign
+                        className={`w-5 h-5 text-primary ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
                       <span className="text-xl font-bold text-foreground">
-                        {quote.price.toLocaleString()} EGP
+                        {quote.price.toLocaleString()} {t('quote.currency')}
                       </span>
                     </div>
                   </div>
@@ -356,7 +376,7 @@ const QuotesPage = () => {
                 {quote.notes && (
                   <div className="bg-muted rounded-lg p-4 mb-4">
                     <h4 className="text-sm font-medium text-foreground mb-2">
-                      Additional Notes:
+                      {t('quote.additionalNotes')}
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       {quote.notes}
@@ -364,22 +384,20 @@ const QuotesPage = () => {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4h6m-6 4h6"
-                      />
-                    </svg>
-                    Submitted {formatDate(quote.createdAt)}
+                <div
+                  className={`flex items-center justify-between pt-4 border-t border-border ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  <div
+                    className={`flex items-center text-sm text-muted-foreground ${
+                      locale === 'ar' ? 'flex-row-reverse' : ''
+                    }`}
+                  >
+                    <FiCalendar
+                      className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+                    />
+                    {t('quote.submitted')} {formatDate(quote.createdAt)}
                   </div>
                   <Button
                     variant="outline"
@@ -390,10 +408,12 @@ const QuotesPage = () => {
                       }
                     }}
                     disabled={!quote.job || typeof quote.job !== 'object'}
+                    className="flex items-center gap-2"
                   >
+                    <FiEye className="w-4 h-4" />
                     {quote.job && typeof quote.job === 'object'
-                      ? 'View Job'
-                      : 'Job Unavailable'}
+                      ? t('quote.viewJob')
+                      : t('quote.jobUnavailable')}
                   </Button>
                 </div>
               </div>

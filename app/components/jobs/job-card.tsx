@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Job } from '@/app/types/jobs';
 import Button from '@/app/components/ui/button';
 import {
@@ -21,6 +22,7 @@ interface JobCardProps {
 
 const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
   const router = useRouter();
+  const locale = useLocale();
 
   // According to API v1.3.0, jobs now include populated service objects
   const serviceName = job.service?.name || job.category || 'General';
@@ -53,20 +55,41 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
   return (
     <div
       onClick={() => router.push(`/jobs/${job._id}`)}
-      className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border group cursor-pointer w-full hover:border-primary/30 relative overflow-hidden"
+      className={`bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border group cursor-pointer w-full hover:border-primary/30 relative overflow-hidden ${
+        locale === 'ar' ? 'rtl' : 'ltr'
+      }`}
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
     >
       {/* Gradient overlay for enhanced visual appeal */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px] pointer-events-none" />
+      <div
+        className={`absolute top-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px] pointer-events-none ${
+          locale === 'ar'
+            ? 'left-0 rounded-br-[100px] rounded-bl-none bg-gradient-to-br'
+            : 'right-0'
+        }`}
+      />
 
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 relative">
+      <div
+        className={`flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 relative ${
+          locale === 'ar' ? 'lg:flex-row-reverse' : ''
+        }`}
+      >
         <div className="flex-1">
-          <div className="flex items-start gap-3 mb-3">
+          <div
+            className={`flex items-start gap-3 mb-3 ${
+              locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'
+            }`}
+          >
             <div className="p-3 bg-primary/10 rounded-xl shrink-0 group-hover:bg-primary/20 transition-colors">
               <HiTag className="w-6 h-6 text-primary" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight mb-2">
+              <h3
+                className={`text-xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight mb-2 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {job.title}
               </h3>
               <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors">
@@ -79,7 +102,11 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
 
       {/* Description */}
       <div className="mb-6">
-        <p className="text-muted-foreground text-base leading-relaxed line-clamp-3">
+        <p
+          className={`text-muted-foreground text-base leading-relaxed line-clamp-3 ${
+            locale === 'ar' ? 'text-right' : 'text-left'
+          }`}
+        >
           {job.description}
         </p>
       </div>
@@ -90,7 +117,11 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
           <div className="p-2 bg-primary/10 rounded-lg">
             <HiLocationMarker className="w-5 h-5 text-primary shrink-0" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div
+            className={`flex-1 min-w-0 ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
             <p className="text-sm font-semibold text-foreground">Location</p>
             <p className="text-sm text-muted-foreground truncate">
               {formatAddress(job.address)}
@@ -138,13 +169,23 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
       </div>
 
       {/* Enhanced Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 relative">
+      <div
+        className={`flex flex-col sm:flex-row gap-3 relative ${
+          locale === 'ar' ? 'sm:flex-row-reverse' : ''
+        }`}
+      >
         <Button
           onClick={handleViewDetails}
           variant="outline"
-          className="flex-1 group/btn border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+          className={`flex-1 group/btn border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 ${
+            locale === 'ar' ? 'flex-row-reverse' : ''
+          }`}
         >
-          <HiEye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+          <HiEye
+            className={`w-4 h-4 group-hover/btn:scale-110 transition-transform ${
+              locale === 'ar' ? 'ml-2' : 'mr-2'
+            }`}
+          />
           View Details
         </Button>
         <Button
@@ -153,18 +194,22 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
             isApplied
               ? 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-300'
               : 'bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
-          }`}
+          } ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
           disabled={isApplied}
           variant={isApplied ? 'outline' : 'primary'}
         >
           {isApplied ? (
             <>
-              <HiUsers className="w-4 h-4 mr-2" />
+              <HiUsers
+                className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+              />
               Applied
             </>
           ) : (
             <>
-              <HiCurrencyDollar className="w-4 h-4 mr-2" />
+              <HiCurrencyDollar
+                className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+              />
               Submit Quote
             </>
           )}

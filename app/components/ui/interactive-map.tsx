@@ -50,7 +50,9 @@ const InteractiveMap = ({
     if (!mapRef.current || mapInstanceRef.current) return;
 
     // Initialize the map
-    const map = L.map(mapRef.current).setView([latitude, longitude], zoom);
+    const map = L.map(mapRef.current, {
+      maxBoundsViscosity: 1.0,
+    }).setView([latitude, longitude], zoom);
 
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -113,6 +115,13 @@ const InteractiveMap = ({
 
     mapInstanceRef.current = map;
 
+    // Ensure proper map bounds calculation
+    setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 100);
+
     // Cleanup function
     return () => {
       if (mapInstanceRef.current) {
@@ -136,6 +145,13 @@ const InteractiveMap = ({
   useEffect(() => {
     if (mapInstanceRef.current && latitude && longitude) {
       mapInstanceRef.current.setView([latitude, longitude], zoom);
+
+      // Ensure proper map bounds calculation after updates
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 100);
 
       // Update marker position
       if (markerRef.current) {
@@ -180,11 +196,17 @@ const InteractiveMap = ({
     <div className="relative">
       <div
         ref={mapRef}
-        className={`rounded-lg border border-border overflow-hidden ${className}`}
-        style={{ height, width }}
+        className={`rounded-lg border border-border overflow-hidden relative ${className}`}
+        style={{
+          height,
+          width,
+          zIndex: 1,
+          contain: 'layout style',
+          position: 'relative',
+        }}
       />
       {isClickable && (
-        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-muted-foreground border border-border">
+        <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-muted-foreground border border-border z-10">
           Click on map to set location
         </div>
       )}

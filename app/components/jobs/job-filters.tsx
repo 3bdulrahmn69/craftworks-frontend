@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Service } from '@/app/types/jobs';
 import { getStatesForSelect } from '@/app/data/states';
 import Button from '@/app/components/ui/button';
@@ -43,6 +44,8 @@ const JobFilters = ({
   onReset,
 }: JobFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const locale = useLocale();
+  const t = useTranslations('jobs.filters');
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -64,16 +67,28 @@ const JobFilters = ({
   ].filter(Boolean).length;
 
   return (
-    <div className="relative max-w-4xl mx-auto">
+    <div
+      className={`relative max-w-4xl mx-auto ${
+        locale === 'ar' ? 'rtl' : 'ltr'
+      }`}
+    >
       {/* Enhanced Container with clean design */}
       <div className="bg-card rounded-2xl border border-border shadow-lg relative">
         <div className="relative p-6">
           {/* Simple Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
+          <div
+            className={`flex items-center justify-between mb-8 ${
+              locale === 'ar' ? 'flex-row-reverse' : ''
+            }`}
+          >
+            <div
+              className={`flex items-center gap-3 ${
+                locale === 'ar' ? 'flex-row-reverse' : ''
+              }`}
+            >
               <HiAdjustments className="w-6 h-6 text-primary" />
               <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                Job Filters
+                {t('title')}
               </h2>
               {activeFilterCount > 0 && (
                 <span className="inline-flex items-center justify-center w-6 h-6 bg-primary text-white text-xs font-bold rounded-full">
@@ -89,13 +104,17 @@ const JobFilters = ({
             >
               {isExpanded ? (
                 <>
-                  <HiChevronUp className="w-4 h-4" />
-                  Hide
+                  <HiChevronUp
+                    className={`w-4 h-4 ${locale === 'ar' ? 'ml-1' : 'mr-1'}`}
+                  />
+                  {t('hideFilters')}
                 </>
               ) : (
                 <>
-                  <HiChevronDown className="w-4 h-4" />
-                  Show
+                  <HiChevronDown
+                    className={`w-4 h-4 ${locale === 'ar' ? 'ml-1' : 'mr-1'}`}
+                  />
+                  {t('showFilters')}
                 </>
               )}
             </Button>
@@ -105,25 +124,38 @@ const JobFilters = ({
           <div className="mb-6">
             <label
               htmlFor="job-search"
-              className="text-sm font-medium text-foreground mb-2 block"
+              className={`text-sm font-medium text-foreground mb-2 block ${
+                locale === 'ar' ? 'text-right' : 'text-left'
+              }`}
             >
-              Search Jobs
+              {t('search.label')}
             </label>
             <div className="relative">
-              <HiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <HiSearch
+                className={`absolute top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground ${
+                  locale === 'ar' ? 'right-4' : 'left-4'
+                }`}
+              />
               <input
                 id="job-search"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search by title, description, skills, or keywords..."
-                className="w-full pl-12 pr-12 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                placeholder={t('search.placeholder')}
+                className={`w-full py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
+                  locale === 'ar'
+                    ? 'pr-12 pl-12 text-right'
+                    : 'pl-12 pr-12 text-left'
+                }`}
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
               />
               {searchQuery && (
                 <button
                   onClick={() => onSearchChange('')}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded transition-all duration-200"
+                  className={`absolute top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded transition-all duration-200 ${
+                    locale === 'ar' ? 'left-4' : 'right-4'
+                  }`}
                 >
                   <HiX className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                 </button>
@@ -142,16 +174,16 @@ const JobFilters = ({
               <div className="relative">
                 <DropdownSelector
                   id="job-service-filter"
-                  label="Service Category"
+                  label={t('service.label')}
                   value={selectedService}
                   onChange={onServiceChange}
                   options={services.map((service) => ({
                     id: service._id,
                     label: service.name,
                   }))}
-                  placeholder="Select a service category"
+                  placeholder={t('service.placeholder')}
                   allowEmpty
-                  emptyLabel="All Services"
+                  emptyLabel={t('service.placeholder')}
                   disabled={servicesLoading}
                 />
                 {servicesLoading && (
@@ -172,16 +204,18 @@ const JobFilters = ({
             <div className="space-y-2">
               <DropdownSelector
                 id="job-state-filter"
-                label="Location"
+                label={t('location.label')}
                 value={selectedState}
                 onChange={onStateChange}
-                options={getStatesForSelect('en').map((state) => ({
-                  id: state.value,
-                  label: state.label,
-                }))}
-                placeholder="Select a location"
+                options={getStatesForSelect(locale as 'en' | 'ar').map(
+                  (state) => ({
+                    id: state.value,
+                    label: state.label,
+                  })
+                )}
+                placeholder={t('location.placeholder')}
                 allowEmpty
-                emptyLabel="All Locations"
+                emptyLabel={t('location.placeholder')}
               />
             </div>
 
@@ -195,7 +229,7 @@ const JobFilters = ({
                   size="lg"
                   disabled={!searchQuery && !selectedService && !selectedState}
                 >
-                  Apply Filters
+                  {t('buttons.apply')}
                 </Button>
 
                 {/* Clear Filters Button */}
@@ -203,11 +237,15 @@ const JobFilters = ({
                   <Button
                     onClick={handleReset}
                     variant="outline"
-                    className="flex-1 sm:flex-initial min-w-[120px] border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                    className={`flex-1 sm:flex-initial min-w-[120px] border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 ${
+                      locale === 'ar' ? 'flex-row-reverse' : ''
+                    }`}
                     size="lg"
                   >
-                    <HiX className="w-4 h-4 mr-2" />
-                    Clear All
+                    <HiX
+                      className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+                    />
+                    {t('buttons.clear')}
                   </Button>
                 )}
               </div>

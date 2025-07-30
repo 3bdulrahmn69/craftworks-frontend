@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import Container from '@/app/components/ui/container';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
@@ -11,6 +12,8 @@ import { HiExclamationCircle, HiBriefcase } from 'react-icons/hi';
 import JobsModal from '@/app/components/jobs/jobs-modal';
 
 const JobsPage = () => {
+  const locale = useLocale();
+  const t = useTranslations('jobs');
   const {
     jobs,
     loading,
@@ -41,16 +44,21 @@ const JobsPage = () => {
 
   if (loading) {
     return (
-      <Container>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <Container className={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <div
+          className="flex flex-col items-center justify-center min-h-[60vh] space-y-4"
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
           <LoadingSpinner size="lg" />
-          <div className="text-center">
+          <div
+            className={`text-center ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Loading Available Jobs
+              {t('loading.title')}
             </h3>
-            <p className="text-muted-foreground">
-              Please wait while we fetch the latest job opportunities for you...
-            </p>
+            <p className="text-muted-foreground">{t('loading.message')}</p>
           </div>
         </div>
       </Container>
@@ -58,16 +66,22 @@ const JobsPage = () => {
   }
 
   return (
-    <Container className="py-8 max-w-7xl">
-      <main role="main">
+    <Container className={`py-8 max-w-7xl ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <main role="main" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Enhanced Header Section */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
-            <HiBriefcase className="inline-block mr-2 text-primary" />
-            Available Jobs
+            <HiBriefcase
+              className={`text-primary ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+            />
+            {t('title')}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl">
-            Explore the latest job opportunities tailored for you
+          <p
+            className={`text-xl text-muted-foreground max-w-3xl ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
+            {t('subtitle')}
           </p>
         </header>
 
@@ -77,20 +91,31 @@ const JobsPage = () => {
             className="bg-destructive/10 border border-destructive/20 text-destructive px-6 py-4 rounded-2xl mb-8 shadow-sm"
             role="alert"
             aria-live="polite"
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
           >
-            <div className="flex items-center gap-3">
+            <div
+              className={`flex items-center gap-3 ${
+                locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'
+              }`}
+            >
               <HiExclamationCircle className="w-6 h-6 shrink-0" />
               <div>
-                <h4 className="font-semibold mb-1">Error Loading Jobs</h4>
+                <h4 className="font-semibold mb-1">{t('error.title')}</h4>
                 <p className="text-sm">{error}</p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="grid gap-8 lg:grid-cols-4">
+        <div
+          className={`grid gap-8 lg:grid-cols-4 ${
+            locale === 'ar' ? 'rtl' : ''
+          }`}
+        >
           {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
+          <div
+            className={`lg:col-span-1 ${locale === 'ar' ? 'lg:order-2' : ''}`}
+          >
             <div className="sticky top-20">
               <JobFilters
                 searchQuery={searchQuery}
@@ -110,7 +135,9 @@ const JobsPage = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="lg:col-span-3">
+          <div
+            className={`lg:col-span-3 ${locale === 'ar' ? 'lg:order-1' : ''}`}
+          >
             {/* Jobs Grid - Single Column Layout */}
             {jobs.length === 0 ? (
               <EmptyState

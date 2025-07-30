@@ -10,6 +10,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   icon?: ReactNode;
   showPasswordToggle?: boolean;
+  required?: boolean;
 }
 
 const Input = memo(function Input({
@@ -18,6 +19,7 @@ const Input = memo(function Input({
   icon,
   showPasswordToggle = false,
   type = 'text',
+  required = false,
   ...rest
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,8 +38,13 @@ const Input = memo(function Input({
   return (
     <div className="space-y-2 w-full">
       {label && (
-        <label className="text-sm font-medium text-foreground block mb-1">
+        <label className="text-sm font-medium text-foreground block mb-2">
           {label}
+          {required && (
+            <span className="text-red-500 ml-1" aria-hidden="true">
+              *
+            </span>
+          )}
         </label>
       )}
       <div className="relative flex items-center">

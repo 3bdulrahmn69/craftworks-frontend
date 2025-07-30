@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
@@ -74,6 +75,9 @@ const getColorClasses = () => {
 
 const ServicesPage = () => {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('services');
+  const isRTL = locale === 'ar';
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,19 +95,19 @@ const ServicesPage = () => {
           console.log('Fetched services:', response.data);
           setServices(response.data);
         } else {
-          setError('Failed to load services');
+          setError(t('error.title'));
         }
       } catch (err: any) {
         console.error('Failed to fetch services:', err);
-        setError(err.message || 'Failed to load services');
-        toast.error('Failed to load services');
+        setError(err.message || t('error.title'));
+        toast.error(t('error.title'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchServices();
-  }, []);
+  }, [t]);
 
   const handleServiceSelect = (service: Service) => {
     // Navigate to create job page with selected service
@@ -116,16 +120,14 @@ const ServicesPage = () => {
 
   if (loading) {
     return (
-      <Container>
+      <Container className={`${isRTL ? 'rtl' : 'ltr'}`}>
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <LoadingSpinner size="lg" />
           <div className="text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Loading Services
+              {t('loading.title')}
             </h3>
-            <p className="text-muted-foreground">
-              Please wait while we fetch available services...
-            </p>
+            <p className="text-muted-foreground">{t('loading.message')}</p>
           </div>
         </div>
       </Container>
@@ -134,14 +136,16 @@ const ServicesPage = () => {
 
   if (error) {
     return (
-      <Container>
+      <Container className={`${isRTL ? 'rtl' : 'ltr'}`}>
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
           <div className="text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Error Loading Services
+              {t('error.title')}
             </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
+            <Button onClick={() => window.location.reload()}>
+              {t('error.button')}
+            </Button>
           </div>
         </div>
       </Container>
@@ -149,17 +153,18 @@ const ServicesPage = () => {
   }
 
   return (
-    <Container className="py-8 max-w-7xl">
+    <Container className={`py-8 max-w-7xl ${isRTL ? 'rtl' : 'ltr'}`}>
       <main role="main">
         {/* Header Section */}
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
-            <FaHammer className="inline-block mr-3 text-primary" />
-            Select a Service
+            <FaHammer
+              className={`inline-block text-primary ${isRTL ? 'ml-3' : 'mr-3'}`}
+            />
+            {t('title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl">
-            Choose the service you want to create a job for. Select from our
-            wide range of professional services.
+            {t('subtitle')}
           </p>
         </header>
 
@@ -168,11 +173,9 @@ const ServicesPage = () => {
           <div className="text-center py-12">
             <FaBroom className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Services Available
+              {t('empty.title')}
             </h3>
-            <p className="text-muted-foreground">
-              No services are currently available. Please check back later.
-            </p>
+            <p className="text-muted-foreground">{t('empty.message')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

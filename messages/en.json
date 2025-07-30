@@ -411,5 +411,424 @@
         "description": "Enjoy quality results! Release payment only when you are fully satisfied with the work delivered."
       }
     ]
+  },
+  "createJob": {
+    "title": {
+      "create": "Create New Job",
+      "edit": "Edit Job"
+    },
+    "navigation": {
+      "back": "Back"
+    },
+    "selectedService": {
+      "label": "Creating job for:",
+      "title": "Selected Service"
+    },
+    "sections": {
+      "basicInfo": {
+        "title": "Basic Information",
+        "jobTitle": {
+          "label": "Job Title",
+          "placeholder": "Enter a clear, descriptive job title",
+          "error": "Job title is required"
+        },
+        "service": {
+          "label": "Service",
+          "placeholder": "Select a service",
+          "loading": "Loading services...",
+          "selected": "Selected:",
+          "error": "Please select a service"
+        },
+        "description": {
+          "label": "Job Description",
+          "placeholder": "Describe the job in detail, including requirements, expectations, and any specific instructions...",
+          "error": "Job description is required"
+        }
+      },
+      "location": {
+        "title": "Location",
+        "country": {
+          "label": "Country"
+        },
+        "state": {
+          "label": "State",
+          "placeholder": "Select state",
+          "error": "State is required"
+        },
+        "city": {
+          "label": "City",
+          "placeholder": "Enter city name",
+          "error": "City is required"
+        },
+        "street": {
+          "label": "Street Address",
+          "placeholder": "Enter street address",
+          "error": "Street address is required"
+        },
+        "gps": {
+          "title": "GPS Location",
+          "description": "Share your precise location to help craftsmen find you easily",
+          "button": "Get Current Location",
+          "buttonLoading": "Getting Location...",
+          "locationSet": "📍 Location set:",
+          "locationRequired": "⚠️ Location is required. Click on the map or use \"Get Current Location\" button.",
+          "error": "GPS location is required"
+        }
+      },
+      "pricing": {
+        "title": "Pricing",
+        "paymentType": {
+          "label": "Payment Type",
+          "cash": "Cash - Direct payment to craftsman",
+          "escrow": "Escrow - Protected payment held until completion",
+          "cashProtected": "Cash Protected - Protected cash payment",
+          "descriptions": {
+            "cash": "Payment made directly to the craftsman",
+            "escrow": "Payment held securely until job completion",
+            "cashProtected": "Cash payment with platform protection"
+          }
+        },
+        "jobPrice": {
+          "label": "Job Price",
+          "placeholder": "0.00",
+          "error": "Job price must be greater than 0"
+        }
+      },
+      "photos": {
+        "title": "Photos (Optional)",
+        "upload": {
+          "label": "Upload Photos (Max 5, 5MB each)",
+          "supported": "Supported formats: JPEG, PNG, WebP. Max size: 5MB per image.",
+          "preview": "Preview"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Job",
+      "update": "Update Job",
+      "creating": "Creating Job...",
+      "updating": "Updating Job..."
+    },
+    "messages": {
+      "maxPhotos": "Maximum 5 photos allowed",
+      "invalidFormat": "{fileName} is not a valid image format",
+      "fileTooLarge": "{fileName} is too large. Maximum size is 5MB",
+      "fixErrors": "Please fix the errors in the form",
+      "loginRequired": "Please log in to continue",
+      "createSuccess": "Job created successfully!",
+      "updateSuccess": "Job updated successfully!",
+      "createError": "Failed to create job",
+      "updateError": "Failed to update job",
+      "loadError": "Failed to load job data",
+      "servicesError": "Failed to load services",
+      "locationError": "Failed to get location information",
+      "locationInfo": "Location coordinates set. Please fill in the address manually."
+    }
+  },
+  "services": {
+    "title": "Select a Service",
+    "subtitle": "Choose the service you want to create a job for. Select from our wide range of professional services.",
+    "loading": {
+      "title": "Loading Services",
+      "message": "Please wait while we fetch available services..."
+    },
+    "error": {
+      "title": "Error Loading Services",
+      "button": "Try Again"
+    },
+    "empty": {
+      "title": "No Services Available",
+      "message": "No services are currently available. Please check back later."
+    }
+  },
+  "myJobs": {
+    "title": "My Jobs",
+    "subtitle": "Manage your job postings and track their progress",
+    "loading": {
+      "title": "Loading Your Jobs",
+      "message": "Please wait while we fetch your job listings..."
+    },
+    "buttons": {
+      "createNew": "Create New Job",
+      "createFirst": "Create Your First Job",
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "cancel": "Cancel",
+      "viewApplications": "View Applications"
+    },
+    "empty": {
+      "title": "No Jobs Posted Yet",
+      "message": "You haven't created any job postings yet. Start by creating your first job."
+    },
+    "jobCard": {
+      "applications": "applications",
+      "openStatus": "Open for applications",
+      "egp": "EGP"
+    },
+    "deleteModal": {
+      "title": "Delete Job",
+      "message": "Are you sure you want to delete the job",
+      "warning": "This action cannot be undone. All applications and related data will be permanently removed.",
+      "deleteButton": "Delete Job"
+    },
+    "status": {
+      "Posted": "Posted",
+      "Hired": "Hired",
+      "In Progress": "In Progress",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    },
+    "paymentTypes": {
+      "Cash": "Cash",
+      "Escrow": "Escrow",
+      "CashProtected": "Cash Protected"
+    }
+  },
+  "jobDetails": {
+    "loading": "Loading job details...",
+    "backButton": "Back to Jobs",
+    "notFound": {
+      "title": "Job not found",
+      "message": "The job you're looking for doesn't exist or has been removed.",
+      "button": "Go Back"
+    },
+    "buttons": {
+      "applied": "Applied",
+      "submitQuote": "Submit Quote"
+    },
+    "sections": {
+      "description": "Job Description",
+      "photos": "Photos",
+      "location": "Location",
+      "information": "Job Information"
+    },
+    "info": {
+      "payment": "Payment",
+      "reviews": "reviews",
+      "respond": "Respond",
+      "job": "Job",
+      "budget": "Budget",
+      "posted": "Posted",
+      "applications": "application",
+      "applicationsPlural": "applications",
+      "locationNotSpecified": "Location not specified",
+      "egp": "EGP"
+    },
+    "quickApply": {
+      "title": "Interested in this job?",
+      "subtitle": "Submit your quote and get hired by the client.",
+      "button": "Submit Quote"
+    },
+    "toast": {
+      "quoteSuccess": "Quote submitted successfully! 🎉",
+      "quoteFailed": "Failed to submit quote",
+      "quoteError": "An error occurred while submitting quote"
+    }
+  },
+  "jobs": {
+    "title": "Available Jobs",
+    "subtitle": "Explore the latest job opportunities tailored for you",
+    "loading": {
+      "title": "Loading Available Jobs",
+      "message": "Please wait while we fetch the latest job opportunities for you..."
+    },
+    "error": {
+      "title": "Error Loading Jobs",
+      "prefix": "Error:"
+    },
+    "filters": {
+      "title": "Job Filters",
+      "hideFilters": "Hide Filters",
+      "showFilters": "Show Filters",
+      "search": {
+        "label": "Search Jobs",
+        "placeholder": "Search by title, description, skills, or keywords..."
+      },
+      "service": {
+        "label": "Service Category",
+        "placeholder": "All Services",
+        "loading": "Loading services..."
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "All Locations"
+      },
+      "buttons": {
+        "apply": "Apply Filters",
+        "clear": "Clear All"
+      },
+      "status": {
+        "unapplied": "You have {count} filter{plural} ready to apply.",
+        "active": "Active filters:"
+      },
+      "tags": {
+        "search": "Search:",
+        "service": "Service:",
+        "location": "Location:"
+      }
+    },
+    "empty": {
+      "withFilters": {
+        "title": "No Jobs Match Your Filters",
+        "message": "Try adjusting your search criteria or removing some filters to see more job opportunities."
+      },
+      "noFilters": {
+        "title": "No Jobs Available",
+        "message": "There are no job postings at the moment. Check back later for new opportunities or try refreshing the page."
+      },
+      "buttons": {
+        "refresh": "Refresh Jobs",
+        "clearFilters": "Clear Filters"
+      },
+      "tip": "💡 **Tip:** Enable notifications to get alerted when new jobs matching your skills are posted."
+    }
+  },
+  "quotes": {
+    "title": "My Quotes",
+    "subtitle": "Track your submitted quotes and their status",
+    "loading": {
+      "message": "Loading your quotes..."
+    },
+    "error": {
+      "tryAgain": "Try Again"
+    },
+    "filters": {
+      "heading": "Filter Quotes",
+      "statusLabel": "Filter by Status",
+      "selectStatus": "Select status",
+      "description": "Filter quotes by their current status",
+      "status": {
+        "all": "All Statuses",
+        "submitted": "Submitted",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      }
+    },
+    "emptyState": {
+      "title": "No quotes found",
+      "noQuotes": "Start browsing jobs and submit your first quote!",
+      "filtered": "No quotes with status \"{status}\"",
+      "refresh": "Refresh Quotes"
+    },
+    "quote": {
+      "jobLabel": "Job:",
+      "jobDeleted": "Job Deleted",
+      "clientLabel": "Client:",
+      "clientUnavailable": "Information not available",
+      "reviews": "reviews",
+      "currency": "EGP",
+      "additionalNotes": "Additional Notes:",
+      "submitted": "Submitted",
+      "viewJob": "View Job",
+      "jobUnavailable": "Job Unavailable"
+    }
+  },
+  "invitations": {
+    "title": "Job Invitations",
+    "subtitle": "Manage your job invitations and respond to clients",
+    "loading": {
+      "title": "Loading Invitations",
+      "message": "Please wait while we fetch your job invitations..."
+    },
+    "error": {
+      "title": "Error Loading Invitations",
+      "message": "Failed to load invitations. Please try again.",
+      "retry": "Try Again"
+    },
+    "filters": {
+      "status": {
+        "label": "Filter by Status:",
+        "all": "All Invitations",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      }
+    },
+    "empty": {
+      "title": "No Invitations Yet",
+      "message": "You haven't received any job invitations yet. Complete your profile and start applying to jobs to receive invitations from clients.",
+      "button": "Browse Jobs"
+    },
+    "card": {
+      "payment": "Payment",
+      "receivedOn": "Received on",
+      "buttons": {
+        "viewJob": "View Job",
+        "respond": "Respond"
+      }
+    },
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "modal": {
+      "title": "Respond to Invitation",
+      "client": "Client",
+      "message": "How would you like to respond to this job invitation?",
+      "buttons": {
+        "cancel": "Cancel",
+        "reject": "Reject",
+        "accept": "Accept",
+        "rejecting": "Rejecting...",
+        "accepting": "Accepting..."
+      }
+    },
+    "toast": {
+      "acceptSuccess": "Invitation accepted successfully!",
+      "rejectSuccess": "Invitation rejected successfully!",
+      "acceptError": "Failed to accept invitation",
+      "rejectError": "Failed to reject invitation"
+    }
+  },
+  "jobApplications": {
+    "subtitle": "Review and manage applications for your job posting",
+    "loading": {
+      "title": "Loading Applications",
+      "message": "Please wait while we load the job applications..."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "message": "Failed to load job applications. Please try again.",
+      "button": "Try Again",
+      "jobNotFound": "Job not found or you don't have access to view it.",
+      "goBack": "Go Back"
+    },
+    "header": {
+      "backToJob": "Back to Job",
+      "status": "Status",
+      "payment": "Payment",
+      "price": "Price",
+      "applicationsCount": "Applications"
+    },
+    "emptyState": {
+      "title": "No Applications Yet",
+      "message": "No craftsmen have applied to this job yet. Share your job posting to attract more applicants."
+    },
+    "application": {
+      "reviews": "reviews",
+      "applied": "Applied",
+      "notes": "Notes",
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "submitted": "Submitted"
+      },
+      "actions": {
+        "accept": "Accept",
+        "reject": "Reject",
+        "viewProfile": "View Profile",
+        "contact": "Contact",
+        "acceptQuote": "Accept Quote",
+        "decline": "Decline",
+        "accepting": "Accepting...",
+        "rejectSoon": "Reject functionality coming soon"
+      }
+    },
+    "currency": "EGP"
   }
 }

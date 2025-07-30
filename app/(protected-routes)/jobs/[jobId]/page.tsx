@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Job } from '@/app/types/jobs';
 import { jobsService } from '@/app/services/jobs';
@@ -27,6 +28,9 @@ const JobDetailsPage = () => {
   const { data: session } = useSession();
   const params = useParams();
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('jobDetails');
+  const tMyJobs = useTranslations('myJobs');
   const jobId = params.jobId as string;
 
   const [job, setJob] = useState<Job | null>(null);
@@ -34,6 +38,29 @@ const JobDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [submittingQuote, setSubmittingQuote] = useState(false);
+
+  // Helper function to translate payment types
+  const translatePaymentType = useCallback(
+    (paymentType: string): string => {
+      return tMyJobs(`paymentTypes.${paymentType}`) || paymentType;
+    },
+    [tMyJobs]
+  );
+
+  // Helper function to format date with locale
+  const formatDate = useCallback(
+    (dateString: string): string => {
+      return new Date(dateString).toLocaleDateString(
+        locale === 'ar' ? 'ar-EG' : 'en-US',
+        {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }
+      );
+    },
+    [locale]
+  );
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -70,7 +97,7 @@ const JobDetailsPage = () => {
       ].filter(Boolean);
       return parts.join(', ');
     }
-    return 'Location not specified';
+    return t('info.locationNotSpecified');
   };
 
   const isApplied = job?.appliedCraftsmen?.includes(session?.user?.id || '');
@@ -78,8 +105,19 @@ const JobDetailsPage = () => {
   if (loading) {
     return (
       <Container>
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="text-lg">Loading job details...</div>
+        <div
+          className={`flex justify-center items-center min-h-[400px] ${
+            locale === 'ar' ? 'rtl' : 'ltr'
+          }`}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
+          <div
+            className={`text-lg ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
+            {t('loading')}
+          </div>
         </div>
       </Container>
     );
@@ -88,17 +126,29 @@ const JobDetailsPage = () => {
   if (error || !job) {
     return (
       <Container>
-        <div className="text-center py-16">
+        <div
+          className={`text-center py-16 ${locale === 'ar' ? 'rtl' : 'ltr'}`}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
           <div className="bg-card rounded-2xl shadow-lg p-8 border border-border max-w-md mx-auto">
             <HiExclamationCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {error || 'Job not found'}
+            <h3
+              className={`text-lg font-semibold text-foreground mb-2 ${
+                locale === 'ar' ? 'text-right' : 'text-left'
+              }`}
+            >
+              {error || t('notFound.title')}
             </h3>
-            <p className="text-muted-foreground mb-4">
-              The job you&apos;re looking for doesn&apos;t exist or has been
-              removed.
+            <p
+              className={`text-muted-foreground mb-4 ${
+                locale === 'ar' ? 'text-right' : 'text-left'
+              }`}
+            >
+              {t('notFound.message')}
             </p>
-            <Button onClick={() => router.back()}>Go Back</Button>
+            <Button onClick={() => router.back()}>
+              {t('notFound.button')}
+            </Button>
           </div>
         </div>
       </Container>
@@ -106,43 +156,65 @@ const JobDetailsPage = () => {
   }
 
   return (
-    <Container className="py-8">
-      <main role="main">
+    <Container className={`py-8 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <main role="main" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header with back button */}
         <div className="mb-8">
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="mb-6"
+            className={`mb-6 ${locale === 'ar' ? 'flex-row-reverse' : ''}`}
           >
-            <HiArrowLeft className="w-4 h-4 mr-2" />
-            Back to Jobs
+            <HiArrowLeft
+              className={`w-4 h-4 ${
+                locale === 'ar' ? 'ml-2 rotate-180' : 'mr-2'
+              }`}
+            />
+            {t('backButton')}
           </Button>
 
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+          <div
+            className={`flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 ${
+              locale === 'ar' ? 'lg:flex-row-reverse text-right' : 'text-left'
+            }`}
+          >
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              <h1
+                className={`text-3xl md:text-4xl font-bold text-foreground mb-4 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {job.title}
               </h1>
             </div>
 
             {/* Action button */}
             {job.status === 'Posted' && session?.user?.role === 'craftsman' && (
-              <div className="lg:flex-shrink-0">
+              <div
+                className={`lg:flex-shrink-0 ${
+                  locale === 'ar' ? 'lg:order-first' : ''
+                }`}
+              >
                 <Button
                   onClick={() => setShowQuoteModal(true)}
                   disabled={isApplied}
                   variant={isApplied ? 'outline' : 'primary'}
                   size="lg"
-                  className="w-full lg:w-auto"
+                  className={`w-full lg:w-auto ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
+                  }`}
                 >
                   {isApplied ? (
                     <>
-                      <HiCheckCircle className="w-5 h-5 mr-2" />
-                      Applied
+                      <HiCheckCircle
+                        className={`w-5 h-5 ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
+                      {t('buttons.applied')}
                     </>
                   ) : (
-                    'Submit Quote'
+                    t('buttons.submitQuote')
                   )}
                 </Button>
               </div>
@@ -150,15 +222,31 @@ const JobDetailsPage = () => {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div
+          className={`grid gap-8 lg:grid-cols-3 ${
+            locale === 'ar' ? 'rtl' : ''
+          }`}
+        >
           {/* Main content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div
+            className={`lg:col-span-2 space-y-8 ${
+              locale === 'ar' ? 'lg:order-2' : ''
+            }`}
+          >
             {/* Description */}
             <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                Job Description
+              <h2
+                className={`text-xl font-semibold text-foreground mb-4 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
+                {t('sections.description')}
               </h2>
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              <p
+                className={`text-muted-foreground leading-relaxed whitespace-pre-wrap ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {job.description}
               </p>
             </div>
@@ -166,9 +254,17 @@ const JobDetailsPage = () => {
             {/* Photos */}
             {job.photos && job.photos.length > 0 && (
               <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                  <HiPhotograph className="w-5 h-5 mr-2" />
-                  Photos
+                <h2
+                  className={`text-xl font-semibold text-foreground mb-4 flex items-center ${
+                    locale === 'ar'
+                      ? 'flex-row-reverse justify-end'
+                      : 'justify-start'
+                  }`}
+                >
+                  <HiPhotograph
+                    className={`w-5 h-5 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+                  />
+                  {t('sections.photos')}
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                   {job.photos.map((photo, index) => (
@@ -192,21 +288,38 @@ const JobDetailsPage = () => {
             {/* Location Map */}
             {job.location && (
               <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                  <HiLocationMarker className="w-5 h-5 mr-2" />
-                  Location
+                <h2
+                  className={`text-xl font-semibold text-foreground mb-4 flex items-center ${
+                    locale === 'ar'
+                      ? 'flex-row-reverse justify-end'
+                      : 'justify-start'
+                  }`}
+                >
+                  <HiLocationMarker
+                    className={`w-5 h-5 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+                  />
+                  {t('sections.location')}
                 </h2>
-                <Map
-                  latitude={job.location.coordinates[1]}
-                  longitude={job.location.coordinates[0]}
-                  zoom={15}
-                  height="300px"
-                  markerTitle={job.title}
-                  address={formatAddress(job.address)}
-                  showPopup={true}
-                  className="w-full"
-                />
-                <div className="mt-3 text-sm text-muted-foreground">
+                <div
+                  className="relative w-full overflow-hidden rounded-lg"
+                  style={{ height: '300px' }}
+                >
+                  <Map
+                    latitude={job.location.coordinates[1]}
+                    longitude={job.location.coordinates[0]}
+                    zoom={15}
+                    height="100%"
+                    markerTitle={job.title}
+                    address={formatAddress(job.address)}
+                    showPopup={true}
+                    className="w-full h-full relative z-0"
+                  />
+                </div>
+                <div
+                  className={`mt-3 text-sm text-muted-foreground ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}
+                >
                   <p>{formatAddress(job.address)}</p>
                 </div>
               </div>
@@ -214,54 +327,106 @@ const JobDetailsPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className={`space-y-6 ${locale === 'ar' ? 'lg:order-1' : ''}`}>
             {/* Job Information */}
             <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                Job Information
+              <h2
+                className={`text-xl font-semibold text-foreground mb-4 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
+                {t('sections.information')}
               </h2>
               <div className="space-y-4">
-                <div className="flex items-center text-sm">
-                  <HiLocationMarker className="w-4 h-4 mr-3 text-primary flex-shrink-0" />
+                <div
+                  className={`flex items-center text-sm ${
+                    locale === 'ar'
+                      ? 'flex-row-reverse text-right'
+                      : 'text-left'
+                  }`}
+                >
+                  <HiLocationMarker
+                    className={`w-4 h-4 text-primary flex-shrink-0 ${
+                      locale === 'ar' ? 'ml-3' : 'mr-3'
+                    }`}
+                  />
                   <span className="text-muted-foreground">
                     {formatAddress(job.address)}
                   </span>
                 </div>
 
-                <div className="flex items-center text-sm">
-                  <HiCash className="w-4 h-4 mr-3 text-primary flex-shrink-0" />
+                <div
+                  className={`flex items-center text-sm ${
+                    locale === 'ar'
+                      ? 'flex-row-reverse text-right'
+                      : 'text-left'
+                  }`}
+                >
+                  <HiCash
+                    className={`w-4 h-4 text-primary flex-shrink-0 ${
+                      locale === 'ar' ? 'ml-3' : 'mr-3'
+                    }`}
+                  />
                   <span className="text-muted-foreground">
-                    Payment: {job.paymentType}
+                    {t('info.payment')}: {translatePaymentType(job.paymentType)}
                   </span>
                 </div>
 
                 {job.jobPrice > 0 && (
-                  <div className="flex items-center text-sm">
-                    <HiCurrencyDollar className="w-4 h-4 mr-3 text-green-600 flex-shrink-0" />
+                  <div
+                    className={`flex items-center text-sm ${
+                      locale === 'ar'
+                        ? 'flex-row-reverse text-right'
+                        : 'text-left'
+                    }`}
+                  >
+                    <HiCurrencyDollar
+                      className={`w-4 h-4 text-green-600 flex-shrink-0 ${
+                        locale === 'ar' ? 'ml-3' : 'mr-3'
+                      }`}
+                    />
                     <span className="text-foreground font-medium">
-                      Budget: {job.jobPrice.toLocaleString()} EGP
+                      {t('info.budget')}: {job.jobPrice.toLocaleString()}{' '}
+                      {t('info.egp')}
                     </span>
                   </div>
                 )}
 
-                <div className="flex items-center text-sm">
-                  <HiClock className="w-4 h-4 mr-3 text-primary flex-shrink-0" />
+                <div
+                  className={`flex items-center text-sm ${
+                    locale === 'ar'
+                      ? 'flex-row-reverse text-right'
+                      : 'text-left'
+                  }`}
+                >
+                  <HiClock
+                    className={`w-4 h-4 text-primary flex-shrink-0 ${
+                      locale === 'ar' ? 'ml-3' : 'mr-3'
+                    }`}
+                  />
                   <span className="text-muted-foreground">
-                    Posted{' '}
-                    {new Date(job.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                    {t('info.posted')} {formatDate(job.createdAt)}
                   </span>
                 </div>
 
                 {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
-                  <div className="flex items-center text-sm">
-                    <HiUsers className="w-4 h-4 mr-3 text-amber-600 flex-shrink-0" />
+                  <div
+                    className={`flex items-center text-sm ${
+                      locale === 'ar'
+                        ? 'flex-row-reverse text-right'
+                        : 'text-left'
+                    }`}
+                  >
+                    <HiUsers
+                      className={`w-4 h-4 text-amber-600 flex-shrink-0 ${
+                        locale === 'ar' ? 'ml-3' : 'mr-3'
+                      }`}
+                    />
                     <span className="text-muted-foreground">
-                      {job.appliedCraftsmen.length} application
-                      {job.appliedCraftsmen.length > 1 ? 's' : ''}
+                      {job.appliedCraftsmen.length}{' '}
+                      {job.appliedCraftsmen.length > 1
+                        ? t('info.applicationsPlural')
+                        : t('info.applications')}
                     </span>
                   </div>
                 )}
@@ -273,17 +438,25 @@ const JobDetailsPage = () => {
               session?.user?.role === 'craftsman' &&
               !isApplied && (
                 <div className="bg-primary/5 rounded-xl p-6 border border-primary/20">
-                  <h3 className="font-semibold text-foreground mb-2">
-                    Interested in this job?
+                  <h3
+                    className={`font-semibold text-foreground mb-2 ${
+                      locale === 'ar' ? 'text-right' : 'text-left'
+                    }`}
+                  >
+                    {t('quickApply.title')}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Submit your quote and get hired by the client.
+                  <p
+                    className={`text-sm text-muted-foreground mb-4 ${
+                      locale === 'ar' ? 'text-right' : 'text-left'
+                    }`}
+                  >
+                    {t('quickApply.subtitle')}
                   </p>
                   <Button
                     onClick={() => setShowQuoteModal(true)}
                     className="w-full"
                   >
-                    Submit Quote
+                    {t('quickApply.button')}
                   </Button>
                 </div>
               )}
@@ -312,7 +485,7 @@ const JobDetailsPage = () => {
 
                 // Handle the 201 status code response structure
                 if (response.data && response.data._id) {
-                  toastService.success('Quote submitted successfully! 🎉');
+                  toastService.success(t('toast.quoteSuccess'));
                   setShowQuoteModal(false);
                   // Refresh job data to update applied status
                   const updatedJobResponse = await jobsService.getJob(
@@ -324,7 +497,7 @@ const JobDetailsPage = () => {
                   }
                 } else if (response.success) {
                   // Legacy success handling
-                  toastService.success('Quote submitted successfully! 🎉');
+                  toastService.success(t('toast.quoteSuccess'));
                   setShowQuoteModal(false);
                   // Refresh job data to update applied status
                   const updatedJobResponse2 = await jobsService.getJob(
@@ -336,13 +509,11 @@ const JobDetailsPage = () => {
                   }
                 } else {
                   toastService.error(
-                    response.message || 'Failed to submit quote'
+                    response.message || t('toast.quoteFailed')
                   );
                 }
               } catch (err: any) {
-                toastService.error(
-                  err.message || 'An error occurred while submitting quote'
-                );
+                toastService.error(err.message || t('toast.quoteError'));
               } finally {
                 setSubmittingQuote(false);
               }

@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import Input from '@/app/components/ui/input';
+import DropdownSelector from '@/app/components/ui/dropdown-selector';
+import Textarea from '@/app/components/ui/textarea';
 import InteractiveMap from '@/app/components/ui/interactive-map';
 import { toast } from 'react-toastify';
 import { jobsService } from '@/app/services/jobs';
@@ -17,7 +20,7 @@ import {
   getCurrentLocationAndGeocode,
   reverseGeocode,
 } from '@/app/utils/geocoding';
-import { getEgyptianStatesArray } from '@/app/data/states';
+import { getStatesForSelect } from '@/app/data/states';
 import {
   FaBriefcase,
   FaMapMarkerAlt,
@@ -52,6 +55,9 @@ const CreateJobPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
+  const t = useTranslations('createJob');
+  const isRTL = locale === 'ar';
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -62,6 +68,47 @@ const CreateJobPage = () => {
   // Check if we're editing an existing job
   const editJobId = searchParams.get('edit');
   const isEditing = !!editJobId;
+
+  // Memoized options for selects to prevent unnecessary re-renders
+  const serviceOptions = useMemo(
+    () =>
+      services.map((service) => ({
+        id: service._id,
+        label: service.name,
+        value: service._id,
+      })),
+    [services]
+  );
+
+  const stateOptions = useMemo(() => {
+    const states = getStatesForSelect(locale as 'en' | 'ar');
+    return states.map((state) => ({
+      id: state.value,
+      label: state.label,
+      value: state.value,
+    }));
+  }, [locale]);
+
+  const paymentTypeOptions = useMemo(
+    () => [
+      {
+        id: 'Cash',
+        label: t('sections.pricing.paymentType.cash'),
+        value: 'Cash',
+      },
+      {
+        id: 'Escrow',
+        label: t('sections.pricing.paymentType.escrow'),
+        value: 'Escrow',
+      },
+      {
+        id: 'CashProtected',
+        label: t('sections.pricing.paymentType.cashProtected'),
+        value: 'CashProtected',
+      },
+    ],
+    [t]
+  );
 
   const [formData, setFormData] = useState<JobFormData>({
     title: '',
@@ -103,9 +150,7 @@ const CreateJobPage = () => {
     } catch (error) {
       console.error('Location/geocoding error:', error);
       toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Failed to get location information'
+        error instanceof Error ? error.message : t('messages.locationError')
       );
     } finally {
       setLocationLoading(false);
@@ -113,38 +158,39 @@ const CreateJobPage = () => {
   };
 
   // Handle location selection from map
-  const handleLocationSelect = async (lat: number, lng: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      location: {
-        type: 'Point',
-        coordinates: [lng, lat],
-      },
-    }));
-
-    // Optionally perform reverse geocoding to auto-fill address fields
-    try {
-      const geocodeResult = await reverseGeocode(lat, lng);
+  const handleLocationSelect = useCallback(
+    async (lat: number, lng: number) => {
       setFormData((prev) => ({
         ...prev,
         location: {
           type: 'Point',
           coordinates: [lng, lat],
         },
-        address: {
-          ...prev.address,
-          state: geocodeResult.state,
-          city: geocodeResult.city,
-        },
       }));
-    } catch (error) {
-      // If reverse geocoding fails, just set the coordinates without address
-      console.warn('Reverse geocoding failed:', error);
-      toast.info(
-        'Location coordinates set. Please fill in the address manually.'
-      );
-    }
-  };
+
+      // Optionally perform reverse geocoding to auto-fill address fields
+      try {
+        const geocodeResult = await reverseGeocode(lat, lng);
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            type: 'Point',
+            coordinates: [lng, lat],
+          },
+          address: {
+            ...prev.address,
+            state: geocodeResult.state,
+            city: geocodeResult.city,
+          },
+        }));
+      } catch (error) {
+        // If reverse geocoding fails, just set the coordinates without address
+        console.warn('Reverse geocoding failed:', error);
+        toast.info(t('messages.locationInfo'));
+      }
+    },
+    [t]
+  );
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -156,14 +202,14 @@ const CreateJobPage = () => {
         }
       } catch (err) {
         console.error('Failed to fetch services:', err);
-        toast.error('Failed to load services');
+        toast.error(t('messages.servicesError'));
       } finally {
         setServicesLoading(false);
       }
     };
 
     fetchServices();
-  }, []);
+  }, [t]);
 
   // Load job data if editing
   useEffect(() => {
@@ -206,175 +252,220 @@ const CreateJobPage = () => {
         }
       } catch (err: any) {
         console.error('Failed to load job for editing:', err);
-        toast.error('Failed to load job data');
+        toast.error(t('messages.loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     loadJobForEdit();
-  }, [editJobId, session?.accessToken]);
+  }, [editJobId, session?.accessToken, t]);
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Job title is required';
+      newErrors.title = t('sections.basicInfo.jobTitle.error');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Job description is required';
+      newErrors.description = t('sections.basicInfo.description.error');
     }
 
     if (!formData.serviceId) {
-      newErrors.serviceId = 'Please select a service';
+      newErrors.serviceId = t('sections.basicInfo.service.error');
     }
 
     if (!formData.address.state) {
-      newErrors.state = 'State is required';
+      newErrors.state = t('sections.location.state.error');
     }
 
     if (!formData.address.city.trim()) {
-      newErrors.city = 'City is required';
+      newErrors.city = t('sections.location.city.error');
     }
 
     if (!formData.address.street.trim()) {
-      newErrors.street = 'Street address is required';
+      newErrors.street = t('sections.location.street.error');
     }
 
     if (!formData.jobPrice || formData.jobPrice <= 0) {
-      newErrors.jobPrice = 'Job price must be greater than 0';
+      newErrors.jobPrice = t('sections.pricing.jobPrice.error');
     }
 
     if (!formData.location) {
-      newErrors.location = 'GPS location is required';
+      newErrors.location = t('sections.location.gps.error');
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
+  const handleInputChange = useCallback(
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) => {
+      const { name, value } = e.target;
 
-    if (name.startsWith('address.')) {
-      const addressField = name.split('.')[1];
-      setFormData((prev) => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]:
-          name === 'jobPrice'
-            ? value === ''
-              ? 0
-              : parseFloat(value) || 0
-            : value,
-      }));
-    }
-
-    // Clear error when user starts typing
-    if (errors[name] || errors[name.split('.')[1]]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-        [name.split('.')[1]]: '',
-      }));
-    }
-  };
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-
-    // Calculate total photos (existing + new files + current new files)
-    const totalPhotos =
-      (formData.existingPhotos?.length || 0) +
-      formData.photos.length +
-      files.length;
-
-    if (totalPhotos > 5) {
-      toast.error('Maximum 5 photos allowed');
-      return;
-    }
-
-    // Validate file types and sizes
-    const validFiles = files.filter((file) => {
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-
-      if (!validTypes.includes(file.type)) {
-        toast.error(`${file.name} is not a valid image format`);
-        return false;
+      if (name.startsWith('address.')) {
+        const addressField = name.split('.')[1];
+        setFormData((prev) => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            [addressField]: value,
+          },
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          [name]:
+            name === 'jobPrice'
+              ? value === ''
+                ? 0
+                : parseFloat(value) || 0
+              : value,
+        }));
       }
 
-      if (file.size > maxSize) {
-        toast.error(`${file.name} is too large. Maximum size is 5MB`);
-        return false;
+      // Clear error when user starts typing
+      if (errors[name] || errors[name.split('.')[1]]) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: '',
+          [name.split('.')[1]]: '',
+        }));
+      }
+    },
+    [errors]
+  );
+
+  // Handle dropdown selector changes
+  const handleDropdownChange = useCallback(
+    (name: string) => (value: string) => {
+      if (name.startsWith('address.')) {
+        const addressField = name.split('.')[1];
+        setFormData((prev) => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            [addressField]: value,
+          },
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
       }
 
-      return true;
-    });
+      // Clear error when user makes selection
+      if (errors[name] || errors[name.split('.')[1]]) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: '',
+          [name.split('.')[1]]: '',
+        }));
+      }
+    },
+    [errors]
+  );
 
-    if (validFiles.length > 0) {
-      // Create preview URLs
-      const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
+  const handlePhotoUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
 
-      setFormData((prev) => ({
-        ...prev,
-        photos: [...prev.photos, ...validFiles],
-      }));
+      // Calculate total photos (existing + new files + current new files)
+      const totalPhotos =
+        (formData.existingPhotos?.length || 0) +
+        formData.photos.length +
+        files.length;
 
-      setPhotoPreviews((prev) => [...prev, ...newPreviews]);
-    }
-  };
-
-  const removePhoto = (index: number) => {
-    const existingPhotosCount = formData.existingPhotos?.length || 0;
-
-    if (index < existingPhotosCount) {
-      // Removing an existing photo
-      setFormData((prev) => ({
-        ...prev,
-        existingPhotos:
-          prev.existingPhotos?.filter((_, i) => i !== index) || [],
-      }));
-    } else {
-      // Removing a new uploaded photo
-      const newPhotoIndex = index - existingPhotosCount;
-      // Revoke the URL to prevent memory leaks
-      const preview = photoPreviews[index];
-      if (preview && preview.startsWith('blob:')) {
-        URL.revokeObjectURL(preview);
+      if (totalPhotos > 5) {
+        toast.error(t('messages.maxPhotos'));
+        return;
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        photos: prev.photos.filter((_, i) => i !== newPhotoIndex),
-      }));
-    }
+      // Validate file types and sizes
+      const validFiles = files.filter((file) => {
+        const validTypes = [
+          'image/jpeg',
+          'image/jpg',
+          'image/png',
+          'image/webp',
+        ];
+        const maxSize = 5 * 1024 * 1024; // 5MB
 
-    setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
-  };
+        if (!validTypes.includes(file.type)) {
+          toast.error(t('messages.invalidFormat', { fileName: file.name }));
+          return false;
+        }
+
+        if (file.size > maxSize) {
+          toast.error(t('messages.fileTooLarge', { fileName: file.name }));
+          return false;
+        }
+
+        return true;
+      });
+
+      if (validFiles.length > 0) {
+        // Create preview URLs
+        const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
+
+        setFormData((prev) => ({
+          ...prev,
+          photos: [...prev.photos, ...validFiles],
+        }));
+
+        setPhotoPreviews((prev) => [...prev, ...newPreviews]);
+      }
+    },
+    [formData.existingPhotos?.length, formData.photos.length, t]
+  );
+
+  const removePhoto = useCallback(
+    (index: number) => {
+      const existingPhotosCount = formData.existingPhotos?.length || 0;
+
+      if (index < existingPhotosCount) {
+        // Removing an existing photo
+        setFormData((prev) => ({
+          ...prev,
+          existingPhotos:
+            prev.existingPhotos?.filter((_, i) => i !== index) || [],
+        }));
+      } else {
+        // Removing a new uploaded photo
+        const newPhotoIndex = index - existingPhotosCount;
+        // Revoke the URL to prevent memory leaks
+        const preview = photoPreviews[index];
+        if (preview && preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          photos: prev.photos.filter((_, i) => i !== newPhotoIndex),
+        }));
+      }
+
+      setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
+    },
+    [formData.existingPhotos?.length, photoPreviews]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
+      toast.error(t('messages.fixErrors'));
       return;
     }
 
     if (!session?.accessToken) {
-      toast.error('Please log in to continue');
+      toast.error(t('messages.loginRequired'));
       return;
     }
 
@@ -426,7 +517,7 @@ const CreateJobPage = () => {
 
       if (response.success) {
         toast.success(
-          isEditing ? 'Job updated successfully!' : 'Job created successfully!'
+          isEditing ? t('messages.updateSuccess') : t('messages.createSuccess')
         );
 
         // Clear the form if creating a new job
@@ -458,12 +549,13 @@ const CreateJobPage = () => {
         router.push('/sc/my-jobs'); // Redirect to jobs list page
       } else {
         throw new Error(
-          response.message || `Failed to ${isEditing ? 'update' : 'create'} job`
+          response.message ||
+            (isEditing ? t('messages.updateError') : t('messages.createError'))
         );
       }
     } catch (err: any) {
       console.error('Failed to create job:', err);
-      toast.error(err.message || 'Failed to create job');
+      toast.error(err.message || t('messages.createError'));
     } finally {
       setLoading(false);
     }
@@ -475,27 +567,35 @@ const CreateJobPage = () => {
     '';
 
   return (
-    <Container className="py-8 max-w-4xl">
+    <Container className={`py-8 max-w-4xl ${isRTL ? 'rtl' : 'ltr'}`}>
       <main role="main">
         {/* Header */}
         <header className="mb-8">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4 p-2 hover:bg-accent"
+            className={`mb-4 p-2 hover:bg-accent ${
+              isRTL ? 'flex-row-reverse' : ''
+            }`}
           >
-            <FaArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            <FaArrowLeft
+              className={`w-4 h-4 ${isRTL ? 'ml-2 scale-x-reverse' : 'mr-2'}`}
+            />
+            {t('navigation.back')}
           </Button>
 
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
-            <FaBriefcase className="inline-block mr-3 text-primary" />
-            {isEditing ? 'Edit Job' : 'Create New Job'}
+            <FaBriefcase
+              className={`inline-block text-primary ${isRTL ? 'ml-3' : 'mr-3'}`}
+            />
+            {isEditing ? t('title.edit') : t('title.create')}
           </h1>
 
           {selectedServiceName && (
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
-              <p className="text-sm text-muted-foreground">Creating job for:</p>
+              <p className="text-sm text-muted-foreground">
+                {t('selectedService.label')}
+              </p>
               <p className="text-lg font-semibold text-primary">
                 {selectedServiceName}
               </p>
@@ -508,78 +608,74 @@ const CreateJobPage = () => {
           {/* Basic Information */}
           <div className="bg-background border rounded-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-              <FaFileAlt className="mr-2 text-primary" />
-              Basic Information
+              <FaFileAlt
+                className={`text-primary ${isRTL ? 'ml-2' : 'mr-2'}`}
+              />
+              {t('sections.basicInfo.title')}
             </h2>
 
             <div className="space-y-4">
               <div>
                 <Input
-                  label="Job Title *"
+                  label={t('sections.basicInfo.jobTitle.label')}
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="Enter a clear, descriptive job title"
+                  placeholder={t('sections.basicInfo.jobTitle.placeholder')}
                   error={errors.title}
+                  required
                 />
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  Service *
-                </label>
                 {servicesLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <LoadingSpinner size="sm" />
-                    <span className="text-muted-foreground">
-                      Loading services...
-                    </span>
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-2">
+                      {t('sections.basicInfo.service.label')}
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <LoadingSpinner size="sm" />
+                      <span className="text-muted-foreground">
+                        {t('sections.basicInfo.service.loading')}
+                      </span>
+                    </div>
                   </div>
                 ) : (
-                  <select
-                    name="serviceId"
+                  <DropdownSelector
+                    id="serviceId"
+                    label={t('sections.basicInfo.service.label')}
+                    options={serviceOptions}
                     value={formData.serviceId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <option value="">Select a service</option>
-                    {services.map((service) => (
-                      <option key={service._id} value={service._id}>
-                        {service.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                {formData.serviceId && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Selected:{' '}
-                    {services.find((s) => s._id === formData.serviceId)?.name}
-                  </p>
-                )}
-                {errors.serviceId && (
-                  <p className="text-sm text-destructive mt-1">
-                    {errors.serviceId}
-                  </p>
+                    onChange={handleDropdownChange('serviceId')}
+                    placeholder={t('sections.basicInfo.service.placeholder')}
+                    error={errors.serviceId}
+                    required
+                    helpText={
+                      formData.serviceId
+                        ? `${t('sections.basicInfo.service.selected')} ${
+                            services.find((s) => s._id === formData.serviceId)
+                              ?.name
+                          }`
+                        : undefined
+                    }
+                  />
                 )}
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  Job Description *
-                </label>
-                <textarea
+                <Textarea
+                  id="description"
+                  label={t('sections.basicInfo.description.label')}
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  placeholder="Describe the job in detail, including requirements, expectations, and any specific instructions..."
+                  rows={12}
+                  placeholder={t('sections.basicInfo.description.placeholder')}
+                  error={errors.description}
+                  required
+                  showCharCount={true}
+                  maxLength={2000}
                 />
-                {errors.description && (
-                  <p className="text-sm text-destructive mt-1">
-                    {errors.description}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -587,14 +683,16 @@ const CreateJobPage = () => {
           {/* Location */}
           <div className="bg-background border rounded-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-              <FaMapMarkerAlt className="mr-2 text-primary" />
-              Location
+              <FaMapMarkerAlt
+                className={`text-primary ${isRTL ? 'ml-2' : 'mr-2'}`}
+              />
+              {t('sections.location.title')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground block mb-2">
-                  Country
+                  {t('sections.location.country.label')}
                 </label>
                 <input
                   type="text"
@@ -605,48 +703,39 @@ const CreateJobPage = () => {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  State *
-                </label>
-                <select
-                  name="address.state"
+                <DropdownSelector
+                  id="address.state"
+                  label={t('sections.location.state.label')}
+                  options={stateOptions}
                   value={formData.address.state}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <option value="">Select state</option>
-                  {getEgyptianStatesArray().map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-                </select>
-                {errors.state && (
-                  <p className="text-sm text-destructive mt-1">
-                    {errors.state}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Input
-                  label="City *"
-                  name="address.city"
-                  value={formData.address.city}
-                  onChange={handleInputChange}
-                  placeholder="Enter city name"
-                  error={errors.city}
+                  onChange={handleDropdownChange('address.state')}
+                  placeholder={t('sections.location.state.placeholder')}
+                  error={errors.state}
+                  required
                 />
               </div>
 
               <div>
                 <Input
-                  label="Street Address *"
+                  label={t('sections.location.city.label')}
+                  name="address.city"
+                  value={formData.address.city}
+                  onChange={handleInputChange}
+                  placeholder={t('sections.location.city.placeholder')}
+                  error={errors.city}
+                  required
+                />
+              </div>
+
+              <div>
+                <Input
+                  label={t('sections.location.street.label')}
                   name="address.street"
                   value={formData.address.street}
                   onChange={handleInputChange}
-                  placeholder="Enter street address"
+                  placeholder={t('sections.location.street.placeholder')}
                   error={errors.street}
+                  required
                 />
               </div>
             </div>
@@ -656,11 +745,10 @@ const CreateJobPage = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="text-sm font-medium text-foreground">
-                    GPS Location *
+                    {t('sections.location.gps.title')}
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Share your precise location to help craftsmen find you
-                    easily
+                    {t('sections.location.gps.description')}
                   </p>
                 </div>
                 <Button
@@ -673,13 +761,18 @@ const CreateJobPage = () => {
                 >
                   {locationLoading ? (
                     <>
-                      <LoadingSpinner size="sm" className="mr-2" />
-                      Getting Location...
+                      <LoadingSpinner
+                        size="sm"
+                        className={isRTL ? 'ml-2' : 'mr-2'}
+                      />
+                      {t('sections.location.gps.buttonLoading')}
                     </>
                   ) : (
                     <>
-                      <FaMapMarkerAlt className="mr-2 w-3 h-3" />
-                      Get Current Location
+                      <FaMapMarkerAlt
+                        className={`w-3 h-3 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                      />
+                      {t('sections.location.gps.button')}
                     </>
                   )}
                 </Button>
@@ -703,13 +796,13 @@ const CreateJobPage = () => {
 
               {formData.location ? (
                 <div className="text-xs text-muted-foreground">
-                  📍 Location set: {formData.location.coordinates[1].toFixed(6)}
-                  , {formData.location.coordinates[0].toFixed(6)}
+                  {t('sections.location.gps.locationSet')}{' '}
+                  {formData.location.coordinates[1].toFixed(6)},{' '}
+                  {formData.location.coordinates[0].toFixed(6)}
                 </div>
               ) : (
                 <div className="text-xs text-destructive">
-                  ⚠️ Location is required. Click on the map or use &quot;Get
-                  Current Location&quot; button.
+                  {t('sections.location.gps.locationRequired')}
                 </div>
               )}
             </div>
@@ -718,52 +811,46 @@ const CreateJobPage = () => {
           {/* Pricing */}
           <div className="bg-background border rounded-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-              <FaDollarSign className="mr-2 text-primary" />
-              Pricing
+              <FaDollarSign
+                className={`text-primary ${isRTL ? 'ml-2' : 'mr-2'}`}
+              />
+              {t('sections.pricing.title')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground block mb-2">
-                  Payment Type
-                </label>
-                <select
-                  name="paymentType"
+                <DropdownSelector
+                  id="paymentType"
+                  label={t('sections.pricing.paymentType.label')}
+                  options={paymentTypeOptions}
                   value={formData.paymentType}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <option value="Cash">
-                    Cash - Direct payment to craftsman
-                  </option>
-                  <option value="Escrow">
-                    Escrow - Protected payment held until completion
-                  </option>
-                  <option value="CashProtected">
-                    Cash Protected - Protected cash payment
-                  </option>
-                </select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formData.paymentType === 'Cash' &&
-                    'Payment made directly to the craftsman'}
-                  {formData.paymentType === 'Escrow' &&
-                    'Payment held securely until job completion'}
-                  {formData.paymentType === 'CashProtected' &&
-                    'Cash payment with platform protection'}
-                </p>
+                  onChange={handleDropdownChange('paymentType')}
+                  helpText={
+                    (formData.paymentType === 'Cash' &&
+                      t('sections.pricing.paymentType.descriptions.cash')) ||
+                    (formData.paymentType === 'Escrow' &&
+                      t('sections.pricing.paymentType.descriptions.escrow')) ||
+                    (formData.paymentType === 'CashProtected' &&
+                      t(
+                        'sections.pricing.paymentType.descriptions.cashProtected'
+                      )) ||
+                    undefined
+                  }
+                />
               </div>
 
               <div>
                 <Input
-                  label="Job Price *"
+                  label={t('sections.pricing.jobPrice.label')}
                   name="jobPrice"
                   type="text"
                   value={
                     formData.jobPrice === 0 ? '' : formData.jobPrice.toString()
                   }
                   onChange={handleInputChange}
-                  placeholder="0.00"
+                  placeholder={t('sections.pricing.jobPrice.placeholder')}
                   error={errors.jobPrice}
+                  required
                 />
               </div>
             </div>
@@ -772,14 +859,14 @@ const CreateJobPage = () => {
           {/* Photos */}
           <div className="bg-background border rounded-lg p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-              <FaImage className="mr-2 text-primary" />
-              Photos (Optional)
+              <FaImage className={`text-primary ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('sections.photos.title')}
             </h2>
 
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-foreground block mb-2">
-                  Upload Photos (Max 5, 5MB each)
+                  {t('sections.photos.upload.label')}
                 </label>
                 <input
                   ref={fileInputRef}
@@ -791,7 +878,7 @@ const CreateJobPage = () => {
                   disabled={photoPreviews.length >= 5}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Supported formats: JPEG, PNG, WebP. Max size: 5MB per image.
+                  {t('sections.photos.upload.supported')}
                 </p>
               </div>
 
@@ -802,7 +889,9 @@ const CreateJobPage = () => {
                     <div key={index} className="relative group">
                       <Image
                         src={preview}
-                        alt={`Preview ${index + 1}`}
+                        alt={`${t('sections.photos.upload.preview')} ${
+                          index + 1
+                        }`}
                         width={96}
                         height={96}
                         className="w-full h-24 object-cover rounded-lg border border-border"
@@ -822,22 +911,30 @@ const CreateJobPage = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end space-x-4">
+          <div
+            className={`flex space-x-4 ${
+              isRTL
+                ? 'justify-start flex-row-reverse space-x-reverse'
+                : 'justify-end'
+            }`}
+          >
             <Button
               type="button"
               variant="outline"
               onClick={() => router.back()}
               disabled={loading}
             >
-              Cancel
+              {t('buttons.cancel')}
             </Button>
             <Button
               type="submit"
               isLoading={loading}
-              loadingText={isEditing ? 'Updating Job...' : 'Creating Job...'}
+              loadingText={
+                isEditing ? t('buttons.updating') : t('buttons.creating')
+              }
               disabled={loading}
             >
-              {isEditing ? 'Update Job' : 'Create Job'}
+              {isEditing ? t('buttons.update') : t('buttons.create')}
             </Button>
           </div>
         </form>

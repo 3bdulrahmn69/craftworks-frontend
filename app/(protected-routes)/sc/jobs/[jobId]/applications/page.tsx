@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useParams } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
@@ -25,6 +26,8 @@ const JobApplicationsPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const params = useParams();
+  const locale = useLocale();
+  const t = useTranslations('jobApplications');
   const jobId = params?.jobId as string;
 
   const [job, setJob] = useState<Job | null>(null);
@@ -98,16 +101,17 @@ const JobApplicationsPage = () => {
 
   if (loading) {
     return (
-      <Container>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <Container className={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <div
+          className="flex flex-col items-center justify-center min-h-[60vh] space-y-4"
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
           <LoadingSpinner size="lg" />
           <div className="text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Loading Applications
+              {t('loading.title')}
             </h3>
-            <p className="text-muted-foreground">
-              Please wait while we fetch the job applications...
-            </p>
+            <p className="text-muted-foreground">{t('loading.message')}</p>
           </div>
         </div>
       </Container>
@@ -116,16 +120,19 @@ const JobApplicationsPage = () => {
 
   if (error || !job) {
     return (
-      <Container>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <Container className={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <div
+          className="flex flex-col items-center justify-center min-h-[60vh] space-y-4"
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        >
           <div className="text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Error Loading Applications
+              {t('error.title')}
             </h3>
             <p className="text-muted-foreground mb-4">
-              {error || 'Job not found'}
+              {error || t('error.jobNotFound')}
             </p>
-            <Button onClick={() => router.back()}>Go Back</Button>
+            <Button onClick={() => router.back()}>{t('error.goBack')}</Button>
           </div>
         </div>
       </Container>
@@ -133,43 +140,62 @@ const JobApplicationsPage = () => {
   }
 
   return (
-    <Container className="py-8 max-w-6xl">
-      <main role="main">
+    <Container className={`py-8 max-w-6xl ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+      <main role="main" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Header */}
         <header className="mb-8">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4 p-2 hover:bg-accent"
+            className={`mb-4 p-2 hover:bg-accent flex items-center ${
+              locale === 'ar' ? 'flex-row-reverse' : ''
+            }`}
           >
-            <FaArrowLeft className="w-4 h-4 mr-2" />
-            Back to Job
+            <FaArrowLeft
+              className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+            />
+            {t('header.backToJob')}
           </Button>
 
           <div className="bg-background border rounded-lg p-6 mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center">
-              <FaBriefcase className="inline-block mr-3 text-primary" />
-              Applications for: {job.title}
+              <FaBriefcase
+                className={`text-primary ${locale === 'ar' ? 'ml-3' : 'mr-3'}`}
+              />
+              {job.title}
             </h1>
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-              <span>Status: {job.status}</span>
-              <span>Payment: {job.paymentType}</span>
-              <span>Price: {job.jobPrice} EGP</span>
-              <span>Applications: {applications.length}</span>
+            <div
+              className={`flex flex-wrap gap-4 text-sm text-muted-foreground ${
+                locale === 'ar' ? 'flex-row-reverse justify-end' : ''
+              }`}
+            >
+              <span>
+                {t('header.status')}: {job.status}
+              </span>
+              <span>
+                {t('header.payment')}: {job.paymentType}
+              </span>
+              <span>
+                {t('header.price')}: {job.jobPrice} {t('currency')}
+              </span>
+              <span>
+                {t('header.applicationsCount')}: {applications.length}
+              </span>
             </div>
           </div>
         </header>
 
         {/* Applications List */}
         {applications.length === 0 ? (
-          <div className="text-center py-12">
+          <div
+            className={`text-center py-12 ${locale === 'ar' ? 'rtl' : 'ltr'}`}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          >
             <FaUser className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              No Applications Yet
+              {t('emptyState.title')}
             </h3>
-            <p className="text-muted-foreground">
-              No craftsmen have applied for this job yet. Check back later.
-            </p>
+            <p className="text-muted-foreground">{t('emptyState.message')}</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -177,11 +203,20 @@ const JobApplicationsPage = () => {
               <div
                 key={application._id}
                 className="bg-background border rounded-lg p-6 hover:shadow-md transition-shadow"
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div
+                  className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 ${
+                    locale === 'ar' ? 'lg:flex-row-reverse' : ''
+                  }`}
+                >
                   {/* Craftsman Info */}
                   <div className="flex-1">
-                    <div className="flex items-start gap-4">
+                    <div
+                      className={`flex items-start gap-4 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
                       {application.craftsman.profilePicture ? (
                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 overflow-hidden">
                           <Image
@@ -199,34 +234,59 @@ const JobApplicationsPage = () => {
                       )}
 
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="text-lg font-semibold text-foreground">
+                        <div
+                          className={`flex items-center gap-2 mb-2 ${
+                            locale === 'ar'
+                              ? 'flex-row-reverse justify-end'
+                              : ''
+                          }`}
+                        >
+                          <h3
+                            className={`text-lg font-semibold text-foreground ${
+                              locale === 'ar' ? 'text-right' : 'text-left'
+                            }`}
+                          >
                             {application.craftsman.fullName}
                           </h3>
                           {application.craftsman.rating && (
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <div
+                              className={`flex items-center gap-1 text-sm text-muted-foreground ${
+                                locale === 'ar' ? 'flex-row-reverse' : ''
+                              }`}
+                            >
                               <FaStar className="text-yellow-500 w-3 h-3" />
                               <span>
                                 {application.craftsman.rating.toFixed(1)}
                               </span>
                               {application.craftsman.ratingCount && (
                                 <span>
-                                  ({application.craftsman.ratingCount} reviews)
+                                  ({application.craftsman.ratingCount}{' '}
+                                  {t('application.reviews')})
                                 </span>
                               )}
                             </div>
                           )}
                         </div>
 
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center gap-1">
+                        <div
+                          className={`flex items-center gap-4 text-sm text-muted-foreground mb-3 ${
+                            locale === 'ar'
+                              ? 'flex-row-reverse justify-end'
+                              : ''
+                          }`}
+                        >
+                          <div
+                            className={`flex items-center gap-1 ${
+                              locale === 'ar' ? 'flex-row-reverse' : ''
+                            }`}
+                          >
                             <FaDollarSign className="w-3 h-3" />
                             <span className="font-semibold text-lg text-foreground">
-                              {application.price} EGP
+                              {application.price} {t('currency')}
                             </span>
                           </div>
                           <span>
-                            Applied:{' '}
+                            {t('application.applied')}:{' '}
                             {new Date(
                               application.createdAt
                             ).toLocaleDateString()}
@@ -240,19 +300,35 @@ const JobApplicationsPage = () => {
                                 : 'bg-blue-100 text-blue-800'
                             }`}
                           >
-                            {application.status}
+                            {t(
+                              `application.status.${application.status.toLowerCase()}`
+                            )}
                           </span>
                         </div>
 
                         {application.notes && (
                           <div className="bg-muted/30 rounded-lg p-3">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div
+                              className={`flex items-center gap-2 mb-2 ${
+                                locale === 'ar'
+                                  ? 'flex-row-reverse justify-end'
+                                  : ''
+                              }`}
+                            >
                               <FaFileAlt className="w-3 h-3 text-muted-foreground" />
-                              <span className="text-sm font-medium text-foreground">
-                                Notes:
+                              <span
+                                className={`text-sm font-medium text-foreground ${
+                                  locale === 'ar' ? 'text-right' : 'text-left'
+                                }`}
+                              >
+                                {t('application.notes')}:
                               </span>
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p
+                              className={`text-sm text-muted-foreground ${
+                                locale === 'ar' ? 'text-right' : 'text-left'
+                              }`}
+                            >
                               {application.notes}
                             </p>
                           </div>
@@ -264,7 +340,11 @@ const JobApplicationsPage = () => {
                   {/* Actions */}
                   {job.status === 'Posted' &&
                     application.status === 'Submitted' && (
-                      <div className="flex gap-3 lg:flex-col">
+                      <div
+                        className={`flex gap-3 lg:flex-col ${
+                          locale === 'ar' ? 'lg:flex-col-reverse' : ''
+                        }`}
+                      >
                         <Button
                           onClick={() => handleAcceptQuote(application._id)}
                           disabled={actionLoading === application._id}
@@ -272,15 +352,30 @@ const JobApplicationsPage = () => {
                           size="sm"
                         >
                           {actionLoading === application._id ? (
-                            <>
-                              <LoadingSpinner size="sm" className="mr-2" />
-                              Accepting...
-                            </>
+                            <div
+                              className={`flex items-center ${
+                                locale === 'ar' ? 'flex-row-reverse' : ''
+                              }`}
+                            >
+                              <LoadingSpinner
+                                size="sm"
+                                className={locale === 'ar' ? 'ml-2' : 'mr-2'}
+                              />
+                              {t('application.actions.accepting')}
+                            </div>
                           ) : (
-                            <>
-                              <FaCheck className="w-3 h-3 mr-2" />
-                              Accept Quote
-                            </>
+                            <div
+                              className={`flex items-center ${
+                                locale === 'ar' ? 'flex-row-reverse' : ''
+                              }`}
+                            >
+                              <FaCheck
+                                className={`w-3 h-3 ${
+                                  locale === 'ar' ? 'ml-2' : 'mr-2'
+                                }`}
+                              />
+                              {t('application.actions.acceptQuote')}
+                            </div>
                           )}
                         </Button>
 
@@ -290,11 +385,21 @@ const JobApplicationsPage = () => {
                           className="flex-1 lg:flex-none"
                           onClick={() => {
                             // TODO: Implement reject functionality if needed
-                            toast.info('Reject functionality coming soon');
+                            toast.info(t('application.actions.rejectSoon'));
                           }}
                         >
-                          <FaTimes className="w-3 h-3 mr-2" />
-                          Decline
+                          <div
+                            className={`flex items-center ${
+                              locale === 'ar' ? 'flex-row-reverse' : ''
+                            }`}
+                          >
+                            <FaTimes
+                              className={`w-3 h-3 ${
+                                locale === 'ar' ? 'ml-2' : 'mr-2'
+                              }`}
+                            />
+                            {t('application.actions.decline')}
+                          </div>
                         </Button>
                       </div>
                     )}

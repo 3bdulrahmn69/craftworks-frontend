@@ -44,8 +44,18 @@ const Map = ({
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize the map
-    const map = L.map(mapRef.current).setView([latitude, longitude], zoom);
+    // Initialize the map with custom options
+    const map = L.map(mapRef.current, {
+      zoomControl: true,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      boxZoom: true,
+      keyboard: true,
+      dragging: true,
+      touchZoom: true,
+      // Constrain the map within its container
+      maxBoundsViscosity: 1.0,
+    }).setView([latitude, longitude], zoom);
 
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -69,6 +79,9 @@ const Map = ({
 
       marker.bindPopup(popupContent).openPopup();
     }
+
+    // Force map to fit within container bounds
+    map.invalidateSize();
 
     mapInstanceRef.current = map;
 
@@ -105,14 +118,24 @@ const Map = ({
           }
         }
       });
+
+      // Force map to recalculate size and bounds
+      mapInstanceRef.current.invalidateSize();
     }
   }, [latitude, longitude, zoom, markerTitle, address, showPopup]);
 
   return (
     <div
       ref={mapRef}
-      className={`rounded-lg border border-border overflow-hidden ${className}`}
-      style={{ height, width }}
+      className={`rounded-lg border border-border overflow-hidden relative isolate ${className}`}
+      style={{
+        height,
+        width,
+        zIndex: 1,
+        contain: 'layout style size',
+        position: 'relative',
+        isolation: 'isolate',
+      }}
     />
   );
 };

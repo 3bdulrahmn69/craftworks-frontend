@@ -122,7 +122,7 @@ const DropdownSelector = ({
     <div className={className}>
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-foreground mb-1"
+        className="block text-sm font-medium text-foreground mb-2"
       >
         {label}
         {required && (

@@ -1,13 +1,25 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Invitation, Pagination } from '@/app/types/jobs';
 import { invitationsService } from '@/app/services/jobs';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
+import DropdownSelector from '@/app/components/ui/dropdown-selector';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { useSession } from 'next-auth/react';
 import { IoTicketSharp } from 'react-icons/io5';
+import {
+  FiUser,
+  FiStar,
+  FiDollarSign,
+  FiCalendar,
+  FiEye,
+  FiMail,
+  FiAlertCircle,
+  FiX,
+} from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 
 interface InvitationsPageState {
@@ -28,6 +40,8 @@ interface ResponseModalState {
 const InvitationsPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations();
 
   const [state, setState] = useState<InvitationsPageState>({
     invitations: [],
@@ -161,41 +175,45 @@ const InvitationsPage = () => {
     ]
   );
 
-  const getStatusBadge = useCallback((status: string) => {
-    const statusClasses = {
-      pending:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      accepted:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-    };
+  const getStatusBadge = useCallback(
+    (status: string) => {
+      const statusClasses = {
+        pending:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+        accepted:
+          'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        rejected:
+          'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+      };
 
-    return (
-      <span
-        className={`px-2 py-1 rounded-full text-xs font-medium ${
-          statusClasses[status as keyof typeof statusClasses] ||
-          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-        }`}
-      >
-        {status === 'pending'
-          ? 'Pending'
-          : status === 'accepted'
-          ? 'Accepted'
-          : status === 'rejected'
-          ? 'Rejected'
-          : status}
-      </span>
-    );
-  }, []);
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            statusClasses[status as keyof typeof statusClasses] ||
+            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+          }`}
+        >
+          {status === 'pending'
+            ? t('invitations.status.pending')
+            : status === 'accepted'
+            ? t('invitations.status.accepted')
+            : status === 'rejected'
+            ? t('invitations.status.rejected')
+            : status}
+        </span>
+      );
+    },
+    [t]
+  );
 
   const statusOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Statuses' },
-      { value: 'pending', label: 'Pending' },
-      { value: 'accepted', label: 'Accepted' },
-      { value: 'rejected', label: 'Rejected' },
+      { id: 'all', label: t('invitations.filters.status.all') },
+      { id: 'pending', label: t('invitations.filters.status.pending') },
+      { id: 'accepted', label: t('invitations.filters.status.accepted') },
+      { id: 'rejected', label: t('invitations.filters.status.rejected') },
     ],
-    []
+    [t]
   );
 
   const formatDate = useCallback((dateString: string) => {
@@ -208,27 +226,44 @@ const InvitationsPage = () => {
 
   if (state.loading && state.invitations.length === 0) {
     return (
-      <Container>
+      <Container className={`py-8 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
         <div className="animate-pulse space-y-6">
-          <div className="h-10 bg-muted rounded-xl w-1/3"></div>
-          <div className="h-6 bg-muted rounded-xl w-1/2"></div>
-          <div className="h-12 bg-muted rounded-xl w-64"></div>
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="h-10 bg-muted rounded-xl w-1/3 mb-4"></div>
+            <div className="h-6 bg-muted rounded-xl w-1/2"></div>
+          </div>
+
+          {/* Filter skeleton */}
+          <div className="h-16 bg-muted rounded-xl w-64 mb-8"></div>
+
+          {/* Card skeletons */}
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-card rounded-xl p-6 border border-border space-y-4"
+              className="bg-card rounded-xl p-6 border border-border space-y-6"
             >
-              <div className="flex justify-between">
-                <div className="space-y-2 flex-1">
-                  <div className="h-5 bg-muted rounded w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
+              {/* Header section */}
+              <div className="flex justify-between items-start">
+                <div className="flex-1 space-y-3">
+                  <div className="h-6 bg-muted rounded w-3/4"></div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-muted rounded-full"></div>
+                    <div className="space-y-1">
+                      <div className="h-4 bg-muted rounded w-32"></div>
+                      <div className="h-3 bg-muted rounded w-24"></div>
+                    </div>
+                  </div>
+                  <div className="h-4 bg-muted rounded w-40"></div>
                 </div>
                 <div className="h-6 bg-muted rounded-full w-20"></div>
               </div>
-              <div className="flex justify-between items-center pt-4">
+
+              {/* Footer section */}
+              <div className="flex justify-between items-center pt-4 border-t border-border">
                 <div className="h-4 bg-muted rounded w-32"></div>
-                <div className="flex gap-2">
-                  <div className="h-8 bg-muted rounded w-20"></div>
+                <div className="flex gap-3">
+                  <div className="h-8 bg-muted rounded w-24"></div>
                   <div className="h-8 bg-muted rounded w-20"></div>
                 </div>
               </div>
@@ -241,52 +276,59 @@ const InvitationsPage = () => {
 
   return (
     <>
-      <Container className="py-8">
+      <Container className={`py-8 ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
         {/* Header */}
-        <header className="mb-8">
+        <header className="mb-8" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
-            <IoTicketSharp className="inline-block mr-2 text-primary" />
-            Job Invitations
+            <IoTicketSharp
+              className={`text-primary ${locale === 'ar' ? 'ml-3' : 'mr-3'}`}
+              size={32}
+            />
+            {t('invitations.title')}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl">
-            Manage your job invitations and respond to clients
+          <p
+            className={`text-xl text-muted-foreground max-w-3xl ${
+              locale === 'ar' ? 'text-right' : 'text-left'
+            }`}
+          >
+            {t('invitations.subtitle')}
           </p>
         </header>
 
         {/* Status Filter */}
-        <div className="mb-8">
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Filter by Status:
-          </label>
-          <select
+        <div className="mb-8" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+          <DropdownSelector
+            id="status-filter"
+            label={t('invitations.filters.status.label')}
+            options={statusOptions}
             value={state.statusFilter}
-            onChange={(e) => handleStatusFilter(e.target.value)}
-            className="px-4 py-3 border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm hover:shadow-md transition-shadow"
-          >
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onChange={handleStatusFilter}
+            placeholder="Select status"
+            className="max-w-xs"
+          />
         </div>
 
         {/* Error State */}
         {state.error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <svg
-                className="w-5 h-5 text-destructive"
-                fill="currentColor"
-                viewBox="0 0 20 20"
+          <div
+            className={`bg-destructive/10 border border-destructive/20 rounded-xl p-6 mb-8 ${
+              locale === 'ar' ? 'rtl' : 'ltr'
+            }`}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          >
+            <div
+              className={`flex items-center gap-3 mb-3 ${
+                locale === 'ar' ? 'flex-row-reverse' : ''
+              }`}
+            >
+              <FiAlertCircle className="w-5 h-5 text-destructive" />
+              <p
+                className={`text-destructive font-medium ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <p className="text-destructive font-medium">{state.error}</p>
+                {state.error}
+              </p>
             </div>
             <Button
               onClick={() =>
@@ -298,35 +340,36 @@ const InvitationsPage = () => {
               variant="outline"
               className="mt-2"
             >
-              Try Again
+              {t('invitations.error.retry')}
             </Button>
           </div>
         )}
 
         {/* Invitations List */}
         {state.invitations.length === 0 ? (
-          <div className="text-center py-16">
+          <div
+            className={`text-center py-16 ${locale === 'ar' ? 'rtl' : 'ltr'}`}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          >
             <div className="bg-card rounded-2xl shadow-lg p-8 border border-border max-w-md mx-auto">
-              <svg
-                className="w-16 h-16 text-muted-foreground mx-auto mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <FiMail className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3
+                className={`text-lg font-semibold text-foreground mb-2 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                No invitations found
+                {t('invitations.empty.title')}
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p
+                className={`text-muted-foreground mb-4 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {state.statusFilter !== 'all'
-                  ? `No invitations with status "${state.statusFilter}"`
-                  : "Clients will send you invitations when they're interested in your work!"}
+                  ? `${t('invitations.filters.status.label')} "${
+                      state.statusFilter
+                    }"`
+                  : t('invitations.empty.message')}
               </p>
               <Button
                 onClick={() =>
@@ -337,92 +380,181 @@ const InvitationsPage = () => {
                 }
                 size="lg"
               >
-                Refresh Invitations
+                {t('invitations.error.retry')}
               </Button>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div
+            className={`space-y-6 ${locale === 'ar' ? 'rtl' : 'ltr'}`}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          >
             {state.invitations.map((invitation) => (
               <div
                 key={invitation._id}
                 className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Job: {invitation.job.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-2">
-                      Client: {invitation.job.client.name}
-                    </p>
-                    {invitation.job.client.rating && (
-                      <div className="flex items-center text-sm text-muted-foreground mb-2">
-                        <svg
-                          className="w-4 h-4 mr-1 text-warning"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        {invitation.job.client.rating.toFixed(1)} (
-                        {invitation.job.client.reviewCount || 0} reviews)
-                      </div>
-                    )}
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <svg
-                        className="w-4 h-4 mr-2 text-primary"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                {/* Header Section with Title and Status */}
+                <div
+                  className={`flex items-start gap-4 mb-6 ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div
+                      className={`flex items-start justify-between gap-3 mb-3 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
+                      <h3
+                        className={`text-xl font-bold text-foreground flex-1 min-w-0 ${
+                          locale === 'ar' ? 'text-right' : 'text-left'
+                        }`}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                        />
-                      </svg>
-                      Payment: {invitation.job.paymentType}
+                        {invitation.job.title}
+                      </h3>
+
+                      {/* Status Badge - Responsive positioning */}
+                      <div
+                        className={`flex-shrink-0 ${
+                          locale === 'ar' ? 'order-first' : 'order-last'
+                        }`}
+                      >
+                        {getStatusBadge(invitation.status)}
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    {getStatusBadge(invitation.status)}
+
+                    {/* Client Info */}
+                    <div
+                      className={`flex items-center mb-3 ${
+                        locale === 'ar' ? 'flex-row-reverse justify-end' : ''
+                      }`}
+                    >
+                      <div
+                        className={`w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ${
+                          locale === 'ar' ? 'ml-3' : 'mr-3'
+                        }`}
+                      >
+                        <FiUser className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-medium text-foreground truncate ${
+                            locale === 'ar' ? 'text-right' : 'text-left'
+                          }`}
+                        >
+                          {invitation.job.client.name}
+                        </p>
+                        {invitation.job.client.rating && (
+                          <div
+                            className={`flex items-center text-xs text-muted-foreground ${
+                              locale === 'ar'
+                                ? 'flex-row-reverse justify-end'
+                                : ''
+                            }`}
+                          >
+                            <FiStar
+                              className={`w-3 h-3 text-yellow-500 ${
+                                locale === 'ar' ? 'ml-1' : 'mr-1'
+                              }`}
+                            />
+                            <span>
+                              {invitation.job.client.rating.toFixed(1)} (
+                              {invitation.job.client.reviewCount || 0} reviews)
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Payment Info */}
+                    <div
+                      className={`flex items-center text-sm text-muted-foreground ${
+                        locale === 'ar' ? 'flex-row-reverse justify-end' : ''
+                      }`}
+                    >
+                      <FiDollarSign
+                        className={`w-4 h-4 text-green-600 ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
+                      <span className="font-medium">
+                        {t('invitations.card.payment')}:
+                      </span>
+                      <span
+                        className={`${
+                          locale === 'ar' ? 'mr-1' : 'ml-1'
+                        } truncate`}
+                      >
+                        {invitation.job.paymentType}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                {/* Footer Section */}
+                <div
+                  className={`flex items-center pt-4 border-t border-border gap-4 ${
+                    locale === 'ar'
+                      ? 'flex-col-reverse sm:flex-row-reverse justify-between'
+                      : 'flex-col sm:flex-row justify-between'
+                  }`}
+                >
+                  {/* Date Info */}
+                  <div
+                    className={`flex items-center text-sm text-muted-foreground ${
+                      locale === 'ar'
+                        ? 'flex-row-reverse justify-end w-full sm:w-auto'
+                        : 'w-full sm:w-auto'
+                    }`}
+                  >
+                    <FiCalendar
+                      className={`w-4 h-4 text-muted-foreground flex-shrink-0 ${
+                        locale === 'ar' ? 'ml-2' : 'mr-2'
+                      }`}
+                    />
+                    <span className="font-medium flex-shrink-0">
+                      {t('invitations.card.receivedOn')}
+                    </span>
+                    <span
+                      className={`${
+                        locale === 'ar' ? 'mr-1' : 'ml-1'
+                      } truncate`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4h6m-6 4h6"
-                      />
-                    </svg>
-                    Invited {formatDate(invitation.createdAt)}
+                      {formatDate(invitation.createdAt)}
+                    </span>
                   </div>
-                  <div className="flex space-x-2">
+
+                  {/* Action Buttons */}
+                  <div
+                    className={`flex gap-3 flex-shrink-0 ${
+                      locale === 'ar'
+                        ? 'flex-row-reverse w-full sm:w-auto justify-end'
+                        : 'w-full sm:w-auto justify-start sm:justify-end'
+                    }`}
+                  >
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => router.push(`/jobs/${invitation.job._id}`)}
+                      className={`flex-1 sm:flex-none min-w-[100px] flex items-center justify-center gap-2 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
                     >
-                      View Job
+                      <FiEye className="w-4 h-4" />
+                      <span>{t('invitations.card.buttons.viewJob')}</span>
                     </Button>
                     {invitation.status === 'pending' && (
                       <Button
                         variant="primary"
                         size="sm"
                         onClick={() => openResponseModal(invitation)}
+                        className={`flex-1 sm:flex-none min-w-[100px] flex items-center justify-center gap-2 ${
+                          locale === 'ar' ? 'flex-row-reverse' : ''
+                        }`}
                       >
-                        Respond
+                        <FiMail className="w-4 h-4" />
+                        <span>{t('invitations.card.buttons.respond')}</span>
                       </Button>
                     )}
                   </div>
@@ -443,53 +575,71 @@ const InvitationsPage = () => {
       {/* Response Modal */}
       {modalState.isOpen && modalState.invitation && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-card rounded-2xl p-6 w-full max-w-md shadow-2xl border border-border animate-fadeIn">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-foreground">
-                Respond to Invitation
+          <div
+            className={`bg-card rounded-2xl p-6 w-full max-w-md shadow-2xl border border-border animate-fadeIn ${
+              locale === 'ar' ? 'rtl' : 'ltr'
+            }`}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+          >
+            <div
+              className={`flex justify-between items-center mb-6 ${
+                locale === 'ar' ? 'flex-row-reverse' : ''
+              }`}
+            >
+              <h3
+                className={`text-xl font-semibold text-foreground ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
+                {t('invitations.modal.title')}
               </h3>
               <button
                 onClick={closeResponseModal}
                 className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted"
                 aria-label="Close modal"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <FiX className="w-6 h-6" />
               </button>
             </div>
 
             <div className="mb-6 p-4 bg-muted rounded-xl">
-              <h4 className="font-medium text-foreground mb-2">
+              <h4
+                className={`font-medium text-foreground mb-2 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {modalState.invitation.job.title}
               </h4>
-              <p className="text-sm text-muted-foreground">
-                Client: {modalState.invitation.job.client.name}
+              <p
+                className={`text-sm text-muted-foreground ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                }`}
+              >
+                {t('invitations.modal.client')}:{' '}
+                {modalState.invitation.job.client.name}
               </p>
             </div>
 
-            <p className="text-muted-foreground mb-6">
-              How would you like to respond to this job invitation?
+            <p
+              className={`text-muted-foreground mb-6 ${
+                locale === 'ar' ? 'text-right' : 'text-left'
+              }`}
+            >
+              {t('invitations.modal.message')}
             </p>
 
-            <div className="flex space-x-3">
+            <div
+              className={`flex gap-3 ${
+                locale === 'ar' ? 'flex-row-reverse' : ''
+              }`}
+            >
               <Button
                 variant="outline"
                 onClick={closeResponseModal}
                 disabled={modalState.responding}
                 className="flex-1"
               >
-                Cancel
+                {t('invitations.modal.buttons.cancel')}
               </Button>
 
               <Button
@@ -498,7 +648,9 @@ const InvitationsPage = () => {
                 disabled={modalState.responding}
                 className="flex-1 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
               >
-                {modalState.responding ? 'Responding...' : 'Reject'}
+                {modalState.responding
+                  ? t('invitations.modal.buttons.rejecting')
+                  : t('invitations.modal.buttons.reject')}
               </Button>
 
               <Button
@@ -506,10 +658,10 @@ const InvitationsPage = () => {
                 onClick={() => handleResponse('accept')}
                 disabled={modalState.responding}
                 isLoading={modalState.responding}
-                loadingText="Accepting..."
+                loadingText={t('invitations.modal.buttons.accepting')}
                 className="flex-1"
               >
-                Accept
+                {t('invitations.modal.buttons.accept')}
               </Button>
             </div>
           </div>
