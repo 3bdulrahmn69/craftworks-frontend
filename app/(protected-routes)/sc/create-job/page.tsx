@@ -8,10 +8,16 @@ import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import Input from '@/app/components/ui/input';
+import InteractiveMap from '@/app/components/ui/interactive-map';
 import { toast } from 'react-toastify';
 import { jobsService } from '@/app/services/jobs';
 import servicesAPI from '@/app/services/services';
 import { Service } from '@/app/types/jobs';
+import {
+  getCurrentLocationAndGeocode,
+  reverseGeocode,
+} from '@/app/utils/geocoding';
+import { getEgyptianStatesArray } from '@/app/data/states';
 import {
   FaBriefcase,
   FaMapMarkerAlt,
@@ -41,36 +47,6 @@ interface JobFormData {
   photos: File[];
   existingPhotos?: string[]; // URLs of existing photos when editing
 }
-
-const egyptianStates = [
-  'Cairo',
-  'Alexandria',
-  'Giza',
-  'Qalyubia',
-  'Port Said',
-  'Suez',
-  'Luxor',
-  'Aswan',
-  'Asyut',
-  'Beheira',
-  'Beni Suef',
-  'Dakahlia',
-  'Damietta',
-  'Fayyum',
-  'Gharbia',
-  'Ismailia',
-  'Kafr el-Sheikh',
-  'Matrouh',
-  'Minya',
-  'Monufia',
-  'New Valley',
-  'North Sinai',
-  'Qena',
-  'Red Sea',
-  'Sharqia',
-  'Sohag',
-  'South Sinai',
-];
 
 const CreateJobPage = () => {
   const { data: session } = useSession();
@@ -106,48 +82,67 @@ const CreateJobPage = () => {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Get user's current location
-  const getCurrentLocation = () => {
+  // Get user's current location and reverse geocode it
+  const getCurrentLocation = async () => {
     setLocationLoading(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setFormData((prev) => ({
-            ...prev,
-            location: {
-              type: 'Point',
-              coordinates: [longitude, latitude],
-            },
-          }));
-          setLocationLoading(false);
+    try {
+      const locationData = await getCurrentLocationAndGeocode();
+
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          type: 'Point',
+          coordinates: [locationData.longitude, locationData.latitude],
         },
-        (error) => {
-          console.error('Geolocation error:', error);
-          let errorMessage = 'Failed to get location';
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = 'Location access denied by user';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = 'Location information unavailable';
-              break;
-            case error.TIMEOUT:
-              errorMessage = 'Location request timed out';
-              break;
-          }
-          toast.error(errorMessage);
-          setLocationLoading(false);
+        address: {
+          ...prev.address,
+          state: locationData.state,
+          city: locationData.city,
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
-        }
+      }));
+    } catch (error) {
+      console.error('Location/geocoding error:', error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Failed to get location information'
       );
-    } else {
-      toast.error('Geolocation is not supported by this browser');
+    } finally {
       setLocationLoading(false);
+    }
+  };
+
+  // Handle location selection from map
+  const handleLocationSelect = async (lat: number, lng: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        type: 'Point',
+        coordinates: [lng, lat],
+      },
+    }));
+
+    // Optionally perform reverse geocoding to auto-fill address fields
+    try {
+      const geocodeResult = await reverseGeocode(lat, lng);
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          type: 'Point',
+          coordinates: [lng, lat],
+        },
+        address: {
+          ...prev.address,
+          state: geocodeResult.state,
+          city: geocodeResult.city,
+        },
+      }));
+    } catch (error) {
+      // If reverse geocoding fails, just set the coordinates without address
+      console.warn('Reverse geocoding failed:', error);
+      toast.info(
+        'Location coordinates set. Please fill in the address manually.'
+      );
     }
   };
 
@@ -620,7 +615,7 @@ const CreateJobPage = () => {
                   className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   <option value="">Select state</option>
-                  {egyptianStates.map((state) => (
+                  {getEgyptianStatesArray().map((state) => (
                     <option key={state} value={state}>
                       {state}
                     </option>
@@ -690,15 +685,31 @@ const CreateJobPage = () => {
                 </Button>
               </div>
 
+              {/* Interactive Map for Location Selection */}
+              <div className="mb-4">
+                <InteractiveMap
+                  latitude={formData.location?.coordinates[1]}
+                  longitude={formData.location?.coordinates[0]}
+                  zoom={13}
+                  height="250px"
+                  markerTitle={formData.title || 'Job Location'}
+                  address={`${formData.address.street}, ${formData.address.city}, ${formData.address.state}`}
+                  showPopup={true}
+                  isClickable={true}
+                  onLocationSelect={handleLocationSelect}
+                  className="w-full"
+                />
+              </div>
+
               {formData.location ? (
                 <div className="text-xs text-muted-foreground">
-                  📍 Location captured:{' '}
-                  {formData.location.coordinates[1].toFixed(6)},{' '}
-                  {formData.location.coordinates[0].toFixed(6)}
+                  📍 Location set: {formData.location.coordinates[1].toFixed(6)}
+                  , {formData.location.coordinates[0].toFixed(6)}
                 </div>
               ) : (
                 <div className="text-xs text-destructive">
-                  ⚠️ Location is required. Please capture your GPS location.
+                  ⚠️ Location is required. Click on the map or use &quot;Get
+                  Current Location&quot; button.
                 </div>
               )}
             </div>

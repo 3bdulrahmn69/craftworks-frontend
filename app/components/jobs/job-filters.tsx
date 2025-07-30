@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Service } from '@/app/types/jobs';
+import { getStatesForSelect } from '@/app/data/states';
 import Button from '@/app/components/ui/button';
 import DropdownSelector from '@/app/components/ui/dropdown-selector';
 import {
@@ -26,30 +27,6 @@ interface JobFiltersProps {
   onSearch: () => void;
   onReset: () => void;
 }
-
-const egyptianStates = [
-  { id: 'Cairo', label: 'Cairo' },
-  { id: 'Alexandria', label: 'Alexandria' },
-  { id: 'Giza', label: 'Giza' },
-  { id: 'Dakahlia', label: 'Dakahlia' },
-  { id: 'Sharqia', label: 'Sharqia' },
-  { id: 'Qalyubia', label: 'Qalyubia' },
-  { id: 'Kafr el-Sheikh', label: 'Kafr el-Sheikh' },
-  { id: 'Gharbia', label: 'Gharbia' },
-  { id: 'Monufia', label: 'Monufia' },
-  { id: 'Beheira', label: 'Beheira' },
-  { id: 'Minya', label: 'Minya' },
-  { id: 'Assiut', label: 'Assiut' },
-  { id: 'Sohag', label: 'Sohag' },
-  { id: 'Qena', label: 'Qena' },
-  { id: 'Aswan', label: 'Aswan' },
-  { id: 'Luxor', label: 'Luxor' },
-  { id: 'Red Sea', label: 'Red Sea' },
-  { id: 'New Valley', label: 'New Valley' },
-  { id: 'Matrouh', label: 'Matrouh' },
-  { id: 'North Sinai', label: 'North Sinai' },
-  { id: 'South Sinai', label: 'South Sinai' },
-];
 
 const JobFilters = ({
   searchQuery,
@@ -89,7 +66,7 @@ const JobFilters = ({
   return (
     <div className="relative max-w-4xl mx-auto">
       {/* Enhanced Container with clean design */}
-      <div className="bg-card rounded-2xl border border-border shadow-lg relative overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border shadow-lg relative">
         <div className="relative p-6">
           {/* Simple Header */}
           <div className="flex items-center justify-between mb-8">
@@ -198,7 +175,10 @@ const JobFilters = ({
                 label="Location"
                 value={selectedState}
                 onChange={onStateChange}
-                options={egyptianStates}
+                options={getStatesForSelect('en').map((state) => ({
+                  id: state.value,
+                  label: state.label,
+                }))}
                 placeholder="Select a location"
                 allowEmpty
                 emptyLabel="All Locations"

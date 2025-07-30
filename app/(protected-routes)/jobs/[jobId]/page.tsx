@@ -9,6 +9,7 @@ import { jobsService } from '@/app/services/jobs';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import JobsModal from '@/app/components/jobs/jobs-modal';
+import Map from '@/app/components/ui/map';
 import { toastService } from '@/app/utils/toast';
 import {
   HiLocationMarker,
@@ -188,24 +189,25 @@ const JobDetailsPage = () => {
               </div>
             )}
 
-            {/* Location Map placeholder */}
+            {/* Location Map */}
             {job.location && (
               <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
                 <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
                   <HiLocationMarker className="w-5 h-5 mr-2" />
                   Location
                 </h2>
-                <div className="h-48 bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <HiLocationMarker className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Coordinates: {job.location.coordinates[1]},{' '}
-                      {job.location.coordinates[0]}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Map integration coming soon
-                    </p>
-                  </div>
+                <Map
+                  latitude={job.location.coordinates[1]}
+                  longitude={job.location.coordinates[0]}
+                  zoom={15}
+                  height="300px"
+                  markerTitle={job.title}
+                  address={formatAddress(job.address)}
+                  showPopup={true}
+                  className="w-full"
+                />
+                <div className="mt-3 text-sm text-muted-foreground">
+                  <p>{formatAddress(job.address)}</p>
                 </div>
               </div>
             )}
