@@ -75,14 +75,6 @@ const EmptyState = ({
             </Button>
           )}
         </div>
-
-        <div
-          className={`mt-8 p-4 bg-muted/50 rounded-xl ${
-            locale === 'ar' ? 'text-right' : 'text-left'
-          }`}
-        >
-          <p className="text-sm text-muted-foreground">{t('tip')}</p>
-        </div>
       </div>
     </div>
   );

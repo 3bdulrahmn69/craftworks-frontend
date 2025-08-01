@@ -29,6 +29,7 @@ import {
   FaImage,
   FaTrash,
   FaArrowLeft,
+  FaCalendarAlt,
 } from 'react-icons/fa';
 
 interface JobFormData {
@@ -47,6 +48,7 @@ interface JobFormData {
   };
   paymentType: 'Cash' | 'Escrow' | 'CashProtected';
   jobPrice: number;
+  jobDate: string; // ISO date string for scheduled date
   photos: File[];
   existingPhotos?: string[]; // URLs of existing photos when editing
 }
@@ -123,6 +125,7 @@ const CreateJobPage = () => {
     location: undefined,
     paymentType: 'Cash',
     jobPrice: 0,
+    jobDate: '',
     photos: [],
     existingPhotos: [],
   });
@@ -241,6 +244,7 @@ const CreateJobPage = () => {
             location: job.location,
             paymentType: job.paymentType,
             jobPrice: job.jobPrice,
+            jobDate: job.jobDate || '', // Load existing jobDate or empty string
             photos: [], // Only new file uploads go here
             existingPhotos: job.photos || [], // Existing photo URLs
           });
@@ -290,6 +294,19 @@ const CreateJobPage = () => {
 
     if (!formData.jobPrice || formData.jobPrice <= 0) {
       newErrors.jobPrice = t('sections.pricing.jobPrice.error');
+    }
+
+    if (!formData.jobDate.trim()) {
+      newErrors.jobDate = t('sections.pricing.jobDate.error');
+    } else {
+      // Check if the selected date is not in the past
+      const selectedDate = new Date(formData.jobDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+
+      if (selectedDate < today) {
+        newErrors.jobDate = t('sections.pricing.jobDate.pastDateError');
+      }
     }
 
     if (!formData.location) {
@@ -485,6 +502,7 @@ const CreateJobPage = () => {
       jobFormData.append('address[street]', formData.address.street);
       jobFormData.append('paymentType', formData.paymentType);
       jobFormData.append('jobPrice', formData.jobPrice.toString());
+      jobFormData.append('jobDate', formData.jobDate);
 
       // Add location coordinates if available
       if (formData.location) {
@@ -542,6 +560,7 @@ const CreateJobPage = () => {
             title: '',
             description: '',
             jobPrice: 0,
+            jobDate: '',
             location: undefined,
           }));
         }
@@ -817,7 +836,7 @@ const CreateJobPage = () => {
               {t('sections.pricing.title')}
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <DropdownSelector
                   id="paymentType"
@@ -852,6 +871,32 @@ const CreateJobPage = () => {
                   error={errors.jobPrice}
                   required
                 />
+              </div>
+
+              <div>
+                <div className="mb-2">
+                  <label className="flex items-center text-sm font-medium text-foreground mb-2">
+                    <FaCalendarAlt
+                      className={`text-blue-500 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                    />
+                    {t('sections.pricing.jobDate.label')}
+                    <span className="text-destructive ml-1">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="jobDate"
+                    value={formData.jobDate}
+                    onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                  />
+                  {errors.jobDate && (
+                    <p className="text-sm text-destructive mt-1">
+                      {errors.jobDate}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

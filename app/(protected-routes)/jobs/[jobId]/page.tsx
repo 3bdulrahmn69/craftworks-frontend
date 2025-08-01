@@ -409,6 +409,25 @@ const JobDetailsPage = () => {
                   </span>
                 </div>
 
+                {job.jobDate && (
+                  <div
+                    className={`flex items-center text-sm ${
+                      locale === 'ar'
+                        ? 'flex-row-reverse text-right'
+                        : 'text-left'
+                    }`}
+                  >
+                    <HiClock
+                      className={`w-4 h-4 text-blue-600 flex-shrink-0 ${
+                        locale === 'ar' ? 'ml-3' : 'mr-3'
+                      }`}
+                    />
+                    <span className="text-foreground font-medium">
+                      {t('info.scheduledFor')} {formatDate(job.jobDate)}
+                    </span>
+                  </div>
+                )}
+
                 {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
                   <div
                     className={`flex items-center text-sm ${

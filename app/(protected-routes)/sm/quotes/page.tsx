@@ -280,7 +280,7 @@ const QuotesPage = () => {
                   fetchQuotes(state.pagination.currentPage, state.statusFilter)
                 }
                 size="lg"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 mx-auto"
               >
                 <FiRefreshCw className="w-4 h-4" />
                 {t('emptyState.refresh')}

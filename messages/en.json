@@ -12,6 +12,7 @@
       "login": "Login",
       "register": "Register",
       "jobs": "Jobs",
+      "MyJobs": "My Jobs",
       "quotes": "My Quotes",
       "invitations": "Invitations",
       "messages": "Messages",
@@ -492,6 +493,12 @@
           "label": "Job Price",
           "placeholder": "0.00",
           "error": "Job price must be greater than 0"
+        },
+        "jobDate": {
+          "label": "Scheduled Date",
+          "placeholder": "Select date",
+          "error": "Job date is required",
+          "pastDateError": "Job date cannot be in the past"
         }
       },
       "photos": {
@@ -552,20 +559,30 @@
     "buttons": {
       "createNew": "Create New Job",
       "createFirst": "Create Your First Job",
-      "view": "View",
+      "viewJob": "View Job",
       "edit": "Edit",
       "delete": "Delete",
       "deleting": "Deleting...",
       "cancel": "Cancel",
-      "viewApplications": "View Applications"
+      "canceling": "Canceling...",
+      "viewApplications": "View Applications",
+      "getRecommendations": "Get Recommendations",
+      "retry": "Try Again"
     },
     "empty": {
       "title": "No Jobs Posted Yet",
       "message": "You haven't created any job postings yet. Start by creating your first job."
     },
     "jobCard": {
-      "applications": "applications",
-      "openStatus": "Open for applications",
+      "location": "Location",
+      "payment": "Payment",
+      "posted": "Posted",
+      "scheduled": "Scheduled",
+      "applications": "Applications",
+      "craftsmenApplied": "craftsmen applied",
+      "active": "Active",
+      "openStatus": "Open for Applications",
+      "viewJob": "View Job",
       "egp": "EGP"
     },
     "deleteModal": {
@@ -585,6 +602,21 @@
       "Cash": "Cash",
       "Escrow": "Escrow",
       "CashProtected": "Cash Protected"
+    },
+    "recommendations": {
+      "title": "Recommended Craftsmen",
+      "subtitle": "Here are the best craftsmen for your job",
+      "loading": "Loading recommendations...",
+      "noRecommendations": "No recommendations available for this job.",
+      "error": "Failed to load recommendations. Please try again.",
+      "invite": "Invite",
+      "inviting": "Inviting...",
+      "invited": "Invited",
+      "rating": "rating",
+      "verified": "Verified",
+      "skills": "Skills",
+      "experience": "Experience",
+      "close": "Close"
     }
   },
   "jobDetails": {
@@ -612,6 +644,7 @@
       "job": "Job",
       "budget": "Budget",
       "posted": "Posted",
+      "scheduledFor": "Scheduled for",
       "applications": "application",
       "applicationsPlural": "applications",
       "locationNotSpecified": "Location not specified",
@@ -682,8 +715,7 @@
       "buttons": {
         "refresh": "Refresh Jobs",
         "clearFilters": "Clear Filters"
-      },
-      "tip": "💡 **Tip:** Enable notifications to get alerted when new jobs matching your skills are posted."
+      }
     }
   },
   "quotes": {
@@ -786,6 +818,7 @@
   },
   "jobApplications": {
     "subtitle": "Review and manage applications for your job posting",
+    "applicationsTitle": "{count} Applications Received",
     "loading": {
       "title": "Loading Applications",
       "message": "Please wait while we load the job applications..."
@@ -809,6 +842,9 @@
       "message": "No craftsmen have applied to this job yet. Share your job posting to attract more applicants."
     },
     "application": {
+      "singular": "Application",
+      "plural": "Applications",
+      "price": "Quoted Price",
       "reviews": "reviews",
       "applied": "Applied",
       "notes": "Notes",

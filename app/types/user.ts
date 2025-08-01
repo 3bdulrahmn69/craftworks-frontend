@@ -29,6 +29,28 @@ export interface User {
   };
 }
 
+// Recommended Craftsman interface based on the API response
+export interface RecommendedCraftsman {
+  _id: string;
+  fullName: string;
+  profilePicture: string;
+  craftsmanInfo: {
+    skills: string[];
+    service: {
+      _id: string;
+      name: string;
+      icon: string;
+      description: string;
+    };
+    bio: string;
+    portfolioImageUrls: string[];
+    verificationStatus: 'pending' | 'verified' | 'rejected';
+    verificationDocs: string[];
+  };
+  rating: number;
+  ratingCount: number;
+}
+
 // API Response wrapper interface
 export interface ApiResponse<T> {
   success: boolean;

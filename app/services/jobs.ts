@@ -177,6 +177,37 @@ export const jobsService = {
     });
     return flattenResponse(response.data);
   },
+
+  // Cancel a job (client only)
+  async cancelJob(
+    jobId: string,
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const response = await api.patch(
+      `/jobs/${jobId}/status`,
+      { status: 'Cancelled' },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return flattenResponse(response.data);
+  },
+
+  // Invite a craftsman to a job (client only)
+  async inviteCraftsman(
+    jobId: string,
+    craftsmanId: string,
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const response = await api.post(
+      `/jobs/${jobId}/invite`,
+      { craftsmanId },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return flattenResponse(response.data);
+  },
 };
 
 export const quotesService = {

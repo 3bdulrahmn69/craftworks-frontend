@@ -347,24 +347,13 @@ const InvitationsPage = () => {
 
         {/* Invitations List */}
         {state.invitations.length === 0 ? (
-          <div
-            className={`text-center py-16 ${locale === 'ar' ? 'rtl' : 'ltr'}`}
-            dir={locale === 'ar' ? 'rtl' : 'ltr'}
-          >
+          <div className={`text-center py-16`}>
             <div className="bg-card rounded-2xl shadow-lg p-8 border border-border max-w-md mx-auto">
               <FiMail className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3
-                className={`text-lg font-semibold text-foreground mb-2 ${
-                  locale === 'ar' ? 'text-right' : 'text-left'
-                }`}
-              >
+              <h3 className={`text-lg font-semibold text-foreground mb-2`}>
                 {t('invitations.empty.title')}
               </h3>
-              <p
-                className={`text-muted-foreground mb-4 ${
-                  locale === 'ar' ? 'text-right' : 'text-left'
-                }`}
-              >
+              <p className={`text-muted-foreground mb-4 `}>
                 {state.statusFilter !== 'all'
                   ? `${t('invitations.filters.status.label')} "${
                       state.statusFilter

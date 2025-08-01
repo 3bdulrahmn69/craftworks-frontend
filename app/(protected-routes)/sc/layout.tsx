@@ -4,7 +4,7 @@ import Header from '@/app/components/header';
 
 const navLinks = [
   { key: 'services', href: '/sc/services' },
-  { key: 'jobs', href: '/sc/my-jobs' },
+  { key: 'MyJobs', href: '/sc/my-jobs' },
   { key: 'messages', href: '/sc/messages' },
   { key: 'notifications', href: '/sc/notifications' },
 ];

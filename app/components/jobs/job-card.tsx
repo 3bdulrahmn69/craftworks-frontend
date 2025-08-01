@@ -151,18 +151,37 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
           </div>
         </div>
 
-        {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
-          <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-xl hover:shadow-md transition-shadow">
-            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
-              <HiUsers className="w-5 h-5 text-amber-600 shrink-0" />
+        {job.jobDate && (
+          <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-200 dark:border-blue-800">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <HiClock className="w-5 h-5 text-blue-600 shrink-0" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+              <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                Scheduled
+              </p>
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                {new Date(job.jobDate).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
+          <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-xl hover:shadow-md transition-shadow">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <HiUsers className="w-5 h-5 text-green-600 shrink-0" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-green-800 dark:text-green-200">
                 Applications
               </p>
-              <p className="text-sm text-amber-600 dark:text-amber-400">
+              <p className="text-sm text-green-600 dark:text-green-400">
                 {job.appliedCraftsmen.length} craftsmen applied
               </p>
+            </div>
+            <div className="px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 text-xs rounded-full font-medium border border-green-200 dark:border-green-700">
+              Active
             </div>
           </div>
         )}

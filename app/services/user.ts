@@ -1,5 +1,5 @@
 import { api } from './api';
-import { User, ApiResponse } from '@/app/types/user';
+import { User, ApiResponse, RecommendedCraftsman } from '@/app/types/user';
 
 export interface UpdateUserData {
   fullName?: string;
@@ -73,6 +73,22 @@ export const userService = {
   deleteProfilePicture: async (token: string): Promise<User> => {
     const response = await api.delete<ApiResponse<User>>(
       '/users/me/profile-picture',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data.data;
+  },
+
+  // Get recommended craftsmen for a job
+  getRecommendations: async (
+    token: string,
+    jobId: string
+  ): Promise<RecommendedCraftsman[]> => {
+    const response = await api.get<ApiResponse<RecommendedCraftsman[]>>(
+      `/users/recommendations?jobId=${jobId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

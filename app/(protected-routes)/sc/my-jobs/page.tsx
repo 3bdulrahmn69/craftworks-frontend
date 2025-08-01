@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
@@ -9,6 +9,8 @@ import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import Modal from '@/app/components/ui/modal';
+import RecommendationsModal from './components/recommendations-modal';
+import JobOptionsDropdown from './components/job-options-dropdown';
 import { Job, Pagination } from '@/app/types/jobs';
 import { jobsService } from '@/app/services/jobs';
 import { toast } from 'react-toastify';
@@ -18,11 +20,9 @@ import {
   FaMapMarkerAlt,
   FaDollarSign,
   FaCalendarAlt,
-  FaEye,
   FaUsers,
   FaClock,
-  FaEdit,
-  FaTrash,
+  FaEye,
 } from 'react-icons/fa';
 
 const ClientJobsPage = () => {
@@ -37,6 +37,16 @@ const ClientJobsPage = () => {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [cancelLoading, setCancelLoading] = useState<string | null>(null);
+  const [recommendationsModal, setRecommendationsModal] = useState<{
+    isOpen: boolean;
+    jobId: string;
+    jobTitle: string;
+  }>({
+    isOpen: false,
+    jobId: '',
+    jobTitle: '',
+  });
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     jobId: string;
@@ -47,39 +57,39 @@ const ClientJobsPage = () => {
     jobTitle: '',
   });
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      if (!session?.accessToken) return;
+  const fetchJobs = useCallback(async () => {
+    if (!session?.accessToken) return;
 
-      try {
-        setLoading(true);
-        setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Fetch jobs posted by the client
-        const response = await jobsService.getMyJobs(
-          {
-            page: currentPage,
-            limit: 10,
-          },
-          session.accessToken
-        );
+      // Fetch jobs posted by the client
+      const response = await jobsService.getMyJobs(
+        {
+          page: currentPage,
+          limit: 10,
+        },
+        session.accessToken
+      );
 
-        if (response.data) {
-          setJobs(response.data);
-          setPagination(response.pagination || null);
-        } else {
-          setError(response.message || t('loading.message'));
-        }
-      } catch (err: any) {
-        setError(err.message || 'An error occurred while fetching jobs');
-        toast.error('Failed to load jobs');
-      } finally {
-        setLoading(false);
+      if (response.data) {
+        setJobs(response.data);
+        setPagination(response.pagination || null);
+      } else {
+        setError(response.message || t('loading.message'));
       }
-    };
-
-    fetchJobs();
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching jobs');
+      toast.error('Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
   }, [session?.accessToken, currentPage, t]);
+
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -117,6 +127,49 @@ const ClientJobsPage = () => {
 
   const closeDeleteModal = () => {
     setDeleteModal({ isOpen: false, jobId: '', jobTitle: '' });
+  };
+
+  // Job action handlers
+  const handleViewJob = (jobId: string) => {
+    router.push(`/jobs/${jobId}`);
+  };
+
+  const handleEditJob = (jobId: string) => {
+    router.push(`/sc/create-job?edit=${jobId}`);
+  };
+
+  const handleCancelJob = async (jobId: string) => {
+    if (!session?.accessToken) return;
+
+    try {
+      setCancelLoading(jobId);
+      const response = await jobsService.cancelJob(jobId, session.accessToken);
+
+      if (response.success) {
+        toast.success('Job cancelled successfully!');
+        // Refresh the jobs list
+        fetchJobs();
+      } else {
+        throw new Error(response.message || 'Failed to cancel job');
+      }
+    } catch (err: any) {
+      console.error('Failed to cancel job:', err);
+      toast.error(err.message || 'Failed to cancel job');
+    } finally {
+      setCancelLoading(null);
+    }
+  };
+
+  const handleViewApplications = (jobId: string) => {
+    router.push(`/sc/jobs/${jobId}/applications`);
+  };
+
+  const openRecommendationsModal = (jobId: string, jobTitle: string) => {
+    setRecommendationsModal({ isOpen: true, jobId, jobTitle });
+  };
+
+  const closeRecommendationsModal = () => {
+    setRecommendationsModal({ isOpen: false, jobId: '', jobTitle: '' });
   };
 
   const getStatusColor = (status: string) => {
@@ -229,200 +282,212 @@ const ClientJobsPage = () => {
             </Button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="grid gap-6">
             {jobs.map((job) => (
               <div
                 key={job._id}
-                className={`bg-background border rounded-lg p-6 hover:shadow-md transition-shadow ${
+                className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 overflow-hidden group ${
                   isRTL ? 'rtl' : 'ltr'
                 }`}
               >
-                <div
-                  className={`flex flex-col lg:flex-row lg:items-start lg:justify-between ${
-                    isRTL ? 'lg:flex-row-reverse' : ''
-                  }`}
-                >
-                  {/* Job Info */}
-                  <div className="flex-1 space-y-3">
-                    <div
-                      className={`flex items-start justify-between ${
-                        isRTL ? 'flex-row-reverse' : ''
-                      }`}
-                    >
-                      <h3
-                        className={`text-xl font-semibold text-foreground line-clamp-2 ${
+                {/* Card Header with Gradient */}
+                <div className="relative bg-gradient-to-r from-primary/5 via-primary/3 to-transparent p-6 border-b border-border/30">
+                  <div
+                    className={`flex items-start justify-between ${
+                      isRTL ? 'flex-row-reverse' : ''
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <div
+                        className={`flex items-center gap-3 mb-3 ${
+                          isRTL ? 'flex-row-reverse' : ''
+                        }`}
+                      >
+                        <div className="p-2.5 bg-primary/10 rounded-xl">
+                          <FaBriefcase className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h3
+                            className={`text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1 ${
+                              isRTL ? 'text-right' : 'text-left'
+                            }`}
+                          >
+                            {job.title}
+                          </h3>
+                          {job.service && (
+                            <p className="text-sm text-muted-foreground font-medium">
+                              {job.service.name}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <p
+                        className={`text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-4 ${
                           isRTL ? 'text-right' : 'text-left'
                         }`}
                       >
-                        {job.title}
-                      </h3>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                          job.status
-                        )} ${isRTL ? 'mr-4' : 'ml-4'}`}
-                      >
-                        {getStatusText(job.status)}
-                      </span>
+                        {job.description}
+                      </p>
                     </div>
 
-                    <p
-                      className={`text-muted-foreground line-clamp-2 ${
-                        isRTL ? 'text-right' : 'text-left'
-                      }`}
-                    >
-                      {job.description}
-                    </p>
-
+                    {/* Status Badge and Options */}
                     <div
-                      className={`flex flex-wrap gap-4 text-sm text-muted-foreground ${
+                      className={`flex items-center gap-3 ${
                         isRTL ? 'flex-row-reverse' : ''
                       }`}
                     >
-                      <div className="flex items-center">
-                        <FaMapMarkerAlt
-                          className={`w-4 h-4 text-primary ${
-                            isRTL ? 'ml-1' : 'mr-1'
-                          }`}
-                        />
-                        {formatAddress(job.address)}
-                      </div>
+                      <span
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(
+                          job.status
+                        )}`}
+                      >
+                        {getStatusText(job.status)}
+                      </span>
+                      <JobOptionsDropdown
+                        job={job}
+                        isRTL={isRTL}
+                        onEdit={() => handleEditJob(job._id)}
+                        onDelete={() => openDeleteModal(job._id, job.title)}
+                        onCancel={() => handleCancelJob(job._id)}
+                        deleteLoading={deleteLoading === job._id}
+                        cancelLoading={cancelLoading === job._id}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-                      <div className="flex items-center">
-                        <FaDollarSign
-                          className={`w-4 h-4 text-primary ${
-                            isRTL ? 'ml-1' : 'mr-1'
-                          }`}
-                        />
-                        {job.jobPrice} {t('jobCard.egp')} (
-                        {getPaymentTypeText(job.paymentType)})
+                {/* Card Body with Enhanced Info Grid */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {/* Location */}
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                        <FaMapMarkerAlt className="w-4 h-4 text-blue-600" />
                       </div>
-
-                      <div className="flex items-center">
-                        <FaCalendarAlt
-                          className={`w-4 h-4 text-primary ${
-                            isRTL ? 'ml-1' : 'mr-1'
-                          }`}
-                        />
-                        {formatDate(job.createdAt)}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {t('jobCard.location')}
+                        </p>
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {formatAddress(job.address)}
+                        </p>
                       </div>
-
-                      {job.service && (
-                        <div className="flex items-center">
-                          <FaBriefcase
-                            className={`w-4 h-4 text-primary ${
-                              isRTL ? 'ml-1' : 'mr-1'
-                            }`}
-                          />
-                          {job.service.name}
-                        </div>
-                      )}
                     </div>
 
-                    {/* Job Stats */}
-                    <div
-                      className={`flex items-center space-x-4 text-sm ${
-                        isRTL ? 'flex-row-reverse space-x-reverse' : ''
-                      }`}
-                    >
-                      <div className="flex items-center text-muted-foreground">
-                        <FaUsers
-                          className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`}
-                        />
-                        <span>
-                          {job.appliedCraftsmen?.length || 0}{' '}
-                          {t('jobCard.applications')}
-                        </span>
+                    {/* Payment */}
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
+                      <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                        <FaDollarSign className="w-4 h-4 text-green-600" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {t('jobCard.payment')}
+                        </p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {job.jobPrice} {t('jobCard.egp')}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {getPaymentTypeText(job.paymentType)}
+                        </p>
+                      </div>
+                    </div>
 
-                      {job.status === 'Posted' && (
-                        <div className="flex items-center text-blue-600">
-                          <FaClock
-                            className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`}
-                          />
-                          <span>{t('jobCard.openStatus')}</span>
-                        </div>
-                      )}
+                    {/* Posted Date */}
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                        <FaCalendarAlt className="w-4 h-4 text-purple-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {t('jobCard.posted')}
+                        </p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {formatDate(job.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Applications/Status */}
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
+                      <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                        {job.status === 'Posted' ? (
+                          <FaClock className="w-4 h-4 text-orange-600" />
+                        ) : (
+                          <FaUsers className="w-4 h-4 text-orange-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {job.status === 'Posted'
+                            ? 'Status'
+                            : t('jobCard.applications')}
+                        </p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {job.status === 'Posted'
+                            ? t('jobCard.openStatus')
+                            : `${job.appliedCraftsmen?.length || 0} ${t(
+                                'jobCard.applications'
+                              )}`}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div
-                    className={`mt-4 lg:mt-0 lg:ml-6 flex flex-col space-y-2 ${
-                      isRTL ? 'lg:mr-6 lg:ml-0' : ''
-                    }`}
-                  >
+                  {/* Action Buttons for Applications and Recommendations */}
+                  {job.status === 'Posted' && (
                     <div
-                      className={`flex space-x-2 ${
-                        isRTL ? 'flex-row-reverse space-x-reverse' : ''
+                      className={`flex flex-col sm:flex-row gap-3 ${
+                        isRTL ? 'sm:flex-row-reverse' : ''
                       }`}
                     >
+                      {/* View Job Button */}
                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => router.push(`/jobs/${job._id}`)}
+                        onClick={() => handleViewJob(job._id)}
+                        className={`flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ${
+                          isRTL ? 'flex-row-reverse' : ''
+                        }`}
                       >
                         <FaEye
                           className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
                         />
-                        {t('buttons.view')}
+                        {t('buttons.viewJob')}
                       </Button>
 
-                      {job.status === 'Posted' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            router.push(`/sc/create-job?edit=${job._id}`)
-                          }
-                        >
-                          <FaEdit
-                            className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
-                          />
-                          {t('buttons.edit')}
-                        </Button>
-                      )}
+                      {/* View Applications Button */}
+                      {job.appliedCraftsmen &&
+                        job.appliedCraftsmen.length > 0 && (
+                          <Button
+                            onClick={() => handleViewApplications(job._id)}
+                            className={`flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ${
+                              isRTL ? 'flex-row-reverse' : ''
+                            }`}
+                          >
+                            <FaUsers
+                              className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                            />
+                            {t('buttons.viewApplications')} (
+                            {job.appliedCraftsmen.length})
+                          </Button>
+                        )}
 
+                      {/* Get Recommendations Button */}
                       <Button
                         variant="outline"
-                        size="sm"
-                        onClick={() => openDeleteModal(job._id, job.title)}
-                        disabled={deleteLoading === job._id}
-                        className="text-destructive hover:text-destructive border-destructive/20 hover:border-destructive/40"
+                        onClick={() =>
+                          openRecommendationsModal(job._id, job.title)
+                        }
+                        className={`flex-1 border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 font-medium py-3 px-6 rounded-xl transition-all duration-200 ${
+                          isRTL ? 'flex-row-reverse' : ''
+                        }`}
                       >
-                        {deleteLoading === job._id ? (
-                          <LoadingSpinner
-                            size="sm"
-                            className={`${isRTL ? 'ml-2' : 'mr-2'}`}
-                          />
-                        ) : (
-                          <FaTrash
-                            className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
-                          />
-                        )}
-                        {deleteLoading === job._id
-                          ? t('buttons.deleting')
-                          : t('buttons.delete')}
+                        <FaUsers
+                          className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                        />
+                        {t('buttons.getRecommendations')}
                       </Button>
                     </div>
-
-                    {job.status === 'Posted' &&
-                      job.appliedCraftsmen &&
-                      job.appliedCraftsmen.length > 0 && (
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            router.push(`/sc/jobs/${job._id}/applications`)
-                          }
-                          className="w-full"
-                        >
-                          <FaUsers
-                            className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
-                          />
-                          {t('buttons.viewApplications')} (
-                          {job.appliedCraftsmen.length})
-                        </Button>
-                      )}
-                  </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -492,6 +557,15 @@ const ClientJobsPage = () => {
             </div>
           </div>
         </Modal>
+
+        {/* Recommendations Modal */}
+        <RecommendationsModal
+          isOpen={recommendationsModal.isOpen}
+          onClose={closeRecommendationsModal}
+          jobId={recommendationsModal.jobId}
+          jobTitle={recommendationsModal.jobTitle}
+          accessToken={session?.accessToken || ''}
+        />
       </main>
     </Container>
   );
