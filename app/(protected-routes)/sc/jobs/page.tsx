@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { Job, Pagination } from '@/app/types/jobs';
 import { jobsService } from '@/app/services/jobs';
+import { formatDate, formatAddress, getStatusColor } from '@/app/utils/helpers';
 import { toast } from 'react-toastify';
 import {
   FaBriefcase,
@@ -24,6 +26,7 @@ import {
 const ClientJobsPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const locale = useLocale();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,39 +69,6 @@ const ClientJobsPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Posted':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Hired':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Completed':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'Cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const formatAddress = (address: any) => {
-    if (typeof address === 'string') return address;
-    if (typeof address === 'object' && address) {
-      return `${address.street}, ${address.city}, ${address.state}`;
-    }
-    return 'No address provided';
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   if (loading) {
@@ -206,7 +176,7 @@ const ClientJobsPage = () => {
 
                       <div className="flex items-center">
                         <FaCalendarAlt className="w-4 h-4 mr-1 text-primary" />
-                        {formatDate(job.createdAt)}
+                        {formatDate(job.createdAt, locale)}
                       </div>
 
                       {job.service && (

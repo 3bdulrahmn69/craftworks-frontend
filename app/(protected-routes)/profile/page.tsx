@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { userService } from '@/app/services/user';
 import { User } from '@/app/types/user';
+import { formatAddress } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import {
@@ -71,19 +72,6 @@ const ProfilePage = () => {
       </Container>
     );
   }
-
-  const formatAddress = (address: User['address']) => {
-    if (!address) return 'No address provided';
-
-    const parts = [
-      address.street,
-      address.city,
-      address.state,
-      address.country,
-    ].filter(Boolean);
-
-    return parts.length > 0 ? parts.join(', ') : 'No address provided';
-  };
 
   return (
     <Container className="py-6 sm:py-8">

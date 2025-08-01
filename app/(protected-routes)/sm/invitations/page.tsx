@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Invitation, Pagination } from '@/app/types/jobs';
 import { invitationsService } from '@/app/services/jobs';
+import { formatDate } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import DropdownSelector from '@/app/components/ui/dropdown-selector';
@@ -215,14 +216,6 @@ const InvitationsPage = () => {
     ],
     [t]
   );
-
-  const formatDate = useCallback((dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }, []);
 
   if (state.loading && state.invitations.length === 0) {
     return (
@@ -510,7 +503,7 @@ const InvitationsPage = () => {
                         locale === 'ar' ? 'mr-1' : 'ml-1'
                       } truncate`}
                     >
-                      {formatDate(invitation.createdAt)}
+                      {formatDate(invitation.createdAt, locale)}
                     </span>
                   </div>
 

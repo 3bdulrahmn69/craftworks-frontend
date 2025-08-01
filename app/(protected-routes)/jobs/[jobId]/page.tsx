@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Job } from '@/app/types/jobs';
 import { jobsService } from '@/app/services/jobs';
+import { formatDate, formatAddress } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import JobsModal from '@/app/components/jobs/jobs-modal';
@@ -22,6 +23,10 @@ import {
   HiArrowLeft,
   HiPhotograph,
   HiCheckCircle,
+  HiPencilAlt,
+  HiTrash,
+  HiUserGroup,
+  HiCog,
 } from 'react-icons/hi';
 
 const JobDetailsPage = () => {
@@ -38,6 +43,9 @@ const JobDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [submittingQuote, setSubmittingQuote] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showApplications, setShowApplications] = useState(false);
 
   // Helper function to translate payment types
   const translatePaymentType = useCallback(
@@ -47,20 +55,43 @@ const JobDetailsPage = () => {
     [tMyJobs]
   );
 
-  // Helper function to format date with locale
-  const formatDate = useCallback(
-    (dateString: string): string => {
-      return new Date(dateString).toLocaleDateString(
-        locale === 'ar' ? 'ar-EG' : 'en-US',
-        {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }
+  // Check if current user is the job owner
+  const isJobOwner = job?.client === session?.user?.id;
+
+  // Handle job deletion
+  const handleDeleteJob = async () => {
+    if (!session?.accessToken || !job?._id) return;
+
+    try {
+      setDeleting(true);
+      const response = await jobsService.deleteJob(
+        job._id,
+        session.accessToken
       );
-    },
-    [locale]
-  );
+
+      if (response.success) {
+        toastService.success(t('messages.jobDeleted'));
+        router.push('/sc/my-jobs');
+      } else {
+        toastService.error(response.message || t('messages.deleteFailed'));
+      }
+    } catch (err: any) {
+      toastService.error(err.message || t('messages.deleteFailed'));
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  // Handle job editing
+  const handleEditJob = () => {
+    router.push(`/sc/jobs/edit/${job?._id}`);
+  };
+
+  // View applications
+  const handleViewApplications = () => {
+    setShowApplications(true);
+  };
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -85,20 +116,6 @@ const JobDetailsPage = () => {
 
     fetchJobDetails();
   }, [session?.accessToken, jobId]);
-
-  const formatAddress = (address: any) => {
-    if (typeof address === 'string') return address;
-    if (typeof address === 'object' && address) {
-      const parts = [
-        address.street,
-        address.city,
-        address.state,
-        address.country,
-      ].filter(Boolean);
-      return parts.join(', ');
-    }
-    return t('info.locationNotSpecified');
-  };
 
   const isApplied = job?.appliedCraftsmen?.includes(session?.user?.id || '');
 
@@ -188,7 +205,7 @@ const JobDetailsPage = () => {
               </h1>
             </div>
 
-            {/* Action button */}
+            {/* Action buttons */}
             {job.status === 'Posted' && session?.user?.role === 'craftsman' && (
               <div
                 className={`lg:flex-shrink-0 ${
@@ -217,6 +234,88 @@ const JobDetailsPage = () => {
                     t('buttons.submitQuote')
                   )}
                 </Button>
+              </div>
+            )}
+
+            {/* Client management actions */}
+            {isJobOwner && (
+              <div
+                className={`lg:flex-shrink-0 ${
+                  locale === 'ar' ? 'lg:order-first' : ''
+                }`}
+              >
+                <div
+                  className={`flex flex-wrap gap-2 ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
+                  }`}
+                >
+                  {/* View Applications */}
+                  {(job.appliedCraftsmen?.length || 0) > 0 && (
+                    <Button
+                      onClick={handleViewApplications}
+                      variant="outline"
+                      size="sm"
+                      className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                    >
+                      <HiUserGroup
+                        className={`w-4 h-4 ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
+                      {t('buttons.viewApplications')} (
+                      {job.appliedCraftsmen?.length || 0})
+                    </Button>
+                  )}
+
+                  {/* Edit Job */}
+                  {['Posted', 'Hired'].includes(job.status) && (
+                    <Button
+                      onClick={handleEditJob}
+                      variant="outline"
+                      size="sm"
+                      className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                    >
+                      <HiPencilAlt
+                        className={`w-4 h-4 ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
+                      {t('buttons.editJob')}
+                    </Button>
+                  )}
+
+                  {/* Delete Job */}
+                  {job.status === 'Posted' && (
+                    <Button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      variant="outline"
+                      size="sm"
+                      className={`border-red-200 text-red-600 hover:bg-red-50 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
+                      <HiTrash
+                        className={`w-4 h-4 ${
+                          locale === 'ar' ? 'ml-2' : 'mr-2'
+                        }`}
+                      />
+                      {t('buttons.deleteJob')}
+                    </Button>
+                  )}
+
+                  {/* Manage Job */}
+                  <Button
+                    onClick={() => router.push(`/sc/jobs/${job._id}/manage`)}
+                    variant="outline"
+                    size="sm"
+                    className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
+                  >
+                    <HiCog
+                      className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
+                    />
+                    {t('buttons.manageJob')}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -539,6 +638,85 @@ const JobDetailsPage = () => {
             }}
             submittingQuote={submittingQuote}
           />
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md mx-4 w-full">
+              <div className="text-center">
+                <HiTrash className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t('deleteModal.title')}
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  {t('deleteModal.message')}
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    disabled={deleting}
+                  >
+                    {t('deleteModal.cancel')}
+                  </Button>
+                  <Button
+                    onClick={handleDeleteJob}
+                    disabled={deleting}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deleting
+                      ? t('deleteModal.deleting')
+                      : t('deleteModal.confirm')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Applications Modal */}
+        {showApplications && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-2xl mx-4 w-full max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-foreground">
+                  {t('applicationsModal.title')} (
+                  {job?.appliedCraftsmen?.length || 0})
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowApplications(false)}
+                >
+                  ×
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                {job?.appliedCraftsmen?.length === 0 ? (
+                  <div className="text-center py-8">
+                    <HiUserGroup className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">
+                      {t('applicationsModal.noApplications')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <HiUserGroup className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">
+                      {t('applicationsModal.placeholder')} -{' '}
+                      {job?.appliedCraftsmen?.length}{' '}
+                      {t('applicationsModal.applications')}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {t('applicationsModal.comingSoon')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </Container>

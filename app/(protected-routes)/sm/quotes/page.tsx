@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Quote, Pagination } from '@/app/types/jobs';
 import { quotesService } from '@/app/services/jobs';
+import { formatDate } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
 import Button from '@/app/components/ui/button';
 import DropdownSelector from '@/app/components/ui/dropdown-selector';
@@ -146,14 +147,6 @@ const QuotesPage = () => {
     ],
     []
   );
-
-  const formatDate = useCallback((dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }, []);
 
   if (state.loading && state.quotes.length === 0) {
     return (
@@ -397,7 +390,7 @@ const QuotesPage = () => {
                     <FiCalendar
                       className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
                     />
-                    {t('quote.submitted')} {formatDate(quote.createdAt)}
+                    {t('quote.submitted')} {formatDate(quote.createdAt, locale)}
                   </div>
                   <Button
                     variant="outline"

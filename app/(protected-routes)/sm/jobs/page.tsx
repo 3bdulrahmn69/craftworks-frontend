@@ -4,12 +4,12 @@ import { useLocale, useTranslations } from 'next-intl';
 import Container from '@/app/components/ui/container';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
-import JobCard from '@/app/components/jobs/job-card';
-import JobFilters from '@/app/components/jobs/job-filters';
-import EmptyState from '@/app/components/jobs/empty-state';
+import JobCard from '../../../components/jobs/job-card';
+import JobFilters from '../../../components/jobs/job-filters';
+import EmptyState from '../../../components/jobs/empty-state';
+import JobsModal from '../../../components/jobs/jobs-modal';
 import { useJobs } from '@/app/hooks/useJobs';
 import { HiExclamationCircle, HiBriefcase } from 'react-icons/hi';
-import JobsModal from '@/app/components/jobs/jobs-modal';
 
 const JobsPage = () => {
   const locale = useLocale();

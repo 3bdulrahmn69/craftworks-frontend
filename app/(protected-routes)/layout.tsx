@@ -1,6 +1,6 @@
 'use client';
 
-import Redirect from '@/app/components/auth/redirect';
+import Redirect from '@/app/components/redirect';
 
 export default function ProtectedLayout({
   children,

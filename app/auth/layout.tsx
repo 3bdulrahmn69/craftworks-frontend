@@ -1,4 +1,4 @@
-import Redirect from '../components/auth/redirect';
+import Redirect from '../components/redirect';
 
 export default function AuthLayout({
   children,

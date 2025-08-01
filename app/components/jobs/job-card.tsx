@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { Job } from '@/app/types/jobs';
 import Button from '@/app/components/ui/button';
+import { formatAddress } from '@/app/utils/helpers';
 import {
   HiLocationMarker,
   HiCash,
@@ -26,21 +27,6 @@ const JobCard = ({ job, onQuoteClick, isApplied }: JobCardProps) => {
 
   // According to API v1.3.0, jobs now include populated service objects
   const serviceName = job.service?.name || job.category || 'General';
-
-  // Format address properly
-  const formatAddress = (address: any) => {
-    if (typeof address === 'string') return address;
-    if (typeof address === 'object' && address) {
-      const parts = [
-        address.street,
-        address.city,
-        address.state,
-        address.country,
-      ].filter(Boolean);
-      return parts.join(', ');
-    }
-    return 'Location not specified';
-  };
 
   const handleQuoteClick = (e: React.MouseEvent) => {
     e.stopPropagation();

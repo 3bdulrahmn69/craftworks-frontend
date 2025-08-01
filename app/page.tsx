@@ -1,4 +1,4 @@
-import Redirect from './components/auth/redirect';
+import Redirect from './components/redirect';
 import Footer from './components/footer';
 import Header from './components/header';
 import CategoriesSection from './components/sections/services-section';

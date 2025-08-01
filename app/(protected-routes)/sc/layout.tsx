@@ -1,10 +1,11 @@
-import Redirect from '@/app/components/auth/redirect';
+import Redirect from '@/app/components/redirect';
 import Footer from '@/app/components/footer';
 import Header from '@/app/components/header';
 
 const navLinks = [
   { key: 'services', href: '/sc/services' },
   { key: 'MyJobs', href: '/sc/my-jobs' },
+  { key: 'calendar', href: '/sc/calendar' },
   { key: 'messages', href: '/sc/messages' },
   { key: 'notifications', href: '/sc/notifications' },
 ];

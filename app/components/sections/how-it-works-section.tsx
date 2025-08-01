@@ -1,20 +1,29 @@
 import { useTranslations } from 'next-intl';
 import Button from '../ui/button';
 import Container from '@/app/components/ui/container';
-import { FaTools, FaUserTie, FaClipboardList, FaSearch, FaHandshake, FaRegSmile, FaHammer, FaRegCheckCircle, FaRegLightbulb, FaRegClock } from "react-icons/fa";
+import {
+  FaClipboardList,
+  FaSearch,
+  FaHandshake,
+  FaRegSmile,
+  FaHammer,
+  FaRegCheckCircle,
+  FaRegLightbulb,
+  FaRegClock,
+} from 'react-icons/fa';
 
 const clientStepIcons = [
-  <FaClipboardList size={24} />, // Step 1: List requirements
-  <FaSearch size={24} />,       // Step 2: Search
-  <FaHandshake size={24} />,    // Step 3: Connect
-  <FaRegSmile size={24} />      // Step 4: Enjoy/Complete
+  <FaClipboardList key="1" size={24} />, // Step 1: List requirements
+  <FaSearch key="2" size={24} />, // Step 2: Search
+  <FaHandshake key="3" size={24} />, // Step 3: Connect
+  <FaRegSmile key="4" size={24} />, // Step 4: Enjoy/Complete
 ];
 
 const craftsmanStepIcons = [
-  <FaHammer size={24} />,         // Step 1: Get jobs
-  <FaRegCheckCircle size={24} />,// Step 2: Accept
-  <FaRegLightbulb size={24} />,  // Step 3: Work
-  <FaRegClock size={24} />       // Step 4: Finish/On time
+  <FaHammer key="1" size={24} />, // Step 1: Get jobs
+  <FaRegCheckCircle key="2" size={24} />, // Step 2: Accept
+  <FaRegLightbulb key="3" size={24} />, // Step 3: Work
+  <FaRegClock key="4" size={24} />, // Step 4: Finish/On time
 ];
 
 const HowItWorksSection = () => {
@@ -42,9 +51,7 @@ const HowItWorksSection = () => {
               <h3 className="text-2xl font-bold text-foreground mb-2">
                 {t('forClients')}
               </h3>
-              <p className="text-muted-foreground">
-                {t('forClientsSubtitle')}
-              </p>
+              <p className="text-muted-foreground">{t('forClientsSubtitle')}</p>
             </div>
 
             <div className="space-y-6">
@@ -57,7 +64,9 @@ const HowItWorksSection = () => {
                     <h4 className="font-semibold text-foreground mb-1">
                       {t(`clientSteps.${key}.title`)}
                     </h4>
-                    <p className="text-muted-foreground">{t(`clientSteps.${key}.description`)}</p>
+                    <p className="text-muted-foreground">
+                      {t(`clientSteps.${key}.description`)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -85,7 +94,9 @@ const HowItWorksSection = () => {
                     <h4 className="font-semibold text-foreground mb-1">
                       {t(`craftsmanSteps.${key}.title`)}
                     </h4>
-                    <p className="text-muted-foreground">{t(`craftsmanSteps.${key}.description`)}</p>
+                    <p className="text-muted-foreground">
+                      {t(`craftsmanSteps.${key}.description`)}
+                    </p>
                   </div>
                 </div>
               ))}

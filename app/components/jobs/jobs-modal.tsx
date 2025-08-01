@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Button from '../ui/button';
-import Input from '../ui/input';
-import Modal from '../ui/modal';
+import Button from '@/app/components/ui/button';
+import Input from '@/app/components/ui/input';
+import Modal from '@/app/components/ui/modal';
 
 interface QuoteFormData {
   price: number;
