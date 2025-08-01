@@ -24,14 +24,14 @@ import {
 const getCategoryIcon = (iconName: string, color: string) => {
   const getIconColorClass = (color: string) => {
     const colorMap: { [key: string]: string } = {
-      blue: 'text-blue-600',
-      amber: 'text-amber-600',
-      cyan: 'text-cyan-600',
-      purple: 'text-purple-600',
-      green: 'text-green-600',
-      red: 'text-red-600',
-      orange: 'text-orange-600',
-      teal: 'text-teal-600',
+      blue: 'text-primary',
+      amber: 'text-warning',
+      cyan: 'text-info',
+      purple: 'text-primary',
+      green: 'text-success',
+      red: 'text-destructive',
+      orange: 'text-warning',
+      teal: 'text-primary',
     };
     return colorMap[color] || colorMap['blue'];
   };

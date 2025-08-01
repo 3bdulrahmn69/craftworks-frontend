@@ -41,7 +41,7 @@ const Input = memo(function Input({
         <label className="text-sm font-medium text-foreground block mb-2">
           {label}
           {required && (
-            <span className="text-red-500 ml-1" aria-hidden="true">
+            <span className="text-destructive ml-1" aria-hidden="true">
               *
             </span>
           )}

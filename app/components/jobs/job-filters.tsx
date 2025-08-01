@@ -237,7 +237,7 @@ const JobFilters = ({
                   <Button
                     onClick={handleReset}
                     variant="outline"
-                    className={`flex-1 sm:flex-initial min-w-[120px] border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 ${
+                    className={`flex-1 sm:flex-initial min-w-[120px] border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50 ${
                       locale === 'ar' ? 'flex-row-reverse' : ''
                     }`}
                     size="lg"
@@ -276,13 +276,13 @@ const JobFilters = ({
                       </span>
                     )}
                     {selectedService && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                         Service:{' '}
                         {services.find((s) => s._id === selectedService)?.name}
                       </span>
                     )}
                     {selectedState && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-success/10 text-success border border-success/20">
                         Location: {selectedState}
                       </span>
                     )}

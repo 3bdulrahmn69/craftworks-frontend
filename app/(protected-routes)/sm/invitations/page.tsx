@@ -179,19 +179,17 @@ const InvitationsPage = () => {
   const getStatusBadge = useCallback(
     (status: string) => {
       const statusClasses = {
-        pending:
-          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-        accepted:
-          'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        pending: 'bg-warning/10 text-warning border border-warning/20',
+        accepted: 'bg-success/10 text-success border border-success/20',
         rejected:
-          'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+          'bg-destructive/10 text-destructive border border-destructive/20',
       };
 
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
             statusClasses[status as keyof typeof statusClasses] ||
-            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+            'bg-muted text-muted-foreground border border-border'
           }`}
         >
           {status === 'pending'
@@ -436,7 +434,7 @@ const InvitationsPage = () => {
                             }`}
                           >
                             <FiStar
-                              className={`w-3 h-3 text-yellow-500 ${
+                              className={`w-3 h-3 text-warning ${
                                 locale === 'ar' ? 'ml-1' : 'mr-1'
                               }`}
                             />
@@ -456,7 +454,7 @@ const InvitationsPage = () => {
                       }`}
                     >
                       <FiDollarSign
-                        className={`w-4 h-4 text-green-600 ${
+                        className={`w-4 h-4 text-success ${
                           locale === 'ar' ? 'ml-2' : 'mr-2'
                         }`}
                       />

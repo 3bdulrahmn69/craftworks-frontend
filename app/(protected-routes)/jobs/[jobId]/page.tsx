@@ -290,7 +290,7 @@ const JobDetailsPage = () => {
                       onClick={() => setShowDeleteConfirm(true)}
                       variant="outline"
                       size="sm"
-                      className={`border-red-200 text-red-600 hover:bg-red-50 ${
+                      className={`border-destructive/30 text-destructive hover:bg-destructive/10 ${
                         locale === 'ar' ? 'flex-row-reverse' : ''
                       }`}
                     >
@@ -480,7 +480,7 @@ const JobDetailsPage = () => {
                     }`}
                   >
                     <HiCurrencyDollar
-                      className={`w-4 h-4 text-green-600 flex-shrink-0 ${
+                      className={`w-4 h-4 text-success flex-shrink-0 ${
                         locale === 'ar' ? 'ml-3' : 'mr-3'
                       }`}
                     />
@@ -517,7 +517,7 @@ const JobDetailsPage = () => {
                     }`}
                   >
                     <HiClock
-                      className={`w-4 h-4 text-blue-600 flex-shrink-0 ${
+                      className={`w-4 h-4 text-primary flex-shrink-0 ${
                         locale === 'ar' ? 'ml-3' : 'mr-3'
                       }`}
                     />
@@ -645,7 +645,7 @@ const JobDetailsPage = () => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md mx-4 w-full">
               <div className="text-center">
-                <HiTrash className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <HiTrash className="w-12 h-12 text-destructive mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">
                   {t('deleteModal.title')}
                 </h3>
@@ -663,7 +663,7 @@ const JobDetailsPage = () => {
                   <Button
                     onClick={handleDeleteJob}
                     disabled={deleting}
-                    className="bg-red-600 hover:bg-red-700 text-white"
+                    className="bg-destructive hover:bg-destructive/80 text-destructive-foreground"
                   >
                     {deleting
                       ? t('deleteModal.deleting')

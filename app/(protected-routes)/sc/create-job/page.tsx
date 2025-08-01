@@ -877,7 +877,7 @@ const CreateJobPage = () => {
                 <div className="mb-2">
                   <label className="flex items-center text-sm font-medium text-foreground mb-2">
                     <FaCalendarAlt
-                      className={`text-blue-500 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                      className={`text-primary ${isRTL ? 'ml-2' : 'mr-2'}`}
                     />
                     {t('sections.pricing.jobDate.label')}
                     <span className="text-destructive ml-1">*</span>

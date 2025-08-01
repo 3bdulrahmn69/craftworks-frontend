@@ -21,7 +21,13 @@ export interface Job {
   };
   paymentType: 'Cash' | 'Escrow' | 'CashProtected';
   status: 'Posted' | 'Hired' | 'In Progress' | 'Completed' | 'Cancelled';
-  client: string;
+  client:
+    | string
+    | {
+        _id: string;
+        fullName: string;
+        phone: string;
+      };
   craftsman?: string | null;
   jobPrice: number;
   platformFee: number;

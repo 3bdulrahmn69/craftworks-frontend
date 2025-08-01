@@ -192,7 +192,7 @@ const RecommendationsModal = ({
                           </h4>
                           {craftsman.craftsmanInfo.verificationStatus ===
                             'verified' && (
-                            <FaCheckCircle className="text-green-500 w-5 h-5 shrink-0" />
+                            <FaCheckCircle className="text-success w-5 h-5 shrink-0" />
                           )}
                         </div>
 
@@ -201,7 +201,7 @@ const RecommendationsModal = ({
                             isRTL ? 'flex-row-reverse justify-end' : ''
                           }`}
                         >
-                          <FaStar className="text-yellow-500 w-4 h-4" />
+                          <FaStar className="text-warning w-4 h-4" />
                           <span className="text-sm font-medium text-foreground">
                             {craftsman.rating.toFixed(1)}
                           </span>
@@ -257,7 +257,7 @@ const RecommendationsModal = ({
                           <Button
                             size="sm"
                             disabled
-                            className="bg-green-600 hover:bg-green-600 cursor-default"
+                            className="bg-success hover:bg-success cursor-default"
                           >
                             <FaCheckCircle
                               className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}

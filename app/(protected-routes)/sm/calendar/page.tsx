@@ -21,6 +21,7 @@ import {
   FaUserTie,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 interface CalendarItem {
   id: string;
@@ -30,6 +31,7 @@ interface CalendarItem {
   date: string;
   jobPrice?: number;
   client?: string;
+  clientPhone?: string;
   location?: string;
   data: Job;
 }
@@ -39,6 +41,7 @@ const CraftsmanCalendarPage = () => {
   const locale = useLocale();
   const t = useTranslations('calendar');
   const isRTL = locale === 'ar';
+  const router = useRouter();
 
   const [calendarItems, setCalendarItems] = useState<CalendarItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +83,15 @@ const CraftsmanCalendarPage = () => {
               date: displayDate,
               jobPrice: job.jobPrice,
               client:
-                typeof job.client === 'string' ? job.client : 'Unknown Client',
+                typeof job.client === 'object' && job.client?.fullName
+                  ? job.client.fullName
+                  : typeof job.client === 'string'
+                  ? job.client
+                  : 'Unknown Client',
+              clientPhone:
+                typeof job.client === 'object' && job.client?.phone
+                  ? job.client.phone
+                  : undefined,
               location:
                 typeof job.address === 'string'
                   ? job.address
@@ -230,43 +241,43 @@ const CraftsmanCalendarPage = () => {
     <Container className={`py-8 max-w-7xl ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="space-y-6">
         {/* Enhanced Header */}
-        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-blue-50/50 dark:to-blue-900/20 rounded-2xl p-8 border border-primary/20 shadow-lg">
+        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-primary/20 shadow-lg">
           <div
-            className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6`}
+            className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6`}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary via-primary/90 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                <FaCalendarAlt className="text-white w-8 h-8" />
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-primary via-primary/90 to-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                <FaCalendarAlt className="text-white w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/90 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent">
                   {t('sm.title')}
                 </h1>
-                <p className="text-lg text-muted-foreground mt-1">
+                <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-1">
                   {t('sm.subtitle')}
                 </p>
               </div>
             </div>
 
             <div
-              className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
+              className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ${
                 isRTL ? 'text-right' : 'text-left'
               }`}
             >
-              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 border border-primary/20 shadow-md">
-                <div className="text-sm text-muted-foreground uppercase tracking-wide font-medium mb-2">
+              <div className="bg-card/70 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-primary/20 shadow-md">
+                <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wide font-medium mb-1 sm:mb-2">
                   {t('stats.totalJobs')}
                 </div>
-                <div className="text-3xl font-bold text-primary">
+                <div className="text-2xl sm:text-3xl font-bold text-primary">
                   {calendarItems.length}
                 </div>
               </div>
 
-              <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20 shadow-md">
-                <div className="text-sm text-muted-foreground uppercase tracking-wide font-medium mb-2">
+              <div className="bg-card/70 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-primary/20 shadow-md">
+                <div className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wide font-medium mb-1 sm:mb-2">
                   {t('stats.thisMonth')}
                 </div>
-                <div className="text-3xl font-bold text-blue-600">
+                <div className="text-2xl sm:text-3xl font-bold text-primary">
                   {getJobsForCurrentMonth().length}
                 </div>
               </div>
@@ -275,31 +286,33 @@ const CraftsmanCalendarPage = () => {
         </div>
 
         {/* Calendar Navigation */}
-        <div className="flex items-center justify-between bg-card rounded-xl p-4 border border-border/50 shadow-sm">
-          <div className={`flex items-center gap-4`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 shadow-sm">
+          <div
+            className={`flex items-center justify-center sm:justify-start gap-2 sm:gap-4`}
+          >
             <button
               onClick={getPreviousMonth}
-              className="p-3 hover:bg-primary/10 rounded-xl transition-colors group"
+              className="p-2 sm:p-3 hover:bg-primary/10 rounded-lg sm:rounded-xl transition-colors group"
             >
               {isRTL ? (
-                <FaChevronRight className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform" />
               ) : (
-                <FaChevronLeft className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform" />
               )}
             </button>
 
-            <h2 className="text-2xl font-bold text-foreground min-w-[250px] text-center">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground min-w-[200px] sm:min-w-[250px] text-center">
               {monthNames[currentMonth]} {currentYear}
             </h2>
 
             <button
               onClick={getNextMonth}
-              className="p-3 hover:bg-primary/10 rounded-xl transition-colors group"
+              className="p-2 sm:p-3 hover:bg-primary/10 rounded-lg sm:rounded-xl transition-colors group"
             >
               {isRTL ? (
-                <FaChevronLeft className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform" />
               ) : (
-                <FaChevronRight className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:scale-110 transition-transform" />
               )}
             </button>
           </div>
@@ -307,9 +320,9 @@ const CraftsmanCalendarPage = () => {
           <Button
             onClick={() => setCurrentDate(new Date())}
             variant="outline"
-            className="border-primary/30 hover:border-primary/50 hover:bg-primary/10 px-6 py-2 font-medium"
+            className="border-primary/30 hover:border-primary/50 hover:bg-primary/10 px-4 sm:px-6 py-2 text-sm font-medium"
           >
-            <FaCalendarAlt className="w-4 h-4 mr-2" />
+            <FaCalendarAlt className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             {t('navigation.today')}
           </Button>
         </div>
@@ -327,15 +340,15 @@ const CraftsmanCalendarPage = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6">
           {/* Calendar Grid */}
-          <div className="lg:col-span-3 bg-card rounded-xl border border-border/50 overflow-hidden shadow-lg">
+          <div className="xl:col-span-3 bg-card rounded-lg sm:rounded-xl border border-border/50 overflow-hidden shadow-lg">
             {/* Calendar Header */}
-            <div className="grid grid-cols-7 border-b border-border/50 bg-gradient-to-r from-primary/5 to-blue-50/50 dark:to-blue-900/20">
+            <div className="grid grid-cols-7 border-b border-border/50 bg-gradient-to-r from-primary/5 to-primary/5">
               {dayNames.map((day) => (
                 <div
                   key={day}
-                  className="p-4 text-center text-sm font-bold text-foreground"
+                  className="p-2 sm:p-3 lg:p-4 text-center text-xs sm:text-sm font-bold text-foreground"
                 >
                   {t(`days.${day.toLowerCase()}`)}
                 </div>
@@ -349,7 +362,7 @@ const CraftsmanCalendarPage = () => {
                   return (
                     <div
                       key={index}
-                      className="h-28 border-b border-r border-border/30"
+                      className="h-20 sm:h-24 lg:h-28 border-b border-r border-border/30"
                     ></div>
                   );
                 }
@@ -361,7 +374,7 @@ const CraftsmanCalendarPage = () => {
                 return (
                   <div
                     key={index}
-                    className={`h-28 border-b border-r border-border/30 p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
+                    className={`h-20 sm:h-24 lg:h-28 border-b border-r border-border/30 p-1 sm:p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
                       !isCurrentMonth ? 'opacity-40 bg-muted/20' : ''
                     } ${
                       isTodayDate
@@ -371,27 +384,29 @@ const CraftsmanCalendarPage = () => {
                     onClick={() => setSelectedDate(date)}
                   >
                     <div
-                      className={`text-sm font-bold mb-2 ${
+                      className={`text-xs sm:text-sm font-bold mb-1 sm:mb-2 ${
                         isTodayDate ? 'text-primary' : 'text-foreground'
                       }`}
                     >
                       {date.getDate()}
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5 sm:space-y-1">
                       {dayItems.slice(0, 2).map((item, itemIndex) => (
                         <div
                           key={itemIndex}
-                          className="text-xs p-1 rounded-md text-white bg-gradient-to-r from-blue-500 to-blue-600 truncate shadow-sm"
+                          className="text-xs p-0.5 sm:p-1 rounded-md text-primary-foreground bg-gradient-to-r from-primary to-primary truncate shadow-sm"
                           title={item.title}
                         >
-                          <FaBriefcase className="w-3 h-3 inline mr-1" />
-                          {item.title.substring(0, 12)}
-                          {item.title.length > 12 ? '...' : ''}
+                          <FaBriefcase className="w-2 h-2 sm:w-3 sm:h-3 inline mr-0.5 sm:mr-1" />
+                          <span className="text-xs">
+                            {item.title.substring(0, 8)}
+                            {item.title.length > 8 ? '...' : ''}
+                          </span>
                         </div>
                       ))}
                       {dayItems.length > 2 && (
                         <div className="text-xs text-muted-foreground font-medium">
-                          +{dayItems.length - 2} more
+                          +{dayItems.length - 2}
                         </div>
                       )}
                     </div>
@@ -402,14 +417,16 @@ const CraftsmanCalendarPage = () => {
           </div>
 
           {/* Enhanced Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Selected Date Items */}
-            <div className="bg-card rounded-xl border border-border/50 p-6 shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <FaBriefcase className="w-5 h-5 text-primary" />
-                {selectedDate
-                  ? formatDate(selectedDate.toISOString(), locale)
-                  : t('sidebar.todayJobs')}
+            <div className="bg-card rounded-lg sm:rounded-xl border border-border/50 p-4 sm:p-6 shadow-lg">
+              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-2">
+                <FaBriefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="truncate">
+                  {selectedDate
+                    ? formatDate(selectedDate.toISOString(), locale)
+                    : t('sidebar.todayJobs')}
+                </span>
               </h3>
 
               {(() => {
@@ -418,9 +435,9 @@ const CraftsmanCalendarPage = () => {
 
                 if (itemsForDate.length === 0) {
                   return (
-                    <div className="text-center py-12">
-                      <FaBriefcase className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground text-lg">
+                    <div className="text-center py-8 sm:py-12">
+                      <FaBriefcase className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                      <p className="text-muted-foreground text-base sm:text-lg">
                         {t('sidebar.noJobs')}
                       </p>
                     </div>
@@ -428,27 +445,27 @@ const CraftsmanCalendarPage = () => {
                 }
 
                 return (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {itemsForDate.map((item) => {
                       const job = item.data;
 
                       return (
                         <div
                           key={item.id}
-                          className="border border-border/50 rounded-xl p-4 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-blue-50/50 to-transparent dark:from-blue-900/20 hover:border-primary/40"
+                          className="border border-border/50 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-primary/10 to-transparent hover:border-primary/40"
                         >
-                          <div className="flex items-start justify-between gap-3 mb-4">
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                                <FaBriefcase className="w-6 h-6 text-white" />
+                          <div className="flex items-start justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-primary rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+                                <FaBriefcase className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-bold text-foreground text-sm line-clamp-2 leading-tight mb-2">
+                                <h4 className="font-bold text-foreground text-sm sm:text-base line-clamp-2 leading-tight mb-2">
                                   {item.title}
                                 </h4>
                                 <div className="flex items-center gap-2">
                                   <span
-                                    className={`text-xs px-3 py-1 rounded-full font-medium shadow-sm ${getStatusColor(
+                                    className={`text-xs px-2 sm:px-3 py-1 rounded-full font-medium shadow-sm ${getStatusColor(
                                       item.status
                                     )}`}
                                   >
@@ -461,44 +478,56 @@ const CraftsmanCalendarPage = () => {
 
                           <div className="space-y-3 text-sm">
                             {item.client && (
-                              <div className="flex items-center gap-3">
-                                <FaUserTie className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                                <span className="text-muted-foreground">
-                                  Client:
-                                </span>
-                                <span className="font-medium text-foreground">
-                                  {item.client}
-                                </span>
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                  <FaUserTie className="w-4 h-4 text-primary flex-shrink-0" />
+                                  <span className="text-muted-foreground text-xs sm:text-sm">
+                                    Client:
+                                  </span>
+                                  <span className="font-medium text-foreground text-xs sm:text-sm truncate">
+                                    {item.client}
+                                  </span>
+                                </div>
+                                {item.clientPhone && (
+                                  <div className="flex items-center gap-2 sm:gap-3 ml-5 sm:ml-7">
+                                    <span className="text-muted-foreground text-xs">
+                                      Phone:
+                                    </span>
+                                    <span className="font-medium text-foreground text-xs">
+                                      {item.clientPhone}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             )}
 
                             {item.location && (
-                              <div className="flex items-center gap-3">
-                                <FaMapMarkerAlt className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                <span className="text-muted-foreground">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <FaMapMarkerAlt className="w-4 h-4 text-primary flex-shrink-0" />
+                                <span className="text-muted-foreground text-xs sm:text-sm">
                                   Location:
                                 </span>
-                                <span className="font-medium text-foreground truncate">
+                                <span className="font-medium text-foreground text-xs sm:text-sm truncate">
                                   {item.location}
                                 </span>
                               </div>
                             )}
 
                             {item.jobPrice && (
-                              <div className="flex items-center gap-3">
-                                <FaDollarSign className="w-4 h-4 text-green-600 flex-shrink-0" />
-                                <span className="text-muted-foreground">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <FaDollarSign className="w-4 h-4 text-success flex-shrink-0" />
+                                <span className="text-muted-foreground text-xs sm:text-sm">
                                   Budget:
                                 </span>
-                                <span className="font-bold text-green-700 dark:text-green-400">
+                                <span className="font-bold text-success text-xs sm:text-sm">
                                   ${item.jobPrice}
                                 </span>
                               </div>
                             )}
 
-                            <div className="flex items-center gap-3">
-                              <FaClock className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                              <span className="text-muted-foreground">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <FaClock className="w-4 h-4 text-primary flex-shrink-0" />
+                              <span className="text-muted-foreground text-xs sm:text-sm">
                                 Date:
                               </span>
                               <span className="font-medium text-foreground text-xs">
@@ -507,17 +536,17 @@ const CraftsmanCalendarPage = () => {
                             </div>
                           </div>
 
-                          <div className="mt-6 pt-4 border-t border-border/30">
+                          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-border/30">
                             <Button
                               variant="outline"
                               size="sm"
-                              className="w-full h-10 font-medium hover:bg-primary hover:text-white transition-colors"
+                              className="flex items-center justify-center w-full h-9 sm:h-10 text-xs sm:text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-[1.02] border-primary/30 hover:border-primary/50 shadow-sm hover:shadow-md group"
                               onClick={() => {
-                                window.open(`/jobs/${job._id}`, '_blank');
+                                router.push(`/jobs/${job._id}`);
                               }}
                             >
-                              <FaEye className="w-4 h-4 mr-2" />
-                              {t('actions.view')} Job Details
+                              <FaEye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 group-hover:scale-110 transition-transform duration-200" />
+                              {t('sidebar.viewJob')}
                             </Button>
                           </div>
                         </div>
@@ -526,45 +555,6 @@ const CraftsmanCalendarPage = () => {
                   </div>
                 );
               })()}
-            </div>
-
-            {/* Job Status Legend */}
-            <div className="bg-card rounded-xl border border-border/50 p-6 shadow-lg">
-              <h3 className="text-lg font-bold text-foreground mb-4">
-                {t('legend.title')}
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                  <span className="text-sm text-foreground">
-                    {t('legend.posted')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm text-foreground">
-                    {t('legend.hired')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm text-foreground">
-                    {t('legend.inProgress')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-foreground">
-                    {t('legend.completed')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                  <span className="text-sm text-foreground">
-                    {t('legend.cancelled')}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

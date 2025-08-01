@@ -936,6 +936,7 @@
       "todayItems": "Today's Items",
       "noJobs": "No jobs scheduled for this date",
       "noItems": "No items scheduled for this date",
+      "viewJob": "View Job",
       "type": {
         "job": "Job",
         "quote": "Quote",

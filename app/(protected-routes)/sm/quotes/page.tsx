@@ -20,6 +20,7 @@ import {
   FiRefreshCw,
   FiEye,
 } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 interface QuotesPageState {
   quotes: Quote[];
@@ -32,6 +33,7 @@ interface QuotesPageState {
 const QuotesPage = () => {
   const { data: session } = useSession();
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations('quotes');
 
   const [state, setState] = useState<QuotesPageState>({
@@ -117,19 +119,17 @@ const QuotesPage = () => {
   const getStatusBadge = useCallback(
     (status: string) => {
       const statusClasses = {
-        submitted:
-          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-        accepted:
-          'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        submitted: 'bg-warning/10 text-warning border border-warning/20',
+        accepted: 'bg-success/10 text-success border border-success/20',
         rejected:
-          'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+          'bg-destructive/10 text-destructive border border-destructive/20',
       };
 
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
             statusClasses[status as keyof typeof statusClasses] ||
-            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+            'bg-muted text-muted-foreground border border-border'
           }`}
         >
           {t(`filters.status.${status}`)}
@@ -397,7 +397,7 @@ const QuotesPage = () => {
                     size="sm"
                     onClick={() => {
                       if (quote.job && typeof quote.job === 'object') {
-                        window.open(`/jobs/${quote.job._id}`, '_blank');
+                        router.push(`/jobs/${quote.job._id}`);
                       }
                     }}
                     disabled={!quote.job || typeof quote.job !== 'object'}

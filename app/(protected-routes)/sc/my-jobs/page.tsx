@@ -281,7 +281,7 @@ const ClientJobsPage = () => {
               <Button
                 onClick={handleDeleteJob}
                 disabled={deleteLoading === deleteModal.jobId}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               >
                 {deleteLoading === deleteModal.jobId ? (
                   <>

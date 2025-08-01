@@ -58,7 +58,7 @@ const TestimonialsSection = () => {
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) =>
       i < rating ? (
-        <FaStar key={i} className="w-5 h-5 text-yellow-400 inline" />
+        <FaStar key={i} className="w-5 h-5 text-warning inline" />
       ) : (
         <FaRegStar key={i} className="w-5 h-5 text-gray-300 inline" />
       )

@@ -124,10 +124,10 @@ const MyJobCard = ({
             {/* View Job Icon Button */}
             <button
               onClick={() => handleViewJob(job._id)}
-              className="p-2.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/40 rounded-xl transition-all duration-200 transform hover:scale-105 group/view"
+              className="p-2.5 bg-primary/10 hover:bg-primary/20 rounded-xl transition-all duration-200 transform hover:scale-105 group/view"
               title={t('buttons.viewJob')}
             >
-              <FaEye className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover/view:scale-110 transition-transform duration-200" />
+              <FaEye className="w-4 h-4 text-primary group-hover/view:scale-110 transition-transform duration-200" />
             </button>
 
             <JobOptionsDropdown
@@ -148,8 +148,8 @@ const MyJobCard = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Location */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <FaMapMarkerAlt className="w-4 h-4 text-blue-600" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <FaMapMarkerAlt className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -163,8 +163,8 @@ const MyJobCard = ({
 
           {/* Payment */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <FaDollarSign className="w-4 h-4 text-green-600" />
+            <div className="p-2 bg-success/10 rounded-lg">
+              <FaDollarSign className="w-4 h-4 text-success" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -181,8 +181,8 @@ const MyJobCard = ({
 
           {/* Posted Date */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <FaCalendarAlt className="w-4 h-4 text-purple-600" />
+            <div className="p-2 bg-info/10 rounded-lg">
+              <FaCalendarAlt className="w-4 h-4 text-info" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -196,11 +196,11 @@ const MyJobCard = ({
 
           {/* Applications/Status */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+            <div className="p-2 bg-warning/10 rounded-lg">
               {job.status === 'Posted' ? (
-                <FaClock className="w-4 h-4 text-orange-600" />
+                <FaClock className="w-4 h-4 text-warning" />
               ) : (
-                <FaUsers className="w-4 h-4 text-orange-600" />
+                <FaUsers className="w-4 h-4 text-warning" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -229,7 +229,7 @@ const MyJobCard = ({
             {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
               <Button
                 onClick={() => handleViewApplications(job._id)}
-                className={`flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ${
+                className={`flex-1 bg-gradient-to-r from-success to-success hover:from-success/80 hover:to-success/80 text-success-foreground font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 ${
                   isRTL ? 'flex-row-reverse' : ''
                 }`}
               >

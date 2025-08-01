@@ -19,7 +19,7 @@ export default function NotFound() {
           {/* 404 Illustration */}
           <div className="mb-6">
             <div className="mx-auto w-32 h-32 bg-muted/50 rounded-2xl flex items-center justify-center">
-              <div className="text-6xl md:text-7xl font-bold text-red-400/50">
+              <div className="text-6xl md:text-7xl font-bold text-destructive/50">
                 404
               </div>
             </div>

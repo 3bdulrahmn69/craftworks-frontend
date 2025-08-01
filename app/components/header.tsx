@@ -39,7 +39,7 @@ function HeaderDesktop({
         <Logo />
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-2">
+        <nav className="hidden lg:flex items-center space-x-2">
           {navLinks.map((link) => (
             <Link
               key={link.key}
@@ -54,7 +54,7 @@ function HeaderDesktop({
       </div>
 
       {/* Right side actions */}
-      <div className="hidden md:flex items-center gap-3">
+      <div className="hidden lg:flex items-center gap-3">
         <ThemeToggle />
         <LanguageToggle />
 
@@ -65,7 +65,7 @@ function HeaderDesktop({
       </div>
 
       {/* Mobile header actions */}
-      <div className="md:hidden flex items-center gap-2">
+      <div className="lg:hidden flex items-center gap-2">
         {isAuthenticated && <UserMenu />}
         <button
           className="p-2 rounded-lg hover:bg-accent/50 text-foreground transition-all duration-200 hover:scale-105"
@@ -99,7 +99,7 @@ function HeaderMobile({
     <>
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 h-screen w-full bg-black/40 backdrop-blur-sm md:hidden z-40 transition-opacity duration-300"
+          className="fixed inset-0 h-screen w-full bg-black/40 backdrop-blur-sm lg:hidden z-40 transition-opacity duration-300"
           onClick={closeMobileMenu}
         />
       )}
@@ -108,7 +108,7 @@ function HeaderMobile({
         <div
           className={`fixed inset-y-0 ${
             local === 'en' ? 'right-0' : 'left-0'
-          } md:hidden bg-card/95 backdrop-blur-lg border-l border-border shadow-2xl w-80 max-w-[85vw] h-screen transform transition-transform duration-300 ease-out z-50 ${
+          } lg:hidden bg-card/95 backdrop-blur-lg border-l border-border shadow-2xl w-80 max-w-[85vw] h-screen transform transition-transform duration-300 ease-out z-50 ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >

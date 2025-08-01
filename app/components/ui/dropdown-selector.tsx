@@ -126,7 +126,7 @@ const DropdownSelector = ({
       >
         {label}
         {required && (
-          <span className="text-red-500 ml-1" aria-hidden="true">
+          <span className="text-destructive ml-1" aria-hidden="true">
             *
           </span>
         )}
@@ -197,7 +197,7 @@ const DropdownSelector = ({
       {error && (
         <p
           id={errorId}
-          className="text-xs text-red-500 mt-1"
+          className="text-xs text-destructive mt-1"
           role="alert"
           aria-live="polite"
         >

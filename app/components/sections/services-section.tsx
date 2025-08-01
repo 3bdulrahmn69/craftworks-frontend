@@ -56,13 +56,12 @@ const getCategoryColor = (index: number) => {
 
 const getColorClasses = (color: string) => {
   const colorMap = {
-    blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400',
-    amber: 'bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400',
-    cyan: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900 dark:text-cyan-400',
-    purple:
-      'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400',
-    red: 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400',
-    green: 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400',
+    blue: 'bg-primary/10 text-primary',
+    amber: 'bg-warning/10 text-warning',
+    cyan: 'bg-info/10 text-info',
+    purple: 'bg-info/10 text-info',
+    red: 'bg-destructive/10 text-destructive',
+    green: 'bg-success/10 text-success',
   };
   return colorMap[color as keyof typeof colorMap] || colorMap.blue;
 };

@@ -197,7 +197,7 @@ const ClientJobsPage = () => {
                       </div>
 
                       {job.status === 'Posted' && (
-                        <div className="flex items-center text-blue-600">
+                        <div className="flex items-center text-primary">
                           <FaClock className="w-4 h-4 mr-1" />
                           <span>Open for applications</span>
                         </div>

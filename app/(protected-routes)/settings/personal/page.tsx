@@ -286,7 +286,7 @@ const PersonalSettings = () => {
                   disabled={deletingImage}
                 >
                   <HiTrash
-                    className={`w-6 h-6 text-red-500`}
+                    className={`w-6 h-6 text-destructive`}
                     aria-hidden="true"
                   />
                 </button>

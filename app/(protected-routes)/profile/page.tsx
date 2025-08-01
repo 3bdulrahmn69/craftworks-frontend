@@ -62,7 +62,7 @@ const ProfilePage = () => {
     return (
       <Container className="flex items-center justify-center py-20">
         <div className="text-center" role="alert" aria-live="polite">
-          <div className="text-red-500 text-lg font-medium mb-2">
+          <div className="text-destructive text-lg font-medium mb-2">
             {error || 'Failed to load profile'}
           </div>
           <p className="text-muted-foreground">
@@ -192,7 +192,7 @@ const ProfilePage = () => {
                             {user.rating.toFixed(1)}
                           </span>
                           <HiStar
-                            className="w-5 h-5 text-yellow-400 fill-current"
+                            className="w-5 h-5 text-warning fill-current"
                             aria-label="stars"
                           />
                         </div>
@@ -290,8 +290,8 @@ const ProfilePage = () => {
                                   key={i}
                                   className={`w-4 h-4 ${
                                     i < Math.floor(user.rating)
-                                      ? 'text-yellow-400 fill-current'
-                                      : 'text-gray-300'
+                                      ? 'text-warning fill-current'
+                                      : 'text-muted-foreground'
                                   }`}
                                 />
                               ))}

@@ -68,7 +68,7 @@ export default function FAQ() {
         </h3>
       </div>
       <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-center gap-3">
-        <FaRegLightbulb className="text-yellow-400 w-5 h-5 animate-pulse" />
+        <FaRegLightbulb className="text-warning w-5 h-5 animate-pulse" />
         <span className="text-sm text-foreground">{t('description')}</span>
       </div>
       <Link href="/contact">
@@ -93,7 +93,7 @@ export default function FAQ() {
         </h3>
       </div>
       <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex items-center gap-3">
-        <FaRegLightbulb className="text-yellow-400 w-5 h-5 animate-pulse" />
+        <FaRegLightbulb className="text-warning w-5 h-5 animate-pulse" />
         <span className="text-sm text-foreground">{t('description')}</span>
       </div>
       <Link href="/auth/register">
