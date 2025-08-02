@@ -26,7 +26,6 @@ import {
   HiPencilAlt,
   HiTrash,
   HiUserGroup,
-  HiCog,
 } from 'react-icons/hi';
 
 const JobDetailsPage = () => {
@@ -45,7 +44,6 @@ const JobDetailsPage = () => {
   const [submittingQuote, setSubmittingQuote] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [showApplications, setShowApplications] = useState(false);
 
   // Helper function to translate payment types
   const translatePaymentType = useCallback(
@@ -85,12 +83,12 @@ const JobDetailsPage = () => {
 
   // Handle job editing
   const handleEditJob = () => {
-    router.push(`/sc/jobs/edit/${job?._id}`);
+    router.push(`/sc/job-manger?edit=${job?._id}`);
   };
 
   // View applications
   const handleViewApplications = () => {
-    setShowApplications(true);
+    router.push(`/sc/jobs/${job?._id}/applications`);
   };
 
   useEffect(() => {
@@ -302,19 +300,6 @@ const JobDetailsPage = () => {
                       {t('buttons.deleteJob')}
                     </Button>
                   )}
-
-                  {/* Manage Job */}
-                  <Button
-                    onClick={() => router.push(`/sc/jobs/${job._id}/manage`)}
-                    variant="outline"
-                    size="sm"
-                    className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
-                  >
-                    <HiCog
-                      className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
-                    />
-                    {t('buttons.manageJob')}
-                  </Button>
                 </div>
               </div>
             )}
@@ -670,50 +655,6 @@ const JobDetailsPage = () => {
                       : t('deleteModal.confirm')}
                   </Button>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Applications Modal */}
-        {showApplications && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-2xl mx-4 w-full max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-foreground">
-                  {t('applicationsModal.title')} (
-                  {job?.appliedCraftsmen?.length || 0})
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowApplications(false)}
-                >
-                  ×
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {job?.appliedCraftsmen?.length === 0 ? (
-                  <div className="text-center py-8">
-                    <HiUserGroup className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">
-                      {t('applicationsModal.noApplications')}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <HiUserGroup className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">
-                      {t('applicationsModal.placeholder')} -{' '}
-                      {job?.appliedCraftsmen?.length}{' '}
-                      {t('applicationsModal.applications')}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {t('applicationsModal.comingSoon')}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           </div>

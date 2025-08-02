@@ -3,13 +3,17 @@ import axios from 'axios';
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
   timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Don't set default Content-Type here to allow FormData to set its own
 });
 
-// Add request interceptor to include auth token
+// Add request interceptor to handle Content-Type based on data type
 api.interceptors.request.use((config) => {
+  // Only set Content-Type to application/json if it's not already set
+  // and if the data is not FormData
+  if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
   // Token will be added manually where needed, not from localStorage
   return config;
 });

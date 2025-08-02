@@ -44,7 +44,7 @@ const MyJobCard = ({
   };
 
   const handleEditJob = (jobId: string) => {
-    router.push(`/sc/create-job?edit=${jobId}`);
+    router.push(`/sc/job-manager?edit=${jobId}`);
   };
 
   const handleViewApplications = (jobId: string) => {
@@ -62,7 +62,7 @@ const MyJobCard = ({
   return (
     <div
       key={job._id}
-      className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 overflow-hidden group ${
+      className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 group ${
         isRTL ? 'rtl' : 'ltr'
       }`}
     >

@@ -228,9 +228,7 @@ const CraftsmanCalendarPage = () => {
               {t('error.title')}
             </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
-              {t('error.retry')}
-            </Button>
+            <Button onClick={() => router.refresh()}>{t('error.retry')}</Button>
           </div>
         </div>
       </Container>

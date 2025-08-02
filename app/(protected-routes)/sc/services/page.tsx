@@ -110,11 +110,11 @@ const ServicesPage = () => {
   }, [t]);
 
   const handleServiceSelect = (service: Service) => {
-    // Navigate to create job page with selected service
+    // Navigate to job manager page with selected service
     router.push(
-      `/sc/create-job?serviceId=${service._id}&serviceName=${encodeURIComponent(
-        service.name
-      )}`
+      `/sc/job-manager?serviceId=${
+        service._id
+      }&serviceName=${encodeURIComponent(service.name)}`
     );
   };
 
@@ -143,7 +143,7 @@ const ServicesPage = () => {
               {t('error.title')}
             </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => router.refresh()}>
               {t('error.button')}
             </Button>
           </div>

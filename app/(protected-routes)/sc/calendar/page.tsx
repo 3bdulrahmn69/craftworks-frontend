@@ -186,9 +186,7 @@ const CalendarPage = () => {
               {t('error.title')}
             </h3>
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
-              {t('error.retry')}
-            </Button>
+            <Button onClick={() => router.refresh()}>{t('error.retry')}</Button>
           </div>
         </div>
       </Container>
@@ -287,7 +285,7 @@ const CalendarPage = () => {
             </Button>
 
             <Button
-              onClick={() => (window.location.href = '/sc/create-job')}
+              onClick={() => router.push('/sc/job-manager')}
               className="bg-gradient-to-r from-primary to-primary hover:from-primary/90 hover:to-primary/90 px-3 sm:px-4 py-2 text-sm font-medium w-full sm:w-auto"
             >
               <FaPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />

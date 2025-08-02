@@ -123,14 +123,17 @@ export const jobsService = {
     jobData: FormData | object,
     token: string
   ): Promise<JobApiResponse> {
-    const response = await api.post('/jobs', jobData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(jobData instanceof FormData
-          ? {}
-          : { 'Content-Type': 'application/json' }),
-      },
-    });
+    const headers: any = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // For FormData, don't set Content-Type (let browser set it with boundary)
+    // For regular objects, set Content-Type to application/json
+    if (!(jobData instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await api.post('/jobs', jobData, { headers });
     return flattenResponse(response.data);
   },
 
@@ -156,14 +159,17 @@ export const jobsService = {
     jobData: FormData | object,
     token: string
   ): Promise<JobApiResponse> {
-    const response = await api.put(`/jobs/${jobId}`, jobData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(jobData instanceof FormData
-          ? {}
-          : { 'Content-Type': 'application/json' }),
-      },
-    });
+    const headers: any = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // For FormData, don't set Content-Type (let browser set it with boundary)
+    // For regular objects, set Content-Type to application/json
+    if (!(jobData instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await api.put(`/jobs/${jobId}`, jobData, { headers });
     return flattenResponse(response.data);
   },
 

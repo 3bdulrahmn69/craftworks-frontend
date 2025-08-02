@@ -53,7 +53,7 @@ interface JobFormData {
   existingPhotos?: string[]; // URLs of existing photos when editing
 }
 
-const CreateJobPage = () => {
+const JobManagerPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -112,7 +112,7 @@ const CreateJobPage = () => {
     [t]
   );
 
-  const [formData, setFormData] = useState<JobFormData>({
+  const [formData, setFormData] = useState<JobFormData>(() => ({
     title: '',
     description: '',
     serviceId: searchParams.get('serviceId') || '',
@@ -128,7 +128,7 @@ const CreateJobPage = () => {
     jobDate: '',
     photos: [],
     existingPhotos: [],
-  });
+  }));
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -228,6 +228,7 @@ const CreateJobPage = () => {
 
         if (response.success && response.data) {
           const job = response.data;
+
           setFormData({
             title: job.title,
             description: job.description,
@@ -244,9 +245,9 @@ const CreateJobPage = () => {
             location: job.location,
             paymentType: job.paymentType,
             jobPrice: job.jobPrice,
-            jobDate: job.jobDate || '', // Load existing jobDate or empty string
-            photos: [], // Only new file uploads go here
-            existingPhotos: job.photos || [], // Existing photo URLs
+            jobDate: job.jobDate.split('T')[0],
+            photos: [],
+            existingPhotos: job.photos || [],
           });
 
           // Set photo previews to show existing photos
@@ -264,6 +265,46 @@ const CreateJobPage = () => {
 
     loadJobForEdit();
   }, [editJobId, session?.accessToken, t]);
+
+  // Cleanup effect for photo previews and periodic validation
+  useEffect(() => {
+    // Periodic validation of photos array
+    const invalidPhotos = formData.photos.filter(
+      (photo) =>
+        !(photo instanceof File) ||
+        photo.constructor !== File ||
+        !photo.size ||
+        !photo.name ||
+        !photo.type
+    );
+
+    if (invalidPhotos.length > 0) {
+      console.warn(
+        'Found invalid photos in array, cleaning up:',
+        invalidPhotos
+      );
+      setFormData((prev) => ({
+        ...prev,
+        photos: prev.photos.filter(
+          (photo) =>
+            photo instanceof File &&
+            photo.constructor === File &&
+            photo.size > 0 &&
+            photo.name &&
+            photo.type
+        ),
+      }));
+    }
+
+    return () => {
+      // Cleanup blob URLs on component unmount
+      photoPreviews.forEach((preview) => {
+        if (preview && preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+    };
+  }, [photoPreviews, formData.photos]);
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -302,7 +343,7 @@ const CreateJobPage = () => {
       // Check if the selected date is not in the past
       const selectedDate = new Date(formData.jobDate);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+      today.setHours(0, 0, 0, 0);
 
       if (selectedDate < today) {
         newErrors.jobDate = t('sections.pricing.jobDate.pastDateError');
@@ -401,11 +442,16 @@ const CreateJobPage = () => {
 
       if (totalPhotos > 5) {
         toast.error(t('messages.maxPhotos'));
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         return;
       }
 
-      // Validate file types and sizes
-      const validFiles = files.filter((file) => {
+      // Validate file types and sizes with ultra-strict validation
+      const validFiles: File[] = [];
+
+      files.forEach((file, index) => {
         const validTypes = [
           'image/jpeg',
           'image/jpg',
@@ -414,29 +460,56 @@ const CreateJobPage = () => {
         ];
         const maxSize = 5 * 1024 * 1024; // 5MB
 
-        if (!validTypes.includes(file.type)) {
-          toast.error(t('messages.invalidFormat', { fileName: file.name }));
-          return false;
+        // Ultra-strict validation
+        if (
+          file &&
+          typeof file === 'object' &&
+          file instanceof File &&
+          file.constructor === File &&
+          file.size > 0 &&
+          file.size <= maxSize &&
+          file.name &&
+          typeof file.name === 'string' &&
+          file.type &&
+          typeof file.type === 'string' &&
+          validTypes.includes(file.type)
+        ) {
+          validFiles.push(file);
+        } else {
+          if (!validTypes.includes(file?.type || '')) {
+            toast.error(
+              t('messages.invalidFormat', { fileName: file?.name || 'unknown' })
+            );
+          } else if ((file?.size || 0) > maxSize) {
+            toast.error(
+              t('messages.fileTooLarge', { fileName: file?.name || 'unknown' })
+            );
+          } else {
+            console.error(`File ${index} failed validation:`, file);
+            toast.error(`Invalid file: ${file?.name || 'unknown'}`);
+          }
         }
-
-        if (file.size > maxSize) {
-          toast.error(t('messages.fileTooLarge', { fileName: file.name }));
-          return false;
-        }
-
-        return true;
       });
 
       if (validFiles.length > 0) {
         // Create preview URLs
         const newPreviews = validFiles.map((file) => URL.createObjectURL(file));
 
-        setFormData((prev) => ({
-          ...prev,
-          photos: [...prev.photos, ...validFiles],
-        }));
+        // Update state with only valid files
+        setFormData((prev) => {
+          const updatedPhotos = [...prev.photos, ...validFiles];
+          return {
+            ...prev,
+            photos: updatedPhotos,
+          };
+        });
 
         setPhotoPreviews((prev) => [...prev, ...newPreviews]);
+      }
+
+      // Clear the file input to allow re-uploading the same file
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     },
     [formData.existingPhotos?.length, formData.photos.length, t]
@@ -456,16 +529,32 @@ const CreateJobPage = () => {
       } else {
         // Removing a new uploaded photo
         const newPhotoIndex = index - existingPhotosCount;
+
         // Revoke the URL to prevent memory leaks
         const preview = photoPreviews[index];
         if (preview && preview.startsWith('blob:')) {
           URL.revokeObjectURL(preview);
         }
 
-        setFormData((prev) => ({
-          ...prev,
-          photos: prev.photos.filter((_, i) => i !== newPhotoIndex),
-        }));
+        setFormData((prev) => {
+          const filteredPhotos = prev.photos.filter(
+            (file, i) => i !== newPhotoIndex
+          );
+          // Ensure all remaining photos are valid
+          const validPhotos = filteredPhotos.filter(
+            (photo) =>
+              photo instanceof File &&
+              photo.constructor === File &&
+              photo.size > 0 &&
+              photo.name &&
+              photo.type
+          );
+
+          return {
+            ...prev,
+            photos: validPhotos,
+          };
+        });
       }
 
       setPhotoPreviews((prev) => prev.filter((_, i) => i !== index));
@@ -488,25 +577,23 @@ const CreateJobPage = () => {
 
     try {
       setLoading(true);
-
-      // Create FormData for file upload
       const jobFormData = new FormData();
 
-      // Add job data
-      jobFormData.append('title', formData.title);
-      jobFormData.append('description', formData.description);
-      jobFormData.append('service', formData.serviceId);
-      jobFormData.append('address[country]', formData.address.country);
-      jobFormData.append('address[state]', formData.address.state);
-      jobFormData.append('address[city]', formData.address.city);
-      jobFormData.append('address[street]', formData.address.street);
-      jobFormData.append('paymentType', formData.paymentType);
-      jobFormData.append('jobPrice', formData.jobPrice.toString());
-      jobFormData.append('jobDate', formData.jobDate);
+      // Add job data with explicit conversion to strings
+      jobFormData.append('title', String(formData.title));
+      jobFormData.append('description', String(formData.description));
+      jobFormData.append('service', String(formData.serviceId));
+      jobFormData.append('address[country]', String(formData.address.country));
+      jobFormData.append('address[state]', String(formData.address.state));
+      jobFormData.append('address[city]', String(formData.address.city));
+      jobFormData.append('address[street]', String(formData.address.street));
+      jobFormData.append('paymentType', String(formData.paymentType));
+      jobFormData.append('jobPrice', String(formData.jobPrice));
+      jobFormData.append('jobDate', String(formData.jobDate));
 
       // Add location coordinates if available
       if (formData.location) {
-        jobFormData.append('location[type]', formData.location.type);
+        jobFormData.append('location[type]', String(formData.location.type));
         jobFormData.append(
           'location[coordinates]',
           formData.location.coordinates.join(',')
@@ -514,24 +601,96 @@ const CreateJobPage = () => {
       }
 
       // Add photos - Only add valid File objects, not URLs or empty objects
+      // IMPORTANT: Only append photos field if we have actual valid files
       if (formData.photos && formData.photos.length > 0) {
-        formData.photos.forEach((photo, index) => {
-          // Ensure it's a valid File object
-          if (photo instanceof File && photo.size > 0) {
-            jobFormData.append('photos', photo);
-          } else {
-            console.warn(`Skipping invalid photo at index ${index}:`, photo);
+        // Ultra-strict photo validation
+        const validPhotoFiles: File[] = [];
+
+        formData.photos.forEach((photo) => {
+          // Multiple checks to ensure it's a valid File
+          if (
+            photo &&
+            typeof photo === 'object' &&
+            photo instanceof File &&
+            photo.constructor === File &&
+            photo.size > 0 &&
+            photo.name &&
+            typeof photo.name === 'string' &&
+            photo.type &&
+            typeof photo.type === 'string' &&
+            ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(
+              photo.type
+            )
+          ) {
+            validPhotoFiles.push(photo);
           }
         });
+
+        // Only append photos if we have valid files
+        if (validPhotoFiles.length > 0) {
+          validPhotoFiles.forEach((photo) => {
+            jobFormData.append('photos', photo);
+          });
+        }
+      }
+
+      // For editing: handle existing photos that should remain
+      if (
+        isEditing &&
+        formData.existingPhotos &&
+        formData.existingPhotos.length > 0
+      ) {
+        formData.existingPhotos.forEach((photoUrl) => {
+          if (typeof photoUrl === 'string' && photoUrl.trim()) {
+            jobFormData.append('existingPhotos', photoUrl);
+          }
+        });
+      }
+
+      // List all FormData entries for final verification
+      const formDataEntries: { [key: string]: any } = {};
+      let photoCount = 0;
+      for (const [key, value] of jobFormData.entries()) {
+        if (key === 'photos') {
+          photoCount++;
+          formDataEntries[`photos_${photoCount}`] = {
+            isFile: value instanceof File,
+            name: (value as File)?.name,
+            size: (value as File)?.size,
+            type: (value as File)?.type,
+          };
+        } else {
+          formDataEntries[key] = value;
+        }
+      }
+
+      // Additional check: ensure no empty objects
+      let hasEmptyObjects = false;
+      for (const [key, value] of jobFormData.entries()) {
+        if (
+          key === 'photos' &&
+          typeof value === 'object' &&
+          !(value instanceof File)
+        ) {
+          console.error('⚠️ Found non-File object in photos:', value);
+          hasEmptyObjects = true;
+        }
+      }
+
+      if (hasEmptyObjects) {
+        throw new Error('Invalid photo objects detected in FormData');
       }
 
       const response = isEditing
         ? await jobsService.updateJob(
             editJobId!,
-            jobFormData,
+            jobFormData, // Always pass FormData, never plain object
             session.accessToken
           )
-        : await jobsService.createJob(jobFormData, session.accessToken);
+        : await jobsService.createJob(
+            jobFormData, // Always pass FormData, never plain object
+            session.accessToken
+          );
 
       if (response.success) {
         toast.success(
@@ -556,7 +715,7 @@ const CreateJobPage = () => {
           // Reset form data
           setFormData((prev) => ({
             ...prev,
-            photos: [],
+            photos: [], // Clear photos array completely
             title: '',
             description: '',
             jobPrice: 0,
@@ -816,8 +975,8 @@ const CreateJobPage = () => {
               {formData.location ? (
                 <div className="text-xs text-muted-foreground">
                   {t('sections.location.gps.locationSet')}{' '}
-                  {formData.location.coordinates[1].toFixed(6)},{' '}
-                  {formData.location.coordinates[0].toFixed(6)}
+                  {formData.location.coordinates[1]},{' '}
+                  {formData.location.coordinates[0]}
                 </div>
               ) : (
                 <div className="text-xs text-destructive">
@@ -887,7 +1046,7 @@ const CreateJobPage = () => {
                     name="jobDate"
                     value={formData.jobDate}
                     onChange={handleInputChange}
-                    min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                    min={new Date().toISOString().split('T')[0]}
                     className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   />
@@ -988,4 +1147,4 @@ const CreateJobPage = () => {
   );
 };
 
-export default CreateJobPage;
+export default JobManagerPage;

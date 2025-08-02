@@ -87,7 +87,7 @@ const JobApplicationsPage = () => {
       if (response.success) {
         toast.success('Quote accepted successfully!');
         // Refresh the data
-        window.location.reload();
+        router.refresh();
       } else {
         throw new Error(response.message || 'Failed to accept quote');
       }

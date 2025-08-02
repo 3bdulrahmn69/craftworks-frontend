@@ -32,7 +32,7 @@ export interface Job {
   jobPrice: number;
   platformFee: number;
   appliedCraftsmen: string[];
-  jobDate?: string; // Optional job date field (ISO date string)
+  jobDate: string;
   createdAt: string;
   updatedAt?: string;
 }
