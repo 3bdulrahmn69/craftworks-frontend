@@ -99,6 +99,32 @@ const JobApplicationsPage = () => {
     }
   };
 
+  const handleRejectQuote = async (quoteId: string) => {
+    if (!session?.accessToken) return;
+
+    try {
+      setActionLoading(quoteId);
+      const response = await jobsService.rejectQuote(
+        jobId,
+        quoteId,
+        session.accessToken
+      );
+
+      if (response.success) {
+        toast.success('Quote rejected successfully!');
+        // Refresh the data
+        router.refresh();
+      } else {
+        throw new Error(response.message || 'Failed to reject quote');
+      }
+    } catch (err: any) {
+      console.error('Failed to reject quote:', err);
+      toast.error(err.message || 'Failed to reject quote');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (loading) {
     return (
       <Container className={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -351,7 +377,7 @@ const JobApplicationsPage = () => {
                                 className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold ${
                                   application.status === 'Accepted'
                                     ? 'bg-success/10 text-success border border-success/20'
-                                    : application.status === 'Rejected'
+                                    : application.status === 'Declined'
                                     ? 'bg-destructive/10 text-destructive border border-destructive/20'
                                     : 'bg-primary/10 text-primary border border-primary/20'
                                 }`}
@@ -480,10 +506,7 @@ const JobApplicationsPage = () => {
                             variant="outline"
                             size="sm"
                             className="border border-destructive/30 hover:border-destructive/50 hover:bg-destructive/10 text-destructive hover:text-destructive font-semibold py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
-                            onClick={() => {
-                              // TODO: Implement reject functionality if needed
-                              toast.info(t('application.actions.rejectSoon'));
-                            }}
+                            onClick={() => handleRejectQuote(application._id)}
                           >
                             <div
                               className={`flex items-center justify-center ${

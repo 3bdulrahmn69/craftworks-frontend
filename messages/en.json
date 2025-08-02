@@ -760,7 +760,8 @@
         "all": "All Statuses",
         "submitted": "Submitted",
         "accepted": "Accepted",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "declined": "Declined"
       }
     },
     "emptyState": {
@@ -889,6 +890,7 @@
         "pending": "Pending",
         "accepted": "Accepted",
         "rejected": "Rejected",
+        "declined": "Declined",
         "submitted": "Submitted"
       },
       "actions": {

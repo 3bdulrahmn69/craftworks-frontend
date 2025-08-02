@@ -841,7 +841,8 @@
         "all": "جميع الحالات",
         "submitted": "مُقدم",
         "accepted": "مقبول",
-        "rejected": "مرفوض"
+        "rejected": "مرفوض",
+        "declined": "مرفوض"
       }
     },
     "emptyState": {
@@ -970,7 +971,8 @@
         "pending": "قيد الانتظار",
         "accepted": "مقبول",
         "rejected": "مرفوض",
-        "submitted": "مُقدم"
+        "submitted": "مُقدم",
+        "declined": "مرفوض"
       },
       "actions": {
         "accept": "قبول",

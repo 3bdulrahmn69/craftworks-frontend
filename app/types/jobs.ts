@@ -104,7 +104,7 @@ export interface JobApplication {
   };
   price: number;
   notes?: string;
-  status: 'Submitted' | 'Accepted' | 'Rejected';
+  status: 'Submitted' | 'Accepted' | 'Declined';
   createdAt: string;
   updatedAt?: string;
   __v?: number;

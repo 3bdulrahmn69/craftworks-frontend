@@ -120,7 +120,7 @@ const QuotesPage = () => {
       const statusClasses = {
         submitted: 'bg-warning/10 text-warning border border-warning/20',
         accepted: 'bg-success/10 text-success border border-success/20',
-        rejected:
+        declined:
           'bg-destructive/10 text-destructive border border-destructive/20',
       };
 
@@ -142,7 +142,7 @@ const QuotesPage = () => {
     () => [
       { value: 'submitted', label: 'submitted' },
       { value: 'accepted', label: 'accepted' },
-      { value: 'rejected', label: 'rejected' },
+      { value: 'declined', label: 'declined' },
     ],
     []
   );

@@ -118,6 +118,21 @@ export const jobsService = {
     return flattenResponse(response.data);
   },
 
+  async rejectQuote(
+    jobId: string,
+    quoteId: string,
+    token: string
+  ): Promise<any> {
+    const response = await api.post(
+      `/jobs/${jobId}/quotes/${quoteId}/reject`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return flattenResponse(response.data);
+  },
+
   // Create a new job (client only)
   async createJob(
     jobData: FormData | object,
