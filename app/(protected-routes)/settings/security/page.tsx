@@ -2,21 +2,22 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/button';
 import { userService, ChangePasswordData } from '@/app/services/user';
-import { HiLockClosed } from 'react-icons/hi2';
+import { HiLockClosed, HiArrowLeft } from 'react-icons/hi2';
 import Input from '@/app/components/ui/input';
 
 import SettingsPageHeader from '@/app/components/settings/settings-page-header';
 
 const SecuritySettings = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ChangePasswordData>({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -52,12 +53,6 @@ const SecuritySettings = () => {
         'Password must contain at least one uppercase letter, one lowercase letter, and one number';
     }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your new password';
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
     if (formData.currentPassword === formData.newPassword) {
       newErrors.newPassword =
         'New password must be different from current password';
@@ -79,7 +74,6 @@ const SecuritySettings = () => {
       setFormData({
         currentPassword: '',
         newPassword: '',
-        confirmPassword: '',
       });
 
       toast.success('Password changed successfully!');
@@ -109,6 +103,19 @@ const SecuritySettings = () => {
       role="main"
       aria-labelledby="security-page-title"
     >
+      {/* Back Button */}
+      <nav aria-label="Breadcrumb">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.replace('/settings')}
+          className="flex items-center gap-2 mb-6"
+          aria-label="Go back to settings"
+        >
+          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
+        </Button>
+      </nav>
+
       <SettingsPageHeader
         title="Security Settings"
         description="Manage your password and security preferences"
@@ -196,26 +203,6 @@ const SecuritySettings = () => {
                 <li>Contains at least one number</li>
               </ul>
             </div>
-          </div>
-
-          {/* Confirm New Password */}
-          <div>
-            <Input
-              id="confirm-password"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              label="Confirm New Password"
-              placeholder="Confirm your new password"
-              required
-              showPasswordToggle={true}
-              error={errors.confirmPassword}
-              aria-describedby="confirm-password-help"
-            />
-            <p id="confirm-password-help" className="sr-only">
-              Re-enter your new password to confirm it matches
-            </p>
           </div>
 
           <div className="flex justify-end pt-4 border-t">

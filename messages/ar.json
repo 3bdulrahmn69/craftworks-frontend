@@ -603,7 +603,7 @@
       "maxPhotos": "5 صور كحد أقصى مسموح",
       "invalidFormat": "{fileName} ليس تنسيق صورة صالح",
       "fileTooLarge": "{fileName} كبير جدًا. الحد الأقصى للحجم 5 ميجابايت",
-      "fixErrors": "يرجى إصلاح الأخطاء في النموذج",
+      "validationError": "يرجى إكمال جميع الحقول المطلوبة",
       "loginRequired": "يرجى تسجيل الدخول للمتابعة",
       "createSuccess": "تم إنشاء الوظيفة بنجاح!",
       "updateSuccess": "تم تحديث الوظيفة بنجاح!",
@@ -691,6 +691,7 @@
       "loading": "جاري تحميل التوصيات...",
       "noRecommendations": "لا توجد توصيات متاحة لهذه الوظيفة.",
       "error": "فشل في تحميل التوصيات. يرجى المحاولة مرة أخرى.",
+      "inviteSuccess": "تمت دعوة الحرفي بنجاح!",
       "invite": "دعوة",
       "inviting": "جاري الدعوة...",
       "invited": "تم الدعوة",
@@ -891,9 +892,22 @@
     "card": {
       "payment": "الدفع",
       "receivedOn": "تم الاستلام في",
+      "directInvitation": "دعوات مباشرة",
+      "clientLabel": "العميل",
       "buttons": {
         "viewJob": "عرض الوظيفة",
-        "respond": "رد"
+        "reject": "رفض",
+        "accept": "قبول"
+      },
+      "status": {
+        "pending": "قيد الانتظار",
+        "accepted": "مقبولة",
+        "rejected": "مرفوضة"
+      },
+      "paymentTypes": {
+        "cash": "نقدي",
+        "escrow": "ضمان",
+        "cashProtected": "نقدي محمي"
       }
     },
     "status": {
@@ -1005,6 +1019,20 @@
       "thu": "الخميس",
       "fri": "الجمعة",
       "sat": "السبت"
+    },
+    "months": {
+      "january": "يناير",
+      "february": "فبراير",
+      "march": "مارس",
+      "april": "أبريل",
+      "may": "مايو",
+      "june": "يونيو",
+      "july": "يوليو",
+      "august": "أغسطس",
+      "september": "سبتمبر",
+      "october": "أكتوبر",
+      "november": "نوفمبر",
+      "december": "ديسمبر"
     },
     "filters": {
       "all": "الكل",

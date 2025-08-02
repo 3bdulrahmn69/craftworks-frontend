@@ -247,4 +247,20 @@ export const invitationsService = {
     );
     return flattenResponse(apiResponse.data);
   },
+
+  // New direct response to job invitation
+  async respondToJobInvitation(
+    jobId: string,
+    response: 'Accepted' | 'Rejected',
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const apiResponse = await api.post(
+      `/jobs/${jobId}/invitations/respond`,
+      { response },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return flattenResponse(apiResponse.data);
+  },
 };

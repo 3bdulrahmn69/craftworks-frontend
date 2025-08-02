@@ -7,7 +7,6 @@ import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import JobCard from '../../../components/jobs/job-card';
 import JobFilters from '../../../components/jobs/job-filters';
 import EmptyState from '../../../components/jobs/empty-state';
-import JobsModal from '../../../components/jobs/jobs-modal';
 import { useJobs } from '@/app/hooks/useJobs';
 import { HiExclamationCircle, HiBriefcase } from 'react-icons/hi';
 
@@ -26,9 +25,6 @@ const JobsPage = () => {
     searchQuery,
     hasActiveFilters,
     hasUnappliedChanges,
-    showQuoteModal,
-    selectedJob,
-    submittingQuote,
     fetchJobs,
     refreshJobs,
     handleSearch,
@@ -36,11 +32,8 @@ const JobsPage = () => {
     handleStateChange,
     handleSearchChange,
     resetFilters,
-    openQuoteModal,
-    closeQuoteModal,
-    submitQuote,
     isUserApplied,
-  } = useJobs({ jobsPerPage: 15 }); // Enhanced to 15 jobs per page
+  } = useJobs({ jobsPerPage: 15 });
 
   if (loading) {
     return (
@@ -153,7 +146,6 @@ const JobsPage = () => {
                     <JobCard
                       key={job._id}
                       job={job}
-                      onQuoteClick={openQuoteModal}
                       isApplied={isUserApplied(job)}
                     />
                   ))}
@@ -173,17 +165,6 @@ const JobsPage = () => {
             )}
           </div>
         </div>
-
-        {/* Quote Modal */}
-        {showQuoteModal && selectedJob && (
-          <JobsModal
-            job={selectedJob}
-            isOpen={showQuoteModal}
-            onClose={closeQuoteModal}
-            onSubmit={submitQuote}
-            submittingQuote={submittingQuote}
-          />
-        )}
       </main>
     </Container>
   );

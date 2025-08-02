@@ -11,6 +11,8 @@ const LanguageToggle = memo(function LanguageToggle() {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof document === 'undefined') return;
+
     const cookies = document.cookie
       .split('; ')
       .find((cookie) => cookie.startsWith('CRAFTWORKS_LOCALE='))
@@ -18,7 +20,7 @@ const LanguageToggle = memo(function LanguageToggle() {
 
     if (cookies) {
       setCurrentLang(cookies as 'en' | 'ar');
-    } else {
+    } else if (typeof navigator !== 'undefined') {
       const browserLang = navigator.language.slice(0, 2);
       setCurrentLang(browserLang as 'en' | 'ar');
       document.cookie = `CRAFTWORKS_LOCALE=${browserLang};`;
@@ -27,6 +29,8 @@ const LanguageToggle = memo(function LanguageToggle() {
   }, [router]);
 
   const toggleLanguage = useCallback(() => {
+    if (typeof document === 'undefined') return;
+
     const newLang = currentLang === 'en' ? 'ar' : 'en';
     setCurrentLang(newLang);
     document.cookie = `CRAFTWORKS_LOCALE=${newLang}; path=/;`;

@@ -378,6 +378,8 @@ export const buildUrlWithParams = (
   baseUrl: string,
   params: Record<string, any>
 ): string => {
+  if (typeof window === 'undefined') return baseUrl;
+
   const url = new URL(baseUrl, window.location.origin);
 
   Object.entries(params).forEach(([key, value]) => {

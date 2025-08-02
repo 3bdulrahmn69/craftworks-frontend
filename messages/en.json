@@ -522,7 +522,7 @@
       "maxPhotos": "Maximum 5 photos allowed",
       "invalidFormat": "{fileName} is not a valid image format",
       "fileTooLarge": "{fileName} is too large. Maximum size is 5MB",
-      "fixErrors": "Please fix the errors in the form",
+      "validationError": "Please complete all required fields",
       "loginRequired": "Please log in to continue",
       "createSuccess": "Job created successfully!",
       "updateSuccess": "Job updated successfully!",
@@ -610,6 +610,7 @@
       "loading": "Loading recommendations...",
       "noRecommendations": "No recommendations available for this job.",
       "error": "Failed to load recommendations. Please try again.",
+      "inviteSuccess": "Invitation sent successfully!",
       "invite": "Invite",
       "inviting": "Inviting...",
       "invited": "Invited",
@@ -810,9 +811,22 @@
     "card": {
       "payment": "Payment",
       "receivedOn": "Received on",
+      "directInvitation": "Direct Invitation",
+      "clientLabel": "Client",
       "buttons": {
         "viewJob": "View Job",
-        "respond": "Respond"
+        "reject": "Reject",
+        "accept": "Accept"
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "paymentTypes": {
+        "cash": "cash",
+        "escrow": "escrow",
+        "cashProtected": "cash protected"
       }
     },
     "status": {
@@ -924,6 +938,20 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
     },
     "filters": {
       "all": "All",

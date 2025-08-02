@@ -49,6 +49,7 @@ export interface RecommendedCraftsman {
   };
   rating: number;
   ratingCount: number;
+  isInvited?: boolean; // Optional field to track invitation status
 }
 
 // API Response wrapper interface

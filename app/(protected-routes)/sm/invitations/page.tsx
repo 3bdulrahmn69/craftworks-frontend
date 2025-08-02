@@ -15,13 +15,15 @@ import {
   FiUser,
   FiStar,
   FiDollarSign,
-  FiCalendar,
   FiEye,
   FiMail,
   FiAlertCircle,
   FiX,
+  FiClock,
 } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface InvitationsPageState {
   invitations: Invitation[];
@@ -32,15 +34,8 @@ interface InvitationsPageState {
   respondingTo: string | null;
 }
 
-interface ResponseModalState {
-  isOpen: boolean;
-  invitation: Invitation | null;
-  responding: boolean;
-}
-
 const InvitationsPage = () => {
   const { data: session } = useSession();
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations();
 
@@ -60,11 +55,11 @@ const InvitationsPage = () => {
     respondingTo: null,
   });
 
-  const [modalState, setModalState] = useState<ResponseModalState>({
-    isOpen: false,
-    invitation: null,
-    responding: false,
-  });
+  // Track direct responses to prevent multiple clicks
+  const [directResponding, setDirectResponding] = useState<{
+    invitationId: string;
+    action: 'accept' | 'reject';
+  } | null>(null);
 
   const fetchInvitations = useCallback(
     async (page: number = 1, status: string = 'all') => {
@@ -84,6 +79,8 @@ const InvitationsPage = () => {
           params.toString(),
           session?.accessToken
         );
+
+        console.log('Fetched invitations:', response);
 
         setState((prev) => ({
           ...prev,
@@ -122,66 +119,69 @@ const InvitationsPage = () => {
     }));
   }, []);
 
-  const openResponseModal = useCallback((invitation: Invitation) => {
-    setModalState({
-      isOpen: true,
-      invitation,
-      responding: false,
-    });
-  }, []);
-
-  const closeResponseModal = useCallback(() => {
-    setModalState({
-      isOpen: false,
-      invitation: null,
-      responding: false,
-    });
-  }, []);
-
-  const handleResponse = useCallback(
-    async (response: 'accept' | 'reject') => {
-      if (!modalState.invitation) return;
+  // Direct response handler for card buttons
+  const handleDirectResponse = useCallback(
+    async (invitation: Invitation, response: 'Accepted' | 'Rejected') => {
+      if (!session?.accessToken) return;
 
       try {
-        setModalState((prev) => ({ ...prev, responding: true }));
+        setDirectResponding({
+          invitationId: invitation._id,
+          action: response.toLowerCase() as 'accept' | 'reject',
+        });
 
-        await invitationsService.respondToInvitation(
-          modalState.invitation._id,
+        await invitationsService.respondToJobInvitation(
+          invitation.job._id,
           response,
-          'dummy-token' // This would come from auth context
+          session.accessToken
         );
 
-        // Refresh the invitations list
-        await fetchInvitations(
-          state.pagination.currentPage,
-          state.statusFilter
+        // Update the local state immediately for better UX
+        setState((prev) => ({
+          ...prev,
+          invitations: prev.invitations.map((inv) =>
+            inv._id === invitation._id
+              ? { ...inv, status: response as any }
+              : inv
+          ),
+        }));
+
+        // Show success message
+        toast.success(
+          t(`invitations.messages.${response}Success`) ||
+            `Invitation ${response} successfully!`
         );
 
-        closeResponseModal();
-
-        // Show success message (you could add a toast notification here)
-      } catch (error) {
+        // Refresh the full list to ensure consistency
+        setTimeout(() => {
+          fetchInvitations(state.pagination.currentPage, state.statusFilter);
+        }, 1000);
+      } catch (error: any) {
         console.error('Error responding to invitation:', error);
-        // Show error message (you could add a toast notification here)
+        toast.error(
+          error.message ||
+            t('invitations.messages.responseError') ||
+            'Failed to respond to invitation'
+        );
       } finally {
-        setModalState((prev) => ({ ...prev, responding: false }));
+        setDirectResponding(null);
       }
     },
     [
-      modalState.invitation,
+      session?.accessToken,
       fetchInvitations,
       state.pagination.currentPage,
       state.statusFilter,
-      closeResponseModal,
+      t,
     ]
   );
 
   const getStatusBadge = useCallback(
     (status: string) => {
       const statusClasses = {
-        pending: 'bg-warning/10 text-warning border border-warning/20',
-        accepted: 'bg-success/10 text-success border border-success/20',
-        rejected:
+        Pending: 'bg-warning/10 text-warning border border-warning/20',
+        Accepted: 'bg-success/10 text-success border border-success/20',
+        Rejected:
           'bg-destructive/10 text-destructive border border-destructive/20',
       };
 
@@ -192,11 +192,11 @@ const InvitationsPage = () => {
             'bg-muted text-muted-foreground border border-border'
           }`}
         >
-          {status === 'pending'
+          {status === 'Pending'
             ? t('invitations.status.pending')
-            : status === 'accepted'
+            : status === 'Accepted'
             ? t('invitations.status.accepted')
-            : status === 'rejected'
+            : status === 'Rejected'
             ? t('invitations.status.rejected')
             : status}
         </span>
@@ -208,9 +208,9 @@ const InvitationsPage = () => {
   const statusOptions = useMemo(
     () => [
       { id: 'all', label: t('invitations.filters.status.all') },
-      { id: 'pending', label: t('invitations.filters.status.pending') },
-      { id: 'accepted', label: t('invitations.filters.status.accepted') },
-      { id: 'rejected', label: t('invitations.filters.status.rejected') },
+      { id: 'Pending', label: t('invitations.filters.status.pending') },
+      { id: 'Accepted', label: t('invitations.filters.status.accepted') },
+      { id: 'Rejected', label: t('invitations.filters.status.rejected') },
     ],
     [t]
   );
@@ -372,7 +372,13 @@ const InvitationsPage = () => {
             {state.invitations.map((invitation) => (
               <div
                 key={invitation._id}
-                className="bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-border"
+                className={`bg-card rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-border relative overflow-hidden ${
+                  invitation.status === 'Accepted'
+                    ? 'ring-2 ring-success/20 bg-success/5'
+                    : invitation.status === 'Rejected'
+                    ? 'ring-2 ring-destructive/20 bg-destructive/5'
+                    : ''
+                }`}
               >
                 {/* Header Section with Title and Status */}
                 <div
@@ -382,19 +388,40 @@ const InvitationsPage = () => {
                 >
                   <div className="flex-1 min-w-0">
                     <div
-                      className={`flex items-start justify-between gap-3 mb-3 ${
+                      className={`flex items-start justify-between gap-3 mb-4 ${
                         locale === 'ar' ? 'flex-row-reverse' : ''
                       }`}
                     >
-                      <h3
-                        className={`text-xl font-bold text-foreground flex-1 min-w-0 ${
-                          locale === 'ar' ? 'text-right' : 'text-left'
-                        }`}
-                      >
-                        {invitation.job.title}
-                      </h3>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className={`text-xl font-bold text-foreground mb-2 ${
+                            locale === 'ar' ? 'text-right' : 'text-left'
+                          }`}
+                        >
+                          {invitation.job.title}
+                        </h3>
 
-                      {/* Status Badge - Responsive positioning */}
+                        {/* Invitation Type Badge */}
+                        <div
+                          className={`flex items-center gap-2 mb-3 ${
+                            locale === 'ar'
+                              ? 'flex-row-reverse justify-end'
+                              : ''
+                          }`}
+                        >
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                            <FiMail
+                              className={`w-3 h-3 ${
+                                locale === 'ar' ? 'ml-1' : 'mr-1'
+                              }`}
+                            />
+                            {t('invitations.card.directInvitation') ||
+                              'Direct Invitation'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Status Badge */}
                       <div
                         className={`flex-shrink-0 ${
                           locale === 'ar' ? 'order-first' : 'order-last'
@@ -404,26 +431,37 @@ const InvitationsPage = () => {
                       </div>
                     </div>
 
-                    {/* Client Info */}
+                    {/* Client Info - Enhanced */}
                     <div
-                      className={`flex items-center mb-3 ${
+                      className={`flex items-center mb-4 p-3 bg-muted/30 rounded-lg ${
                         locale === 'ar' ? 'flex-row-reverse justify-end' : ''
                       }`}
                     >
                       <div
-                        className={`w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ${
+                        className={`w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 ${
                           locale === 'ar' ? 'ml-3' : 'mr-3'
                         }`}
                       >
-                        <FiUser className="w-5 h-5 text-primary" />
+                        {invitation.job.client.profilePicture ? (
+                          <Image
+                            width={48}
+                            height={48}
+                            src={invitation.job.client.profilePicture}
+                            alt={invitation.job.client.fullName}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <FiUser className="w-6 h-6 text-muted-foreground" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p
-                          className={`text-sm font-medium text-foreground truncate ${
+                          className={`text-sm font-semibold text-foreground mb-1 ${
                             locale === 'ar' ? 'text-right' : 'text-left'
                           }`}
                         >
-                          {invitation.job.client.name}
+                          {t('invitations.card.clientLabel') || 'Client'}:{' '}
+                          {invitation.job.client.fullName}
                         </p>
                         {invitation.job.client.rating && (
                           <div
@@ -440,104 +478,151 @@ const InvitationsPage = () => {
                             />
                             <span>
                               {invitation.job.client.rating.toFixed(1)} (
-                              {invitation.job.client.reviewCount || 0} reviews)
+                              {invitation.job.client.ratingCount || 0} ratings)
                             </span>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Payment Info */}
-                    <div
-                      className={`flex items-center text-sm text-muted-foreground ${
-                        locale === 'ar' ? 'flex-row-reverse justify-end' : ''
-                      }`}
-                    >
-                      <FiDollarSign
-                        className={`w-4 h-4 text-success ${
-                          locale === 'ar' ? 'ml-2' : 'mr-2'
-                        }`}
-                      />
-                      <span className="font-medium">
-                        {t('invitations.card.payment')}:
-                      </span>
-                      <span
-                        className={`${
-                          locale === 'ar' ? 'mr-1' : 'ml-1'
-                        } truncate`}
+                    {/* Job Details Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                      {/* Payment Info */}
+                      <div
+                        className={`flex items-center text-sm p-2 bg-success/5 rounded-lg `}
                       >
-                        {invitation.job.paymentType}
-                      </span>
+                        <FiDollarSign
+                          className={`w-4 h-4 text-success ${
+                            locale === 'ar' ? 'ml-2' : 'mr-2'
+                          }`}
+                        />
+                        <span className="font-medium text-foreground">
+                          {t('invitations.card.payment')}:
+                        </span>
+                        <span
+                          className={`${
+                            locale === 'ar' ? 'mr-1' : 'ml-1'
+                          } text-success font-medium`}
+                        >
+                          {t(
+                            `invitations.card.paymentTypes.${invitation.job.paymentType.toLowerCase()}`
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Date Info */}
+                      <div
+                        className={`flex items-center text-sm p-2 bg-muted/20 rounded-lg `}
+                      >
+                        <FiClock
+                          className={`w-4 h-4 text-muted-foreground ${
+                            locale === 'ar' ? 'ml-2' : 'mr-2'
+                          }`}
+                        />
+                        <span className="font-medium text-foreground">
+                          {t('invitations.card.receivedOn') || 'Received'}:
+                        </span>
+                        <span
+                          className={`${
+                            locale === 'ar' ? 'mr-1' : 'ml-1'
+                          } text-muted-foreground`}
+                        >
+                          {formatDate(invitation.createdAt, locale)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Footer Section */}
+                {/* Enhanced Footer Section with Direct Response Buttons */}
                 <div
-                  className={`flex items-center pt-4 border-t border-border gap-4 ${
-                    locale === 'ar'
-                      ? 'flex-col-reverse sm:flex-row-reverse justify-between'
-                      : 'flex-col sm:flex-row justify-between'
+                  className={`flex items-center justify-between pt-4 border-t border-border gap-4 ${
+                    locale === 'ar' ? 'flex-row-reverse' : ''
                   }`}
                 >
-                  {/* Date Info */}
-                  <div
-                    className={`flex items-center text-sm text-muted-foreground ${
-                      locale === 'ar'
-                        ? 'flex-row-reverse justify-end w-full sm:w-auto'
-                        : 'w-full sm:w-auto'
-                    }`}
-                  >
-                    <FiCalendar
-                      className={`w-4 h-4 text-muted-foreground flex-shrink-0 ${
-                        locale === 'ar' ? 'ml-2' : 'mr-2'
-                      }`}
-                    />
-                    <span className="font-medium flex-shrink-0">
-                      {t('invitations.card.receivedOn')}
-                    </span>
-                    <span
-                      className={`${
-                        locale === 'ar' ? 'mr-1' : 'ml-1'
-                      } truncate`}
-                    >
-                      {formatDate(invitation.createdAt, locale)}
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div
-                    className={`flex gap-3 flex-shrink-0 ${
-                      locale === 'ar'
-                        ? 'flex-row-reverse w-full sm:w-auto justify-end'
-                        : 'w-full sm:w-auto justify-start sm:justify-end'
-                    }`}
-                  >
+                  {/* View Job Button */}
+                  <Link href={`/jobs/${invitation.job._id}`}>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => router.push(`/jobs/${invitation.job._id}`)}
-                      className={`flex-1 sm:flex-none min-w-[100px] flex items-center justify-center gap-2 ${
+                      className={`flex items-center gap-2 ${
                         locale === 'ar' ? 'flex-row-reverse' : ''
                       }`}
                     >
                       <FiEye className="w-4 h-4" />
-                      <span>{t('invitations.card.buttons.viewJob')}</span>
+                      <span>
+                        {t('invitations.card.buttons.viewJob') || 'View Job'}
+                      </span>
                     </Button>
-                    {invitation.status === 'pending' && (
+                  </Link>
+
+                  {/* Direct Response Buttons */}
+                  {invitation.status === 'Pending' ? (
+                    <div
+                      className={`flex gap-2 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
                       <Button
-                        variant="primary"
+                        variant="outline"
                         size="sm"
-                        onClick={() => openResponseModal(invitation)}
-                        className={`flex-1 sm:flex-none min-w-[100px] flex items-center justify-center gap-2 ${
-                          locale === 'ar' ? 'flex-row-reverse' : ''
-                        }`}
+                        onClick={() =>
+                          handleDirectResponse(invitation, 'Rejected')
+                        }
+                        disabled={
+                          directResponding?.invitationId === invitation._id &&
+                          directResponding?.action === 'reject'
+                        }
+                        className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
                       >
-                        <FiMail className="w-4 h-4" />
-                        <span>{t('invitations.card.buttons.respond')}</span>
+                        {directResponding?.invitationId === invitation._id &&
+                        directResponding?.action === 'reject' ? (
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full" />
+                        ) : (
+                          <FiX className="w-4 h-4" />
+                        )}
+                        <span className={locale === 'ar' ? 'mr-1' : 'ml-1'}>
+                          {t('invitations.card.buttons.reject') || 'Reject'}
+                        </span>
                       </Button>
-                    )}
-                  </div>
+
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          handleDirectResponse(invitation, 'Accepted')
+                        }
+                        disabled={
+                          directResponding?.invitationId === invitation._id &&
+                          directResponding?.action === 'accept'
+                        }
+                        className="bg-success hover:bg-success/80 text-white"
+                      >
+                        {directResponding?.invitationId === invitation._id &&
+                        directResponding?.action === 'accept' ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" />
+                        ) : (
+                          <FiMail className="w-4 h-4" />
+                        )}
+                        <span className={locale === 'ar' ? 'mr-1' : 'ml-1'}>
+                          {t('invitations.card.buttons.accept') || 'Accept'}
+                        </span>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div
+                      className={`flex items-center gap-2 ${
+                        locale === 'ar' ? 'flex-row-reverse' : ''
+                      }`}
+                    >
+                      <span className="text-sm text-muted-foreground">
+                        {invitation.status === 'Accepted'
+                          ? t('invitations.card.status.accepted') ||
+                            'You accepted this invitation'
+                          : t('invitations.card.status.rejected') ||
+                            'You rejected this invitation'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -551,102 +636,6 @@ const InvitationsPage = () => {
           isLoading={state.loading}
         />
       </Container>
-
-      {/* Response Modal */}
-      {modalState.isOpen && modalState.invitation && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div
-            className={`bg-card rounded-2xl p-6 w-full max-w-md shadow-2xl border border-border animate-fadeIn ${
-              locale === 'ar' ? 'rtl' : 'ltr'
-            }`}
-            dir={locale === 'ar' ? 'rtl' : 'ltr'}
-          >
-            <div
-              className={`flex justify-between items-center mb-6 ${
-                locale === 'ar' ? 'flex-row-reverse' : ''
-              }`}
-            >
-              <h3
-                className={`text-xl font-semibold text-foreground ${
-                  locale === 'ar' ? 'text-right' : 'text-left'
-                }`}
-              >
-                {t('invitations.modal.title')}
-              </h3>
-              <button
-                onClick={closeResponseModal}
-                className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted"
-                aria-label="Close modal"
-              >
-                <FiX className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="mb-6 p-4 bg-muted rounded-xl">
-              <h4
-                className={`font-medium text-foreground mb-2 ${
-                  locale === 'ar' ? 'text-right' : 'text-left'
-                }`}
-              >
-                {modalState.invitation.job.title}
-              </h4>
-              <p
-                className={`text-sm text-muted-foreground ${
-                  locale === 'ar' ? 'text-right' : 'text-left'
-                }`}
-              >
-                {t('invitations.modal.client')}:{' '}
-                {modalState.invitation.job.client.name}
-              </p>
-            </div>
-
-            <p
-              className={`text-muted-foreground mb-6 ${
-                locale === 'ar' ? 'text-right' : 'text-left'
-              }`}
-            >
-              {t('invitations.modal.message')}
-            </p>
-
-            <div
-              className={`flex gap-3 ${
-                locale === 'ar' ? 'flex-row-reverse' : ''
-              }`}
-            >
-              <Button
-                variant="outline"
-                onClick={closeResponseModal}
-                disabled={modalState.responding}
-                className="flex-1"
-              >
-                {t('invitations.modal.buttons.cancel')}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => handleResponse('reject')}
-                disabled={modalState.responding}
-                className="flex-1 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
-              >
-                {modalState.responding
-                  ? t('invitations.modal.buttons.rejecting')
-                  : t('invitations.modal.buttons.reject')}
-              </Button>
-
-              <Button
-                variant="primary"
-                onClick={() => handleResponse('accept')}
-                disabled={modalState.responding}
-                isLoading={modalState.responding}
-                loadingText={t('invitations.modal.buttons.accepting')}
-                className="flex-1"
-              >
-                {t('invitations.modal.buttons.accept')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

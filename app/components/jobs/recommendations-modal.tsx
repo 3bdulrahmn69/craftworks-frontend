@@ -39,9 +39,9 @@ const RecommendationsModal = ({
   const [invitingCraftsman, setInvitingCraftsman] = useState<string | null>(
     null
   );
-  const [invitedCraftsmen, setInvitedCraftsmen] = useState<Set<string>>(
-    new Set()
-  );
+  const [localInvitedCraftsmen, setLocalInvitedCraftsmen] = useState<
+    Set<string>
+  >(new Set());
 
   const fetchRecommendations = useCallback(async () => {
     if (!accessToken || !jobId) return;
@@ -75,17 +75,37 @@ const RecommendationsModal = ({
       );
 
       if (response.success) {
-        toast.success(
-          t('recommendations.inviteSuccess') ||
-            'Craftsman invited successfully!'
+        // Show different success message for re-invitations
+        const isReInvitation = recommendations.find(
+          (c) => c._id === craftsmanId
+        )?.isInvited;
+        const successMessage = isReInvitation
+          ? t('recommendations.reInviteSuccess') ||
+            'Craftsman re-invited successfully!'
+          : t('recommendations.inviteSuccess') ||
+            'Craftsman invited successfully!';
+
+        toast.success(successMessage);
+        setLocalInvitedCraftsmen((prev) => new Set(prev).add(craftsmanId));
+
+        // Update the craftsman's isInvited status in the recommendations list
+        setRecommendations((prev) =>
+          prev.map((craftsman) =>
+            craftsman._id === craftsmanId
+              ? { ...craftsman, isInvited: true }
+              : craftsman
+          )
         );
-        setInvitedCraftsmen((prev) => new Set(prev).add(craftsmanId));
       } else {
         throw new Error(response.message || 'Failed to invite craftsman');
       }
     } catch (err: any) {
       console.error('Failed to invite craftsman:', err);
-      toast.error(err.message || 'Failed to invite craftsman');
+      const errorMessage =
+        err.message ||
+        t('recommendations.inviteError') ||
+        'Failed to invite craftsman';
+      toast.error(errorMessage);
     } finally {
       setInvitingCraftsman(null);
     }
@@ -94,7 +114,7 @@ const RecommendationsModal = ({
   const handleClose = () => {
     setRecommendations([]);
     setError(null);
-    setInvitedCraftsmen(new Set());
+    setLocalInvitedCraftsmen(new Set());
     onClose();
   };
 
@@ -157,7 +177,7 @@ const RecommendationsModal = ({
                     isRTL ? 'flex-row-reverse' : ''
                   }`}
                 >
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 overflow-hidden shrink-0">
+                  <div className="relative w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 overflow-hidden shrink-0">
                     {craftsman.profilePicture ? (
                       <Image
                         src={craftsman.profilePicture}
@@ -168,6 +188,12 @@ const RecommendationsModal = ({
                       />
                     ) : (
                       <FaUsers className="text-primary w-8 h-8" />
+                    )}
+                    {/* Invitation status indicator */}
+                    {craftsman.isInvited && (
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-success rounded-full flex items-center justify-center border-2 border-white">
+                        <FaCheckCircle className="text-white w-3 h-3" />
+                      </div>
                     )}
                   </div>
 
@@ -253,17 +279,20 @@ const RecommendationsModal = ({
                       <div
                         className={`${isRTL ? 'mr-4' : 'ml-4'} flex-shrink-0`}
                       >
-                        {invitedCraftsmen.has(craftsman._id) ? (
-                          <Button
-                            size="sm"
-                            disabled
-                            className="bg-success hover:bg-success cursor-default"
-                          >
-                            <FaCheckCircle
-                              className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
-                            />
-                            {t('recommendations.invited')}
-                          </Button>
+                        {craftsman.isInvited ||
+                        localInvitedCraftsmen.has(craftsman._id) ? (
+                          <div className="flex flex-col gap-2">
+                            <Button
+                              size="sm"
+                              disabled
+                              className="bg-success hover:bg-success cursor-default"
+                            >
+                              <FaCheckCircle
+                                className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`}
+                              />
+                              {t('recommendations.invited')}
+                            </Button>
+                          </div>
                         ) : (
                           <Button
                             size="sm"

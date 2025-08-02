@@ -57,6 +57,10 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
+  /* Font families */
+  --font-family-roboto: 'Roboto', sans-serif;
+  --font-family-cairo: 'Cairo', sans-serif;
+
   /* Border radius */
   --radius-xs: 0.125rem;
   --radius-sm: 0.25rem;
@@ -229,6 +233,24 @@ body {
   color: var(--color-foreground);
   font-feature-settings: 'rlig' 1, 'calt' 1;
   font-size: var(--font-size-base);
+  font-family: var(--font-family-roboto);
+}
+
+/* Language-specific font families */
+html[lang='ar'] body,
+html[lang='ar'] * {
+  font-family: var(--font-family-cairo);
+}
+
+html[lang='en'] body,
+html[lang='en'] * {
+  font-family: var(--font-family-roboto);
+}
+
+/* Fallback for any unspecified language */
+html:not([lang]) body,
+html[lang=''] body {
+  font-family: var(--font-family-roboto);
 }
 
 /* Focus styles */
@@ -342,4 +364,22 @@ img {
 
 .rtl input[type='file'] {
   direction: ltr;
+}
+
+/* Font utility classes */
+.font-roboto {
+  font-family: var(--font-family-roboto) !important;
+}
+
+.font-cairo {
+  font-family: var(--font-family-cairo) !important;
+}
+
+/* Ensure proper font rendering for Arabic text */
+html[lang='ar'] {
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+html[lang='en'] {
+  font-feature-settings: 'liga' 1, 'kern' 1, 'rlig' 1, 'calt' 1;
 }

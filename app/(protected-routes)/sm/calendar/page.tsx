@@ -250,7 +250,7 @@ const CraftsmanCalendarPage = () => {
                 <FaCalendarAlt className="text-white w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary">
                   {t('sm.title')}
                 </h1>
                 <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-1">
@@ -302,7 +302,8 @@ const CraftsmanCalendarPage = () => {
             </button>
 
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground min-w-[200px] sm:min-w-[250px] text-center">
-              {monthNames[currentMonth]} {currentYear}
+              {t(`months.${monthNames[currentMonth].toLowerCase()}`)}{' '}
+              {currentYear}
             </h2>
 
             <button
@@ -333,9 +334,6 @@ const CraftsmanCalendarPage = () => {
             <FaBriefcase className="w-16 h-16 text-muted-foreground mb-4" />
             <p className="text-xl font-semibold text-foreground mb-2">
               {t('noJobs.message')}
-            </p>
-            <p className="text-muted-foreground">
-              Check back later for new job assignments
             </p>
           </div>
         )}
@@ -374,7 +372,7 @@ const CraftsmanCalendarPage = () => {
                 return (
                   <div
                     key={index}
-                    className={`h-20 sm:h-24 lg:h-28 border-b border-r border-border/30 p-1 sm:p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
+                    className={`h-20 sm:h-24 lg:h-28 border-b border-r border-border p-1 sm:p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
                       !isCurrentMonth ? 'opacity-40 bg-muted/20' : ''
                     } ${
                       isTodayDate
@@ -384,7 +382,7 @@ const CraftsmanCalendarPage = () => {
                     onClick={() => setSelectedDate(date)}
                   >
                     <div
-                      className={`text-xs sm:text-sm font-bold mb-1 sm:mb-2 ${
+                      className={`text-xs sm:text-sm font-bold mb-1 sm:mb-2 p-1 ${
                         isTodayDate ? 'text-primary' : 'text-foreground'
                       }`}
                     >

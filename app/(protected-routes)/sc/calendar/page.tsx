@@ -208,7 +208,7 @@ const CalendarPage = () => {
                 <FaCalendarAlt className="text-white w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary">
                   {t('title')}
                 </h1>
                 <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mt-1">
@@ -260,7 +260,8 @@ const CalendarPage = () => {
             </button>
 
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground min-w-[200px] sm:min-w-[250px] text-center">
-              {monthNames[currentMonth]} {currentYear}
+              {t(`months.${monthNames[currentMonth].toLowerCase()}`)}{' '}
+              {currentYear}
             </h2>
 
             <button
@@ -302,16 +303,6 @@ const CalendarPage = () => {
             <p className="text-xl font-semibold text-foreground mb-2">
               {t('noJobs.message')}
             </p>
-            <p className="text-muted-foreground mb-6">
-              Create your first job to get started
-            </p>
-            <Button
-              onClick={() => (window.location.href = '/sc/create-job')}
-              className="bg-gradient-to-r from-primary to-primary hover:from-primary/90 hover:to-primary/90"
-            >
-              <FaPlus className="w-4 h-4 mr-2" />
-              Create Your First Job
-            </Button>
           </div>
         )}
 
@@ -349,7 +340,7 @@ const CalendarPage = () => {
                 return (
                   <div
                     key={index}
-                    className={`h-20 sm:h-24 lg:h-28 border-b border-r border-border/30 p-1 sm:p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
+                    className={`h-20 sm:h-24 lg:h-28 border-b border-r border-border p-1 sm:p-2 cursor-pointer hover:bg-primary/5 transition-all duration-200 ${
                       !isCurrentMonth ? 'opacity-40 bg-muted/20' : ''
                     } ${
                       isTodayDate
@@ -359,7 +350,7 @@ const CalendarPage = () => {
                     onClick={() => setSelectedDate(date)}
                   >
                     <div
-                      className={`text-xs sm:text-sm font-bold mb-1 sm:mb-2 ${
+                      className={`text-xs sm:text-sm font-bold mb-1 sm:mb-2 p-1 ${
                         isTodayDate ? 'text-primary' : 'text-foreground'
                       }`}
                     >
@@ -466,7 +457,7 @@ const CalendarPage = () => {
                               </div>
                             )}
 
-                            {job.jobPrice && (
+                            {job.jobPrice >= 0 && (
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <FaDollarSign className="w-4 h-4 text-success flex-shrink-0" />
                                 <span className="text-muted-foreground text-xs sm:text-sm">
@@ -495,22 +486,21 @@ const CalendarPage = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 sm:h-10 text-xs sm:text-sm font-medium hover:bg-primary hover:text-white transition-all duration-200 hover:scale-[1.02] border-primary/30 hover:border-primary/50 shadow-sm hover:shadow-md group"
+                              className="flex items-center justify-center h-9 sm:h-10 text-xs sm:text-sm font-medium hover:bg-primary hover:text-white transition-all duration-200 hover:scale-[1.02] border-primary/30 hover:border-primary/50 shadow-sm hover:shadow-md group"
                               onClick={() => {
-                                router.push(`/sc/jobs/${job._id}`);
+                                router.push(`/jobs/${job._id}`);
                               }}
                             >
                               <FaEye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
                               <span className="relative">
                                 {t('actions.view')}
-                                <span className="absolute inset-x-0 -bottom-0.5 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
                               </span>
                             </Button>
 
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-9 sm:h-10 text-xs sm:text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-[1.02] border-primary/30 hover:border-primary/50 shadow-sm hover:shadow-md group"
+                              className="flex items-center justify-center h-9 sm:h-10 text-xs sm:text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-[1.02] border-primary/30 hover:border-primary/50 shadow-sm hover:shadow-md group"
                               onClick={() => {
                                 router.push(`/sc/edit-job/${job._id}`);
                               }}
@@ -518,7 +508,6 @@ const CalendarPage = () => {
                               <FaEdit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 group-hover:scale-110 transition-transform duration-200" />
                               <span className="relative">
                                 {t('actions.edit')}
-                                <span className="absolute inset-x-0 -bottom-0.5 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
                               </span>
                             </Button>
                           </div>

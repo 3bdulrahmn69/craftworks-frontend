@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/button';
 import SettingsPageHeader from '@/app/components/settings/settings-page-header';
@@ -12,12 +13,13 @@ import servicesAPI from '@/app/services/services';
 import { User } from '@/app/types/user';
 import { Service } from '@/app/types/services';
 
-import { HiCamera, HiTrash, HiUser } from 'react-icons/hi2';
+import { HiCamera, HiTrash, HiUser, HiArrowLeft } from 'react-icons/hi2';
 import Input from '@/app/components/ui/input';
 import DropdownSelector from '@/app/components/ui/dropdown-selector';
 
 const PersonalSettings = () => {
   const { data: session } = useSession();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -219,6 +221,19 @@ const PersonalSettings = () => {
       role="main"
       aria-labelledby="page-title"
     >
+      {/* Back Button */}
+      <nav aria-label="Breadcrumb">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => router.replace('/settings')}
+          className="flex items-center gap-2 mb-6"
+          aria-label="Go back to settings"
+        >
+          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
+        </Button>
+      </nav>
+
       <SettingsPageHeader
         title="Personal Information"
         description="Update your profile details and personal information"

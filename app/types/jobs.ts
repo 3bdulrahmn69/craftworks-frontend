@@ -35,7 +35,6 @@ export interface Job {
   jobDate?: string; // Optional job date field (ISO date string)
   createdAt: string;
   updatedAt?: string;
-  __v?: number;
 }
 
 export interface Service {
@@ -50,34 +49,31 @@ export interface Service {
 
 export interface Quote {
   _id: string;
-  job:
-    | string
-    | {
-        _id: string;
-        title: string;
-        description: string;
-        photos?: string[];
-        address: {
-          country: string;
-          state: string;
-          city: string;
-          street: string;
-        };
-        location?: {
-          type: 'Point';
-          coordinates: [number, number];
-        };
-        status: string;
-        createdAt: string;
-        client: {
-          _id: string;
-          fullName: string;
-          profilePicture?: string;
-          rating?: number;
-          ratingCount?: number;
-        };
-      }
-    | null;
+  job: {
+    _id: string;
+    title: string;
+    description: string;
+    photos?: string[];
+    address: {
+      country: string;
+      state: string;
+      city: string;
+      street: string;
+    };
+    location?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
+    status: string;
+    createdAt: string;
+    client: {
+      _id: string;
+      fullName: string;
+      profilePicture?: string;
+      rating?: number;
+      ratingCount?: number;
+    };
+  };
   craftsman:
     | string
     | {
@@ -121,14 +117,15 @@ export interface Invitation {
     _id: string;
     title: string;
     client: {
-      name: string;
+      fullName: string;
+      profilePicture?: string;
       rating?: number;
-      reviewCount?: number;
+      ratingCount?: number;
     };
     paymentType: string;
   };
   craftsman: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'Pending' | 'Accepted' | 'Rejected';
   createdAt: string;
   updatedAt?: string;
 }

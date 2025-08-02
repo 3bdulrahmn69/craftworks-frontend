@@ -16,7 +16,6 @@ export interface UpdateUserData {
 export interface ChangePasswordData {
   currentPassword: string;
   newPassword: string;
-  confirmPassword: string;
 }
 
 export const userService = {
@@ -48,7 +47,7 @@ export const userService = {
     token: string,
     passwordData: ChangePasswordData
   ): Promise<void> => {
-    await api.put<ApiResponse<null>>('/auth/change-password', passwordData, {
+    await api.post<ApiResponse<null>>('/auth/change-password', passwordData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

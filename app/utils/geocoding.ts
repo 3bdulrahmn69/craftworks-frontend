@@ -187,7 +187,7 @@ export async function getCurrentLocationAndGeocode(): Promise<{
   city: string;
 }> {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
       reject(new Error('Geolocation is not supported by this browser.'));
       return;
     }

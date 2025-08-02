@@ -10,11 +10,15 @@ import ThemeToastContainer from './components/ui/theme-toast-container';
 const roboto = Roboto({
   variable: '--font-roboto',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
 });
 
 const cairo = Cairo({
   variable: '--font-cairo',
-  subsets: ['latin'],
+  subsets: ['latin', 'arabic'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -33,11 +37,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
-      <body
-        className={`${
-          locale === 'en' ? roboto.variable : cairo.variable
-        } antialiased`}
-      >
+      <body className={`${roboto.variable} ${cairo.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <Providers>

@@ -20,7 +20,7 @@ import {
   FiRefreshCw,
   FiEye,
 } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface QuotesPageState {
   quotes: Quote[];
@@ -33,7 +33,6 @@ interface QuotesPageState {
 const QuotesPage = () => {
   const { data: session } = useSession();
   const locale = useLocale();
-  const router = useRouter();
   const t = useTranslations('quotes');
 
   const [state, setState] = useState<QuotesPageState>({
@@ -392,22 +391,21 @@ const QuotesPage = () => {
                     />
                     {t('quote.submitted')} {formatDate(quote.createdAt, locale)}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      if (quote.job && typeof quote.job === 'object') {
-                        router.push(`/jobs/${quote.job._id}`);
-                      }
-                    }}
-                    disabled={!quote.job || typeof quote.job !== 'object'}
+                  <Link
+                    href={`/jobs/${quote?.job?._id}`}
                     className="flex items-center gap-2"
                   >
-                    <FiEye className="w-4 h-4" />
-                    {quote.job && typeof quote.job === 'object'
-                      ? t('quote.viewJob')
-                      : t('quote.jobUnavailable')}
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <FiEye className="w-4 h-4" />
+                      {quote.job && typeof quote.job === 'object'
+                        ? t('quote.viewJob')
+                        : t('quote.jobUnavailable')}
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ))}

@@ -477,7 +477,7 @@ const CreateJobPage = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error(t('messages.fixErrors'));
+      toast.error(t('messages.validationError'));
       return;
     }
 
