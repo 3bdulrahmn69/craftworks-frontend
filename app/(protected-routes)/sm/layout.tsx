@@ -1,6 +1,9 @@
+'use client';
+
 import Redirect from '@/app/components/redirect';
 import Footer from '@/app/components/footer';
 import Header from '@/app/components/header';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { key: 'jobs', href: '/sm/jobs' },
@@ -12,11 +15,14 @@ const navLinks = [
 ];
 
 const CraftsmanLayout = ({ children }: { children: React.ReactNode }) => {
+  const getPath = usePathname();
+  const isMessagesPage = getPath.startsWith('/sm/messages');
+
   return (
     <Redirect requireAuth={true} allowedRoles={['craftsman']}>
-      <Header navLinks={navLinks} />
+      {!isMessagesPage && <Header navLinks={navLinks} />}
       {children}
-      <Footer />
+      {!isMessagesPage && <Footer />}
     </Redirect>
   );
 };

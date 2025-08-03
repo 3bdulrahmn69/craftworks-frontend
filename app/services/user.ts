@@ -29,6 +29,15 @@ export const userService = {
     return response.data.data;
   },
 
+  getPublicUser: async (userId: string, token: string): Promise<User> => {
+    const response = await api.get<ApiResponse<User>>(`/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.data;
+  },
+
   // Update user profile
   updateProfile: async (
     token: string,

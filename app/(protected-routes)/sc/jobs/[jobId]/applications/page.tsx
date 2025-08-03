@@ -9,6 +9,7 @@ import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import { jobsService } from '@/app/services/jobs';
+import { messageService } from '@/app/services/messages';
 import { JobApplication, Job } from '@/app/types/jobs';
 import { toast } from 'react-toastify';
 import {
@@ -20,6 +21,7 @@ import {
   FaCheck,
   FaTimes,
   FaFileAlt,
+  FaComments,
 } from 'react-icons/fa';
 
 const JobApplicationsPage = () => {
@@ -120,6 +122,39 @@ const JobApplicationsPage = () => {
     } catch (err: any) {
       console.error('Failed to reject quote:', err);
       toast.error(err.message || 'Failed to reject quote');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleStartChat = async (
+    craftsmanId: string,
+    craftsmanName: string
+  ) => {
+    if (!session?.accessToken) return;
+
+    try {
+      setActionLoading(`chat-${craftsmanId}`);
+
+      // Create or get existing chat with the craftsman
+      const response = await messageService.createChat(
+        {
+          craftsmanId: craftsmanId,
+          jobId: jobId,
+        },
+        session.accessToken
+      );
+
+      if (response.success && response.data) {
+        // Navigate to the messages page with the chat
+        router.push(`/sc/messages?chatId=${response.data._id}`);
+        toast.success(`Chat started with ${craftsmanName}`);
+      } else {
+        throw new Error(response.message || 'Failed to start chat');
+      }
+    } catch (err: any) {
+      console.error('Failed to start chat:', err);
+      toast.error(err.message || 'Failed to start chat');
     } finally {
       setActionLoading(null);
     }
@@ -453,78 +488,133 @@ const JobApplicationsPage = () => {
                     </div>
 
                     {/* Actions */}
-                    {job.status === 'Posted' &&
-                      application.status === 'Submitted' && (
-                        <div
-                          className={`flex flex-col sm:flex-row gap-3 xl:flex-col xl:gap-3 ${
-                            locale === 'ar'
-                              ? 'sm:flex-row-reverse xl:flex-col-reverse'
-                              : ''
-                          }`}
-                        >
-                          <Button
-                            onClick={() => handleAcceptQuote(application._id)}
-                            disabled={actionLoading === application._id}
-                            className="bg-gradient-to-r from-success to-success hover:from-success/90 hover:to-success/90 text-success-foreground font-semibold py-2.5 px-4 sm:px-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
-                            size="sm"
+                    <div
+                      className={`flex flex-col gap-3 ${
+                        locale === 'ar' ? 'items-end' : 'items-start'
+                      }`}
+                    >
+                      {/* Chat Button - Always available */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border border-primary/30 hover:border-primary/50 hover:bg-primary/10 text-primary hover:text-primary font-semibold py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
+                        onClick={() =>
+                          handleStartChat(
+                            application.craftsman._id,
+                            application.craftsman.fullName
+                          )
+                        }
+                        disabled={
+                          actionLoading === `chat-${application.craftsman._id}`
+                        }
+                      >
+                        {actionLoading ===
+                        `chat-${application.craftsman._id}` ? (
+                          <div
+                            className={`flex items-center justify-center ${
+                              locale === 'ar' ? 'flex-row-reverse' : ''
+                            }`}
                           >
-                            {actionLoading === application._id ? (
+                            <LoadingSpinner
+                              size="sm"
+                              className={`${
+                                locale === 'ar' ? 'ml-2' : 'mr-2'
+                              } text-primary`}
+                            />
+                            <span className="text-xs sm:text-sm">
+                              {t('application.actions.startingChat')}
+                            </span>
+                          </div>
+                        ) : (
+                          <div
+                            className={`flex items-center justify-center ${
+                              locale === 'ar' ? 'flex-row-reverse' : ''
+                            }`}
+                          >
+                            <FaComments
+                              className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                                locale === 'ar' ? 'ml-2' : 'mr-2'
+                              }`}
+                            />
+                            <span className="text-xs sm:text-sm">
+                              {t('application.actions.startChat')}
+                            </span>
+                          </div>
+                        )}
+                      </Button>
+
+                      {/* Accept/Reject Actions - Only for submitted applications */}
+                      {job.status === 'Posted' &&
+                        application.status === 'Submitted' && (
+                          <div
+                            className={`flex flex-col sm:flex-row gap-3 w-full ${
+                              locale === 'ar' ? 'sm:flex-row-reverse' : ''
+                            }`}
+                          >
+                            <Button
+                              onClick={() => handleAcceptQuote(application._id)}
+                              disabled={actionLoading === application._id}
+                              className="bg-gradient-to-r from-success to-success hover:from-success/90 hover:to-success/90 text-success-foreground font-semibold py-2.5 px-4 sm:px-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
+                              size="sm"
+                            >
+                              {actionLoading === application._id ? (
+                                <div
+                                  className={`flex items-center justify-center ${
+                                    locale === 'ar' ? 'flex-row-reverse' : ''
+                                  }`}
+                                >
+                                  <LoadingSpinner
+                                    size="sm"
+                                    className={`${
+                                      locale === 'ar' ? 'ml-2' : 'mr-2'
+                                    } text-success-foreground`}
+                                  />
+                                  <span className="text-xs sm:text-sm">
+                                    {t('application.actions.accepting')}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div
+                                  className={`flex items-center justify-center ${
+                                    locale === 'ar' ? 'flex-row-reverse' : ''
+                                  }`}
+                                >
+                                  <FaCheck
+                                    className={`w-3 h-3 sm:w-4 sm:h-4 ${
+                                      locale === 'ar' ? 'ml-2' : 'mr-2'
+                                    }`}
+                                  />
+                                  <span className="text-xs sm:text-sm">
+                                    {t('application.actions.acceptQuote')}
+                                  </span>
+                                </div>
+                              )}
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border border-destructive/30 hover:border-destructive/50 hover:bg-destructive/10 text-destructive hover:text-destructive font-semibold py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
+                              onClick={() => handleRejectQuote(application._id)}
+                            >
                               <div
                                 className={`flex items-center justify-center ${
                                   locale === 'ar' ? 'flex-row-reverse' : ''
                                 }`}
                               >
-                                <LoadingSpinner
-                                  size="sm"
-                                  className={`${
-                                    locale === 'ar' ? 'ml-2' : 'mr-2'
-                                  } text-success-foreground`}
-                                />
-                                <span className="text-xs sm:text-sm">
-                                  {t('application.actions.accepting')}
-                                </span>
-                              </div>
-                            ) : (
-                              <div
-                                className={`flex items-center justify-center ${
-                                  locale === 'ar' ? 'flex-row-reverse' : ''
-                                }`}
-                              >
-                                <FaCheck
+                                <FaTimes
                                   className={`w-3 h-3 sm:w-4 sm:h-4 ${
                                     locale === 'ar' ? 'ml-2' : 'mr-2'
                                   }`}
                                 />
                                 <span className="text-xs sm:text-sm">
-                                  {t('application.actions.acceptQuote')}
+                                  {t('application.actions.decline')}
                                 </span>
                               </div>
-                            )}
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="border border-destructive/30 hover:border-destructive/50 hover:bg-destructive/10 text-destructive hover:text-destructive font-semibold py-2.5 px-4 sm:px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] min-w-[120px] sm:min-w-[140px]"
-                            onClick={() => handleRejectQuote(application._id)}
-                          >
-                            <div
-                              className={`flex items-center justify-center ${
-                                locale === 'ar' ? 'flex-row-reverse' : ''
-                              }`}
-                            >
-                              <FaTimes
-                                className={`w-3 h-3 sm:w-4 sm:h-4 ${
-                                  locale === 'ar' ? 'ml-2' : 'mr-2'
-                                }`}
-                              />
-                              <span className="text-xs sm:text-sm">
-                                {t('application.actions.decline')}
-                              </span>
-                            </div>
-                          </Button>
-                        </div>
-                      )}
+                            </Button>
+                          </div>
+                        )}
+                    </div>
                   </div>
                 </div>
               ))}

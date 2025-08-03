@@ -4,6 +4,19 @@
  */
 
 // Date formatting helpers
+export const isValidDate = (dateString: string | undefined | null): boolean => {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+};
+
+export const safeDate = (dateString: string | undefined | null): Date => {
+  if (!isValidDate(dateString)) {
+    return new Date(); // Return current date as fallback
+  }
+  return new Date(dateString!);
+};
+
 export const formatDate = (
   dateString: string,
   locale: string = 'en-US'

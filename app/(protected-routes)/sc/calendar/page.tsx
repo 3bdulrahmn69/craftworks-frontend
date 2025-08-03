@@ -28,7 +28,7 @@ import {
 } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
-interface CalendarJob extends Job {
+interface CalendarJob extends Omit<Job, 'jobDate'> {
   jobDate?: string;
 }
 

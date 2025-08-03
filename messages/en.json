@@ -1059,5 +1059,80 @@
         "message": "You haven't read any notifications yet."
       }
     }
+  },
+  "messaging": {
+    "title": "Messages",
+    "subtitle": "Chat with clients and craftsmen",
+    "loading": {
+      "chats": "Loading conversations...",
+      "messages": "Loading messages...",
+      "sending": "Sending..."
+    },
+    "error": {
+      "fetchChats": "Failed to load conversations",
+      "fetchMessages": "Failed to load messages",
+      "sendMessage": "Failed to send message",
+      "uploadImage": "Failed to upload image",
+      "createChat": "Failed to create conversation",
+      "retry": "Try Again"
+    },
+    "chat": {
+      "newConversation": "New Conversation",
+      "searchPlaceholder": "Search conversations...",
+      "noConversations": "No conversations",
+      "startFirstChat": "Start your first conversation with a client or craftsman",
+      "selectChat": "Select a conversation to start messaging",
+      "online": "Online",
+      "offline": "Offline",
+      "typing": "typing...",
+      "lastSeen": "Last seen {time}",
+      "unreadCount": "{count} unread"
+    },
+    "message": {
+      "typeMessage": "Type a message...",
+      "attachImage": "Attach image",
+      "send": "Send",
+      "photo": "📷 Photo",
+      "noMessages": "No messages yet",
+      "startConversation": "Start the conversation by sending a message",
+      "messageDeleted": "This message was deleted",
+      "messageFailedToSend": "Failed to send",
+      "retry": "Retry"
+    },
+    "status": {
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "read": "Read",
+      "sending": "Sending...",
+      "failed": "Failed"
+    },
+    "actions": {
+      "deleteMessage": "Delete message",
+      "retryMessage": "Retry sending",
+      "markAsRead": "Mark as read",
+      "reportUser": "Report user",
+      "blockUser": "Block user"
+    },
+    "imageUpload": {
+      "selectImage": "Select an image",
+      "maxSize": "Maximum file size is 5MB",
+      "invalidFormat": "Please select a valid image file",
+      "uploading": "Uploading image...",
+      "preview": "Image preview",
+      "remove": "Remove image"
+    },
+    "notifications": {
+      "newMessage": "New message from {sender}",
+      "messageRead": "Your message was read",
+      "userOnline": "{user} is now online",
+      "userOffline": "{user} is now offline"
+    },
+    "connection": {
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "reconnecting": "Reconnecting...",
+      "failed": "Connection failed"
+    }
   }
 }
