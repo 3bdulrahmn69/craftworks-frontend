@@ -1004,5 +1004,60 @@
     "noItems": {
       "message": "You have no items scheduled for this month."
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Stay updated with your latest activities",
+    "loading": {
+      "title": "Loading notifications...",
+      "message": "Please wait while we fetch your notifications."
+    },
+    "error": {
+      "title": "Error loading notifications",
+      "retry": "Try Again",
+      "markReadFailed": "Failed to mark notification as read",
+      "markAllReadFailed": "Failed to mark all notifications as read"
+    },
+    "stats": {
+      "total": "Total",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "read": "Read",
+      "placeholder": "Filter notifications",
+      "showing": {
+        "all": "Showing {count} notifications",
+        "unread": "Showing {count} unread notifications",
+        "read": "Showing {count} read notifications"
+      }
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "refreshSuccess": "Notifications refreshed successfully",
+      "markAllRead": "Mark All as Read",
+      "markAllReadSuccess": "All notifications marked as read successfully"
+    },
+    "card": {
+      "markAsRead": "Mark as read",
+      "status": "Status"
+    },
+    "empty": {
+      "noNotifications": {
+        "title": "No notifications yet",
+        "message": "You'll see your notifications here when they arrive."
+      },
+      "noUnread": {
+        "title": "No unread notifications",
+        "message": "All your notifications have been read."
+      },
+      "noRead": {
+        "title": "No read notifications",
+        "message": "You haven't read any notifications yet."
+      }
+    }
   }
 }
