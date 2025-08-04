@@ -10,6 +10,7 @@ import ChatHeader from './chat-header';
 import MessageList from './message-list';
 import MessageInput from './message-input';
 import EmptyState from './empty-state';
+import TypingIndicator from './typing-indicator';
 import ImageModal from '@/app/components/ui/image-modal';
 
 interface MessagingLayoutProps {
@@ -48,6 +49,7 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
     startTyping,
     stopTyping,
     markAsRead,
+    typingUsers,
   } = useSocket(
     // onNewMessage callback
     (newMessage: any) => {
@@ -395,8 +397,13 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <h3 className="text-lg font-semibold">Loading chats...</h3>
+          <div className="w-12 h-12 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            Loading Conversations
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Please wait while we load your messages...
+          </p>
         </div>
       </div>
     );
@@ -406,9 +413,30 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
   if (error) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-destructive">Error</p>
-          <p className="text-sm text-muted-foreground">{error}</p>
+        <div className="text-center p-6">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-destructive"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.232 15.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-destructive mb-2">Error</h3>
+          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Refresh Page
+          </button>
         </div>
       </div>
     );
@@ -461,8 +489,30 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
                 }
               />
 
+              {/* Typing Indicator */}
+              <TypingIndicator
+                isVisible={
+                  selectedChat
+                    ? typingUsers.some(
+                        (user) =>
+                          user.chatId === selectedChat._id &&
+                          user.userId !== session?.user?.id
+                      )
+                    : false
+                }
+                userNames={typingUsers
+                  .filter(
+                    (user) =>
+                      selectedChat &&
+                      user.chatId === selectedChat._id &&
+                      user.userId !== session?.user?.id
+                  )
+                  .map((user) => user.userName || 'Someone')}
+              />
+
               {/* Message Input */}
               <MessageInput
+                selectedChatId={selectedChat._id}
                 onSendMessage={(
                   content: string,
                   messageType: 'text' | 'image'
@@ -470,7 +520,7 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
                   if (messageType === 'text') {
                     handleSendMessage(content);
                   }
-                  // Handle image messages if needed
+                  // Image messages are handled directly in MessageInput
                 }}
                 onTypingStart={() => {
                   if (selectedChat && startTyping) {

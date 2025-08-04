@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Chat } from '@/app/types/messages';
+import ConnectionStatus from './connection-status';
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -28,15 +29,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         </h1>
         <p className="text-sm text-muted-foreground">Your conversations</p>
         {/* Connection status */}
-        <div className="flex items-center gap-2 mt-2 text-xs">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          ></div>
-          <span className="text-muted-foreground">
-            {isConnected ? 'Connected' : 'Disconnected'}
-          </span>
+        <div className="mt-2">
+          <ConnectionStatus isConnected={isConnected} />
         </div>
       </div>
 

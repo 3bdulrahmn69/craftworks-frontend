@@ -14,6 +14,7 @@ interface MessageInputProps {
   onTypingStart: () => void;
   onTypingStop: () => void;
   disabled?: boolean;
+  selectedChatId?: string;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
@@ -21,6 +22,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onTypingStart,
   onTypingStop,
   disabled = false,
+  selectedChatId,
 }) => {
   const { data: session } = useSession();
   const locale = useLocale();
@@ -75,19 +77,20 @@ const MessageInput: React.FC<MessageInputProps> = ({
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    if (!session?.accessToken) return;
+    if (!session?.accessToken || !selectedChatId) return;
 
     if (selectedImage) {
       // Send image message
       try {
         setIsUploading(true);
-        const uploadResponse = await messageService.uploadMessageImage(
+        const uploadResponse = await messageService.uploadImageMessage(
+          selectedChatId,
           selectedImage,
           session.accessToken
         );
 
         if (uploadResponse.success) {
-          onSendMessage(uploadResponse.data.url, 'image');
+          onSendMessage(uploadResponse.data.content, 'image');
           clearImageSelection();
         } else {
           toastService.error(t('error.uploadImage'));
@@ -115,6 +118,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     onSendMessage,
     onTypingStop,
     session?.accessToken,
+    selectedChatId,
     clearImageSelection,
     t,
   ]);
