@@ -1165,7 +1165,9 @@
       "selectChat": "اختر محادثة لبدء المراسلة",
       "online": "متصل",
       "offline": "غير متصل",
-      "typing": "يكتب...",
+      "typing": "شخص ما يكتب...",
+      "userTyping": "{name} يكتب...",
+      "usersTyping": "{names} يكتبون...",
       "lastSeen": "آخر ظهور {time}",
       "unreadCount": "{count} غير مقروءة"
     },

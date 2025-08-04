@@ -135,6 +135,7 @@ const ChatList: React.FC<ChatListProps> = ({
                       width={40}
                       height={40}
                       className="rounded-full object-cover"
+                      style={{ width: '40px', height: '40px' }}
                     />
                   ) : (
                     <HiUserCircle className="w-10 h-10 text-muted-foreground" />

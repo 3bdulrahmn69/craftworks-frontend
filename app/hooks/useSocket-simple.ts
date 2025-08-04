@@ -73,10 +73,10 @@ export const useSocket = (
       process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
     console.log('🌐 Socket: Connecting to:', serverUrl);
 
-    // Create socket with authentication
+    // Create socket with authentication (backend expects token without Bearer prefix)
     const newSocket = io(serverUrl, {
       auth: {
-        token: `Bearer ${session.accessToken}`,
+        token: session.accessToken, // Remove Bearer prefix for Socket.IO
       },
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -96,94 +96,6 @@ export const useSocket = (
       console.error('❌ Error:', error);
       console.error('🔍 Error message:', error.message);
       console.error('🔍 Error type:', error.type);
-
-      // Try different authentication format
-      if (
-        error.message?.includes('Authentication') ||
-        error.message?.includes('token')
-      ) {
-        console.log('🔄 Socket: Trying alternative auth format...');
-
-        // Disconnect current socket
-        newSocket.disconnect();
-
-        // Try with just the token in auth (no Bearer prefix)
-        const altSocket = io(serverUrl, {
-          auth: {
-            token: session.accessToken,
-          },
-          transports: ['websocket', 'polling'],
-          reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000,
-        });
-
-        altSocket.on('connect', () => {
-          console.log('✅ Socket: Alternative auth connected!');
-          console.log('🆔 Socket: Alternative Socket ID:', altSocket.id);
-          setSocket(altSocket);
-          setIsConnected(true);
-        });
-
-        altSocket.on('connect_error', (altError: any) => {
-          console.error('🚫 Socket: Alternative auth also failed');
-          console.error('❌ Alt Error:', altError);
-          setIsConnected(false);
-        });
-
-        altSocket.on('disconnect', (reason: string) => {
-          console.log('❌ Socket: Alternative disconnected');
-          console.log('📝 Reason:', reason);
-          setIsConnected(false);
-        });
-
-        // Set up all message event listeners for alternative socket
-        altSocket.on('new-message', (message: Message) => {
-          console.log('📨 Socket: New message received:', message);
-          callbacksRef.current.onNewMessage?.(message);
-        });
-
-        altSocket.on(
-          'message-read',
-          (data: { chatId: string; messageId: string; readBy: string }) => {
-            console.log('📖 Socket: Message read:', data);
-            callbacksRef.current.onMessageRead?.(data);
-          }
-        );
-
-        altSocket.on('chat-updated', (chat: any) => {
-          console.log('💬 Socket: Chat updated:', chat);
-          callbacksRef.current.onChatUpdated?.(chat);
-        });
-
-        altSocket.on('user-typing', (data: TypingIndicator) => {
-          console.log('⌨️ Socket: User typing:', data);
-          setTypingUsers((prev) => {
-            const filtered = prev.filter((u) => u.userId !== data.userId);
-            return data.isTyping ? [...filtered, data] : filtered;
-          });
-        });
-
-        // Listen for errors and confirmations on alt socket
-        altSocket.on('error', (error: any) => {
-          console.error('🚨 Alt Socket Error:', error);
-        });
-
-        altSocket.on('message-sent', (data: any) => {
-          console.log('✅ Alt Message sent confirmation:', data);
-        });
-
-        altSocket.on('message-error', (error: any) => {
-          console.error('❌ Alt Message Error:', error);
-        });
-
-        altSocket.on('chat-joined', (data: any) => {
-          console.log('✅ Alt Successfully joined chat:', data);
-        });
-
-        return;
-      }
-
       setIsConnected(false);
     });
 
@@ -235,19 +147,10 @@ export const useSocket = (
       console.error('❌ Message Error:', error);
     });
 
-    // Catch-all listener to see what events are being received
-    const originalOn = newSocket.on;
-    newSocket.on = function (event: string, listener: any) {
-      if (!['connect', 'disconnect', 'connect_error'].includes(event)) {
-        console.log('🎧 Socket: Registering listener for event:', event);
-      }
-      return originalOn.call(this, event, (...args: any[]) => {
-        if (!['connect', 'disconnect', 'connect_error'].includes(event)) {
-          console.log(`🔔 Socket: Event '${event}' received with args:`, args);
-        }
-        return listener(...args);
-      });
-    };
+    // Listen for chat join confirmation
+    newSocket.on('chat-joined', (data: any) => {
+      console.log('✅ Successfully joined chat:', data);
+    });
 
     setSocket(newSocket);
 
@@ -267,35 +170,18 @@ export const useSocket = (
   }) => {
     if (socket && isConnected) {
       console.log('📤 Socket: Sending message:', data);
-      console.log('📤 Socket connection details:', {
-        socketId: socket.id,
-        connected: socket.connected,
-        isConnected,
-      });
       socket.emit('send-message', data);
     } else {
       console.warn('⚠️ Socket: Cannot send message - not connected');
-      console.warn('⚠️ Socket state:', { socket: !!socket, isConnected });
     }
   };
 
   const joinChat = (chatId: string) => {
     if (socket && isConnected) {
       console.log('🚪 Socket: Joining chat:', chatId);
-      console.log('🚪 Socket details:', {
-        socketId: socket.id,
-        connected: socket.connected,
-        userId: session?.user?.id,
-      });
       socket.emit('join-chat', chatId);
-
-      // Add a listener for successful join confirmation
-      socket.once('chat-joined', (data: any) => {
-        console.log('✅ Successfully joined chat:', data);
-      });
     } else {
       console.warn('⚠️ Socket: Cannot join chat - not connected');
-      console.warn('⚠️ Socket state:', { socket: !!socket, isConnected });
     }
   };
 

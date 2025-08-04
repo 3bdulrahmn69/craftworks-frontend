@@ -60,6 +60,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
               width={40}
               height={40}
               className="w-full h-full object-cover"
+              style={{ width: 'auto', height: 'auto' }}
             />
           ) : (
             <div className="w-full h-full bg-primary/10 flex items-center justify-center">

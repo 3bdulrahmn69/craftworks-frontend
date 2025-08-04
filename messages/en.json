@@ -1084,7 +1084,9 @@
       "selectChat": "Select a conversation to start messaging",
       "online": "Online",
       "offline": "Offline",
-      "typing": "typing...",
+      "typing": "Someone is typing...",
+      "userTyping": "{name} is typing...",
+      "usersTyping": "{names} are typing...",
       "lastSeen": "Last seen {time}",
       "unreadCount": "{count} unread"
     },

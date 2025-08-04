@@ -89,6 +89,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
               width={32}
               height={32}
               className="rounded-full object-cover"
+              style={{ width: '32px', height: '32px' }}
             />
           ) : (
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">

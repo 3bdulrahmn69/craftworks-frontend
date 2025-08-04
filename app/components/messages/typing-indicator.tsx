@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface TypingIndicatorProps {
   isVisible: boolean;
@@ -11,17 +12,30 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({
   isVisible,
   userNames = [],
 }) => {
+  const locale = useLocale();
+  const t = useTranslations('messaging');
+  const isRTL = locale === 'ar';
+
   if (!isVisible) return null;
 
-  const displayText =
-    userNames.length > 0
-      ? `${userNames.join(', ')} ${
-          userNames.length === 1 ? 'is' : 'are'
-        } typing...`
-      : 'Someone is typing...';
+  const getDisplayText = () => {
+    if (userNames.length === 0) {
+      return t('chat.typing');
+    }
+
+    if (userNames.length === 1) {
+      return t('chat.userTyping', { name: userNames[0] });
+    }
+
+    return t('chat.usersTyping', { names: userNames.join(', ') });
+  };
 
   return (
-    <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+    <div
+      className={`flex items-center gap-2 p-2 text-sm text-muted-foreground ${
+        isRTL ? 'flex-row-reverse' : ''
+      }`}
+    >
       <div className="flex gap-1">
         <div
           className="w-2 h-2 bg-primary rounded-full animate-bounce"
@@ -36,7 +50,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({
           style={{ animationDelay: '300ms' }}
         />
       </div>
-      <span>{displayText}</span>
+      <span>{getDisplayText()}</span>
     </div>
   );
 };
