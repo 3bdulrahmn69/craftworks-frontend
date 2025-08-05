@@ -886,6 +886,7 @@
       "reviews": "reviews",
       "applied": "Applied",
       "notes": "Notes",
+      "statusLabel": "Status",
       "status": {
         "pending": "Pending",
         "accepted": "Accepted",
@@ -898,10 +899,10 @@
         "reject": "Reject",
         "viewProfile": "View Profile",
         "contact": "Contact",
-        "acceptQuote": "Accept Quote",
+        "hire": "Hire",
         "decline": "Decline",
         "accepting": "Accepting...",
-        "rejectSoon": "Reject functionality coming soon"
+        "startChat": "Start Chat"
       }
     },
     "currency": "EGP"

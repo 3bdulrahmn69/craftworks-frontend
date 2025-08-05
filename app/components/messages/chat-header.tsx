@@ -24,7 +24,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 
   const handleUserDetailsClick = () => {
     if (otherParticipant) {
-      router.push(`/user-details/${otherParticipant._id}`);
+      router.push(`/user/${otherParticipant._id}`);
     }
   };
 

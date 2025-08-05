@@ -967,6 +967,7 @@
       "reviews": "تقييم",
       "applied": "تقدم في",
       "notes": "ملاحظات",
+      "statusLabel": "الحالة",
       "status": {
         "pending": "قيد الانتظار",
         "accepted": "مقبول",
@@ -979,10 +980,10 @@
         "reject": "رفض",
         "viewProfile": "عرض الملف الشخصي",
         "contact": "تواصل",
-        "acceptQuote": "قبول العرض",
+        "hire": "توظيف",
         "decline": "رفض",
         "accepting": "جاري القبول...",
-        "rejectSoon": "وظيفة الرفض ستكون متاحة قريباً"
+        "startChat": "بدء الدردشة"
       }
     },
     "currency": "جنيه"

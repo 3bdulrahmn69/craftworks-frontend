@@ -203,7 +203,7 @@ const Header = ({
   const toggleMobileMenu = useCallback(() => setMobileMenuOpen((v) => !v), []);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-card/80 border-b border-border transition-all duration-300 backdrop-blur-lg supports-[backdrop-filter]:bg-card/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border transition-all duration-300 backdrop-blur-lg supports-[backdrop-filter]:bg-card/60">
       <HeaderDesktop
         navLinks={navLinks}
         t={t}

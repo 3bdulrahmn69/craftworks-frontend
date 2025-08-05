@@ -11,8 +11,10 @@ import {
   HiOutlineLocationMarker,
   HiOutlineStar,
   HiOutlineCalendar,
-  HiOutlineBadgeCheck,
   HiArrowLeft,
+  HiOutlineGlobe,
+  HiOutlineBriefcase,
+  HiOutlineBadgeCheck,
 } from 'react-icons/hi';
 import Image from 'next/image';
 
@@ -26,7 +28,6 @@ const UserDetails = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (!userId || !session?.accessToken) return;
-
       setLoading(true);
       try {
         const userDetails = await userService.getPublicUser(
@@ -44,13 +45,12 @@ const UserDetails = () => {
     fetchUserDetails();
   }, [userId, session?.accessToken]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-  };
 
   if (loading) {
     return (
@@ -90,148 +90,130 @@ const UserDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto">
-        {/* Header with Back Button */}
-        <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border z-10">
-          <div className="flex items-center gap-4 p-4">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-            >
-              <HiArrowLeft className="h-5 w-5" />
-              <span>Back</span>
-            </button>
-            <div className="h-6 w-px bg-border" />
-            <h1 className="text-xl font-semibold text-foreground">
-              User Profile
-            </h1>
-          </div>
-        </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="fixed z-20 top-6 left-6 flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-3 rounded-full border border-border shadow-lg hover:bg-card transition-all group"
+        >
+          <HiArrowLeft className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
+          <span className="text-muted-foreground group-hover:text-foreground">
+            Back
+          </span>
+        </button>
 
-        {/* Main Content */}
-        <div className="p-6">
+        <div className="pt-20 pb-12">
           {/* Profile Card */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-            {/* Cover Section */}
-            <div className="h-32 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10"></div>
+          <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all">
+            {/* Header */}
+            <div className="h-28 bg-gradient-to-r from-primary/10 via-background/20 to-background relative">
+              <div className="absolute inset-0 bg-[url('/pattern.svg')] bg-[length:120px_120px] opacity-10" />
+            </div>
 
             {/* Profile Info */}
-            <div className="relative px-6 pb-6">
-              {/* Profile Picture */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 -mt-16">
-                <div className="relative">
-                  {user.profilePicture ? (
-                    <Image
-                      width={128}
-                      height={128}
-                      src={user.profilePicture}
-                      alt={`${user.fullName}&apos;s profile`}
-                      className="w-32 h-32 rounded-2xl object-cover border-4 border-card shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 rounded-2xl bg-muted border-4 border-card shadow-lg flex items-center justify-center">
-                      <span className="text-4xl font-semibold text-muted-foreground">
+            <div className="relative px-6 py-8">
+              <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 -mt-20">
+                {/* Profile Image */}
+                <div className="relative group">
+                  <div className="relative w-36 h-36 rounded-full overflow-hidden border-4 border-card shadow-xl group-hover:shadow-2xl transition-all">
+                    {user.profilePicture ? (
+                      <Image
+                        width={144}
+                        height={144}
+                        src={user.profilePicture}
+                        alt={`${user.fullName}'s profile`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-muted to-muted/70 flex items-center justify-center text-5xl font-bold text-muted-foreground">
                         {user.fullName?.[0] || 'U'}
-                      </span>
-                    </div>
-                  )}
-                  {user.role === 'craftsman' && (
-                    <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-xl shadow-lg">
-                      <HiOutlineBadgeCheck className="h-5 w-5" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Name and Basic Info */}
-                <div className="flex-1 sm:mb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <h2 className="text-3xl font-bold text-foreground mb-2">
-                        {user.fullName}
-                      </h2>
-                      <div className="flex items-center gap-3 text-muted-foreground">
-                        {user.role === 'craftsman' && (
-                          <>
-                            <div className="w-1 h-1 bg-muted-foreground rounded-full" />
-                            <span className="inline-flex items-center gap-1 text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">
-                              <HiOutlineBadgeCheck className="h-4 w-4" />
-                              Verified Craftsman
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Rating */}
-                    {user.rating && (
-                      <div className="flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-xl">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <HiOutlineStar
-                              key={i}
-                              className={`h-5 w-5 ${
-                                i < Math.floor(user.rating)
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-muted-foreground'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-semibold text-foreground">
-                            {user.rating}
-                          </span>
-                          <span className="text-muted-foreground ml-1">
-                            ({user.ratingCount} reviews)
-                          </span>
-                        </div>
                       </div>
                     )}
                   </div>
+
+                  {/* Verification Badge */}
+                  {user.role === 'craftsman' && user.isVerified && (
+                    <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground p-2.5 rounded-full shadow-lg z-10">
+                      <HiOutlineBadgeCheck className="h-6 w-6" />
+                    </div>
+                  )}
                 </div>
+
+                {/* Name and Meta Info */}
+                <div className="flex-1 sm:mb-6">
+                  <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
+                    {user.fullName}
+                  </h2>
+
+                  <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+                    {user.location && (
+                      <span className="inline-flex items-center gap-1.5 text-sm bg-muted px-3 py-1.5 rounded-full">
+                        <HiOutlineLocationMarker className="h-4 w-4" />
+                        {user.location}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rating */}
+                {user.rating && (
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 px-5 py-3 rounded-xl border border-primary/20">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <HiOutlineStar
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(user.rating)
+                              ? 'text-yellow-500 fill-yellow-500'
+                              : 'text-muted-foreground/40'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-base font-bold text-foreground">
+                      {user.rating}
+                    </span>
+                    <span className="text-sm text-muted-foreground ml-1">
+                      ({user.ratingCount} reviews)
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            {/* Contact Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                Contact Information
-              </h3>
-
+          {/* Detail Sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
+            {/* Contact Info */}
+            <DetailSection icon={<HiOutlineUser />} title="Contact Information">
               <DetailCard
-                icon={<HiOutlineMail className="h-5 w-5" />}
+                icon={<HiOutlineMail />}
                 title="Email"
                 value={user.email}
               />
-
               <DetailCard
-                icon={<HiOutlinePhone className="h-5 w-5" />}
+                icon={<HiOutlinePhone />}
                 title="Phone"
                 value={user.phone || 'Not provided'}
               />
-
               <DetailCard
-                icon={<HiOutlineCalendar className="h-5 w-5" />}
+                icon={<HiOutlineCalendar />}
                 title="Member Since"
                 value={formatDate(user.createdAt)}
               />
-            </div>
+            </DetailSection>
 
-            {/* Additional Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                Additional Information
-              </h3>
-
+            {/* Additional Info */}
+            <DetailSection
+              icon={<HiOutlineBriefcase />}
+              title="Additional Information"
+            >
               {user.address && (
                 <DetailCard
-                  icon={<HiOutlineLocationMarker className="h-5 w-5" />}
+                  icon={<HiOutlineLocationMarker />}
                   title="Address"
                   value={
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       {user.address.street && <div>{user.address.street}</div>}
                       {user.address.city && (
                         <div>
@@ -239,7 +221,10 @@ const UserDetails = () => {
                         </div>
                       )}
                       {user.address.country && (
-                        <div>{user.address.country}</div>
+                        <div className="flex items-center gap-1.5 pt-2 border-t border-border/20 mt-2">
+                          <HiOutlineGlobe className="h-4 w-4 text-muted-foreground" />
+                          <span>{user.address.country}</span>
+                        </div>
                       )}
                     </div>
                   }
@@ -247,34 +232,25 @@ const UserDetails = () => {
               )}
 
               {user.role === 'craftsman' && user.service && (
-                <div className="bg-muted/50 p-6 rounded-xl border border-border">
-                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <HiOutlineUser className="h-5 w-5 text-primary" />
+                <div className="bg-gradient-to-br from-card to-card/80 p-6 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                  <h3 className="font-bold text-foreground mb-4 flex items-center gap-3 text-lg">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <HiOutlineBadgeCheck className="h-5 w-5 text-primary" />
+                    </div>
                     Craftsmanship Service
                   </h3>
 
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Service
-                      </h4>
-                      <p className="text-foreground font-medium">
-                        {user.service.name}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Description
-                      </h4>
-                      <p className="text-foreground">
-                        {user.service.description}
-                      </p>
-                    </div>
+                  <div className="border-l-2 border-primary pl-4 py-1">
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
+                      Service
+                    </h4>
+                    <p className="text-foreground font-bold text-lg">
+                      {user.service.name}
+                    </p>
                   </div>
                 </div>
               )}
-            </div>
+            </DetailSection>
           </div>
         </div>
       </div>
@@ -282,7 +258,7 @@ const UserDetails = () => {
   );
 };
 
-// Reusable detail card component
+// Detail Card
 const DetailCard = ({
   icon,
   title,
@@ -292,16 +268,35 @@ const DetailCard = ({
   title: string;
   value: React.ReactNode;
 }) => (
-  <div className="flex items-start gap-4 bg-card p-4 rounded-xl border border-border hover:shadow-sm transition-shadow">
-    <div className="bg-primary/10 p-3 rounded-lg text-primary flex-shrink-0">
+  <div className="flex items-start gap-4 bg-card p-5 rounded-2xl border border-border hover:border-primary/30 hover:shadow-md transition-all">
+    <div className="bg-primary/10 p-3 rounded-lg text-primary mt-0.5">
       {icon}
     </div>
     <div className="min-w-0 flex-1">
-      <h3 className="text-sm font-medium text-muted-foreground mb-1">
+      <h3 className="text-sm font-medium text-muted-foreground mb-2">
         {title}
       </h3>
-      <div className="text-foreground break-words">{value}</div>
+      <div className="text-foreground font-medium text-base">{value}</div>
     </div>
+  </div>
+);
+
+// Detail Section Wrapper
+const DetailSection = ({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="space-y-6">
+    <h3 className="text-xl font-bold text-foreground flex items-center gap-3 pb-1 border-b border-border/50">
+      {icon}
+      <span>{title}</span>
+    </h3>
+    {children}
   </div>
 );
 
