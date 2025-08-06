@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import Image from 'next/image';
 import Container from '@/app/components/ui/container';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
-import servicesAPI from '@/app/services/services';
+import servicesAPI, {
+  getServiceName,
+  getServiceDescription,
+} from '@/app/services/services';
 import { Service } from '@/app/types/jobs';
 import { toast } from 'react-toastify';
 import {
@@ -87,12 +91,9 @@ const ServicesPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await servicesAPI.getAllServices();
-
-        console.log('Services response:', response);
+        const response = await servicesAPI.getAllServices(locale);
 
         if (response.success) {
-          console.log('Fetched services:', response.data);
           setServices(response.data);
         } else {
           setError(t('error.title'));
@@ -107,14 +108,14 @@ const ServicesPage = () => {
     };
 
     fetchServices();
-  }, [t]);
+  }, [t, locale]);
 
   const handleServiceSelect = (service: Service) => {
     // Navigate to job manager page with selected service
     router.push(
       `/sc/job-manager?serviceId=${
         service._id
-      }&serviceName=${encodeURIComponent(service.name)}`
+      }&serviceName=${encodeURIComponent(getServiceName(service, locale))}`
     );
   };
 
@@ -191,15 +192,25 @@ const ServicesPage = () => {
                 >
                   <div className="flex flex-col items-center text-center space-y-6 h-full">
                     <div className="flex items-center justify-center mb-2">
-                      {getCategoryIcon(service.icon, color)}
+                      {service.image ? (
+                        <Image
+                          src={service.image}
+                          alt={getServiceName(service, locale)}
+                          width={48}
+                          height={48}
+                          className="object-cover rounded-lg"
+                        />
+                      ) : (
+                        getCategoryIcon('hammer-icon', color)
+                      )}
                     </div>
 
                     <div className="flex-grow flex flex-col justify-center">
                       <h3 className="text-xl font-semibold mb-3">
-                        {service.name}
+                        {getServiceName(service, locale)}
                       </h3>
                       <p className="text-sm opacity-80 line-clamp-3 leading-relaxed">
-                        {service.description}
+                        {getServiceDescription(service, locale)}
                       </p>
                     </div>
                   </div>

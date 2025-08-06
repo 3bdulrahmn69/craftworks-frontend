@@ -14,7 +14,7 @@ import Textarea from '@/app/components/ui/textarea';
 import InteractiveMap from '@/app/components/ui/interactive-map';
 import { toast } from 'react-toastify';
 import { jobsService } from '@/app/services/jobs';
-import servicesAPI from '@/app/services/services';
+import servicesAPI, { getServiceName } from '@/app/services/services';
 import { Service } from '@/app/types/jobs';
 import {
   getCurrentLocationAndGeocode,
@@ -46,8 +46,7 @@ interface JobFormData {
     type: 'Point';
     coordinates: [number, number]; // [longitude, latitude]
   };
-  paymentType: 'Cash' | 'Escrow' | 'CashProtected';
-  jobPrice: number;
+  paymentType: 'Cash' | 'Visa';
   jobDate: string; // ISO date string for scheduled date
   photos: File[];
   existingPhotos?: string[]; // URLs of existing photos when editing
@@ -76,10 +75,10 @@ const JobManagerPage = () => {
     () =>
       services.map((service) => ({
         id: service._id,
-        label: service.name,
+        label: getServiceName(service, locale),
         value: service._id,
       })),
-    [services]
+    [services, locale]
   );
 
   const stateOptions = useMemo(() => {
@@ -99,14 +98,9 @@ const JobManagerPage = () => {
         value: 'Cash',
       },
       {
-        id: 'Escrow',
-        label: t('sections.pricing.paymentType.escrow'),
-        value: 'Escrow',
-      },
-      {
-        id: 'CashProtected',
-        label: t('sections.pricing.paymentType.cashProtected'),
-        value: 'CashProtected',
+        id: 'Visa',
+        label: t('sections.pricing.paymentType.visa'),
+        value: 'Visa',
       },
     ],
     [t]
@@ -124,7 +118,6 @@ const JobManagerPage = () => {
     },
     location: undefined,
     paymentType: 'Cash',
-    jobPrice: 0,
     jobDate: '',
     photos: [],
     existingPhotos: [],
@@ -199,7 +192,7 @@ const JobManagerPage = () => {
     const fetchServices = async () => {
       try {
         setServicesLoading(true);
-        const response = await servicesAPI.getAllServices();
+        const response = await servicesAPI.getAllServices(locale);
         if (response.data) {
           setServices(response.data);
         }
@@ -212,7 +205,7 @@ const JobManagerPage = () => {
     };
 
     fetchServices();
-  }, [t]);
+  }, [t, locale]);
 
   // Load job data if editing
   useEffect(() => {
@@ -244,7 +237,6 @@ const JobManagerPage = () => {
                 : job.address,
             location: job.location,
             paymentType: job.paymentType,
-            jobPrice: job.jobPrice,
             jobDate: job.jobDate.split('T')[0],
             photos: [],
             existingPhotos: job.photos || [],
@@ -331,10 +323,6 @@ const JobManagerPage = () => {
 
     if (!formData.address.street.trim()) {
       newErrors.street = t('sections.location.street.error');
-    }
-
-    if (!formData.jobPrice || formData.jobPrice <= 0) {
-      newErrors.jobPrice = t('sections.pricing.jobPrice.error');
     }
 
     if (!formData.jobDate.trim()) {
@@ -588,7 +576,6 @@ const JobManagerPage = () => {
       jobFormData.append('address[city]', String(formData.address.city));
       jobFormData.append('address[street]', String(formData.address.street));
       jobFormData.append('paymentType', String(formData.paymentType));
-      jobFormData.append('jobPrice', String(formData.jobPrice));
       jobFormData.append('jobDate', String(formData.jobDate));
 
       // Add location coordinates if available
@@ -741,8 +728,12 @@ const JobManagerPage = () => {
 
   const selectedServiceName =
     searchParams.get('serviceName') ||
-    services.find((s) => s._id === formData.serviceId)?.name ||
-    '';
+    (services.find((s) => s._id === formData.serviceId)
+      ? getServiceName(
+          services.find((s) => s._id === formData.serviceId)!,
+          locale
+        )
+      : '');
 
   return (
     <Container className={`py-8 max-w-4xl ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -1006,29 +997,10 @@ const JobManagerPage = () => {
                   helpText={
                     (formData.paymentType === 'Cash' &&
                       t('sections.pricing.paymentType.descriptions.cash')) ||
-                    (formData.paymentType === 'Escrow' &&
-                      t('sections.pricing.paymentType.descriptions.escrow')) ||
-                    (formData.paymentType === 'CashProtected' &&
-                      t(
-                        'sections.pricing.paymentType.descriptions.cashProtected'
-                      )) ||
+                    (formData.paymentType === 'Visa' &&
+                      t('sections.pricing.paymentType.descriptions.visa')) ||
                     undefined
                   }
-                />
-              </div>
-
-              <div>
-                <Input
-                  label={t('sections.pricing.jobPrice.label')}
-                  name="jobPrice"
-                  type="text"
-                  value={
-                    formData.jobPrice === 0 ? '' : formData.jobPrice.toString()
-                  }
-                  onChange={handleInputChange}
-                  placeholder={t('sections.pricing.jobPrice.placeholder')}
-                  error={errors.jobPrice}
-                  required
                 />
               </div>
 

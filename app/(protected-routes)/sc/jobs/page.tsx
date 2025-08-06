@@ -9,6 +9,7 @@ import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Button from '@/app/components/ui/button';
 import PaginationComponent from '@/app/components/ui/pagination-component';
 import { Job, Pagination } from '@/app/types/jobs';
+import { getServiceName } from '@/app/services/services';
 import { jobsService } from '@/app/services/jobs';
 import { formatDate, formatAddress, getStatusColor } from '@/app/utils/helpers';
 import { toast } from 'react-toastify';
@@ -171,7 +172,7 @@ const ClientJobsPage = () => {
 
                       <div className="flex items-center">
                         <FaDollarSign className="w-4 h-4 mr-1 text-primary" />
-                        {job.jobPrice} EGP ({job.paymentType})
+                        Payment: {job.paymentType}
                       </div>
 
                       <div className="flex items-center">
@@ -182,7 +183,7 @@ const ClientJobsPage = () => {
                       {job.service && (
                         <div className="flex items-center">
                           <FaBriefcase className="w-4 h-4 mr-1 text-primary" />
-                          {job.service.name}
+                          {getServiceName(job.service, locale)}
                         </div>
                       )}
                     </div>

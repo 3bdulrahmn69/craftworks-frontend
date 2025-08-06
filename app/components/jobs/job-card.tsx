@@ -2,6 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { Job } from '@/app/types/jobs';
+import { getServiceName } from '@/app/services/services';
 import { formatAddress } from '@/app/utils/helpers';
 import {
   HiLocationMarker,
@@ -21,7 +22,9 @@ const JobCard = ({ job }: JobCardProps) => {
   const locale = useLocale();
 
   // According to API v1.3.0, jobs now include populated service objects
-  const serviceName = job.service?.name || job.category || 'General';
+  const serviceName = job.service
+    ? getServiceName(job.service, locale)
+    : job.category || 'General';
 
   return (
     <Link href={`/jobs/${job._id}`} className="w-full block">

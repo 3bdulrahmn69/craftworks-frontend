@@ -455,14 +455,15 @@ const CalendarPage = () => {
                               </div>
                             )}
 
-                            {job.jobPrice >= 0 && (
+                            {/* Platform fee information if available */}
+                            {job.platformFee && (
                               <div className="flex items-center gap-2 sm:gap-3">
                                 <FaDollarSign className="w-4 h-4 text-success flex-shrink-0" />
                                 <span className="text-muted-foreground text-xs sm:text-sm">
-                                  Budget:
+                                  Platform Fee:
                                 </span>
                                 <span className="font-bold text-success text-xs sm:text-sm">
-                                  ${job.jobPrice}
+                                  ${job.platformFee}
                                 </span>
                               </div>
                             )}

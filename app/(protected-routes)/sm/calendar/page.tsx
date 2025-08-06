@@ -29,7 +29,6 @@ interface CalendarItem {
   title: string;
   status: string;
   date: string;
-  jobPrice?: number;
   client?: string;
   clientPhone?: string;
   location?: string;
@@ -81,7 +80,6 @@ const CraftsmanCalendarPage = () => {
               title: job.title,
               status: job.status,
               date: displayDate,
-              jobPrice: job.jobPrice,
               client:
                 typeof job.client === 'object' && job.client?.fullName
                   ? job.client.fullName
@@ -509,17 +507,16 @@ const CraftsmanCalendarPage = () => {
                               </div>
                             )}
 
-                            {item.jobPrice && (
-                              <div className="flex items-center gap-2 sm:gap-3">
-                                <FaDollarSign className="w-4 h-4 text-success flex-shrink-0" />
-                                <span className="text-muted-foreground text-xs sm:text-sm">
-                                  Budget:
-                                </span>
-                                <span className="font-bold text-success text-xs sm:text-sm">
-                                  ${item.jobPrice}
-                                </span>
-                              </div>
-                            )}
+                            {/* Payment type information */}
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <FaDollarSign className="w-4 h-4 text-success flex-shrink-0" />
+                              <span className="text-muted-foreground text-xs sm:text-sm">
+                                Payment:
+                              </span>
+                              <span className="font-bold text-success text-xs sm:text-sm">
+                                {item.data.paymentType}
+                              </span>
+                            </div>
 
                             <div className="flex items-center gap-2 sm:gap-3">
                               <FaClock className="w-4 h-4 text-primary flex-shrink-0" />

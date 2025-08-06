@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Service } from '@/app/types/jobs';
+import { getServiceName } from '@/app/services/services';
 import { getStatesForSelect } from '@/app/data/states';
 import Button from '@/app/components/ui/button';
 import DropdownSelector from '@/app/components/ui/dropdown-selector';
@@ -179,7 +180,7 @@ const JobFilters = ({
                   onChange={onServiceChange}
                   options={services.map((service) => ({
                     id: service._id,
-                    label: service.name,
+                    label: getServiceName(service, locale),
                   }))}
                   placeholder={t('service.placeholder')}
                   allowEmpty
@@ -278,7 +279,12 @@ const JobFilters = ({
                     {selectedService && (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                         Service:{' '}
-                        {services.find((s) => s._id === selectedService)?.name}
+                        {services.find((s) => s._id === selectedService)
+                          ? getServiceName(
+                              services.find((s) => s._id === selectedService)!,
+                              locale
+                            )
+                          : ''}
                       </span>
                     )}
                     {selectedState && (

@@ -19,7 +19,6 @@ import {
   HiCash,
   HiClock,
   HiUsers,
-  HiCurrencyDollar,
   HiExclamationCircle,
   HiArrowLeft,
   HiPhotograph,
@@ -481,26 +480,6 @@ const JobDetailsPage = () => {
                     {t('info.payment')}: {translatePaymentType(job.paymentType)}
                   </span>
                 </div>
-
-                {job.jobPrice > 0 && (
-                  <div
-                    className={`flex items-center text-sm ${
-                      locale === 'ar'
-                        ? 'flex-row-reverse text-right'
-                        : 'text-left'
-                    }`}
-                  >
-                    <HiCurrencyDollar
-                      className={`w-4 h-4 text-success flex-shrink-0 ${
-                        locale === 'ar' ? 'ml-3' : 'mr-3'
-                      }`}
-                    />
-                    <span className="text-foreground font-medium">
-                      {t('info.budget')}: {job.jobPrice.toLocaleString()}{' '}
-                      {t('info.egp')}
-                    </span>
-                  </div>
-                )}
 
                 <div
                   className={`flex items-center text-sm ${

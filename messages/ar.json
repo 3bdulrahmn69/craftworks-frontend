@@ -563,12 +563,10 @@
         "paymentType": {
           "label": "نوع الدفع",
           "cash": "نقدي - دفع مباشر للحرفي",
-          "escrow": "ضمان - دفع محمي يُحتفظ به حتى الانتهاء",
-          "cashProtected": "نقدي محمي - دفع نقدي مع حماية المنصة",
+          "visa": "فيزا - دفع آمن بالبطاقة",
           "descriptions": {
             "cash": "الدفع مباشرة للحرفي",
-            "escrow": "الدفع محفوظ بأمان حتى انتهاء العمل",
-            "cashProtected": "دفع نقدي مع حماية المنصة"
+            "visa": "دفع آمن من خلال بطاقة فيزا"
           }
         },
         "jobPrice": {
@@ -658,6 +656,7 @@
     "jobCard": {
       "location": "الموقع",
       "payment": "الدفع",
+      "paymentType": "نوع الدفع",
       "posted": "تم النشر",
       "scheduled": "مجدولة",
       "applications": "الطلبات",
@@ -682,8 +681,7 @@
     },
     "paymentTypes": {
       "Cash": "نقدي",
-      "Escrow": "إيداع آمن",
-      "CashProtected": "نقدي محمي"
+      "Visa": "فيزا"
     },
     "recommendations": {
       "title": "الحرفيون الموصى بهم",
@@ -907,8 +905,7 @@
       },
       "paymentTypes": {
         "cash": "نقدي",
-        "escrow": "ضمان",
-        "cashProtected": "نقدي محمي"
+        "visa": "فيزا"
       }
     },
     "status": {

@@ -3,23 +3,20 @@ export interface Job {
   _id: string;
   title: string;
   description: string;
-  category: string; // Legacy field, keeping for backward compatibility
-  service?: Service; // New populated service object (API v1.3.0)
+  category?: string; // Legacy field for backward compatibility
+  service?: Service;
   photos?: string[];
-  address:
-    | string
-    | {
-        // Address can be string or structured object
-        country: string;
-        state: string;
-        city: string;
-        street: string;
-      };
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    street: string;
+  };
   location?: {
     type: 'Point';
     coordinates: [number, number];
   };
-  paymentType: 'Cash' | 'Escrow' | 'CashProtected';
+  paymentType: 'Cash' | 'Visa';
   status: 'Posted' | 'Hired' | 'In Progress' | 'Completed' | 'Cancelled';
   client:
     | string
@@ -29,7 +26,6 @@ export interface Job {
         phone: string;
       };
   craftsman?: string | null;
-  jobPrice: number;
   platformFee: number;
   appliedCraftsmen: string[];
   jobDate: string;
@@ -39,9 +35,20 @@ export interface Job {
 
 export interface Service {
   _id: string;
-  name: string;
-  icon: string;
-  description: string;
+  name:
+    | string
+    | {
+        en: string;
+        ar: string;
+      };
+  description:
+    | string
+    | {
+        en: string;
+        ar: string;
+      };
+  image: string;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
   __v?: number;

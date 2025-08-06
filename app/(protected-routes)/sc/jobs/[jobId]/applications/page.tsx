@@ -256,15 +256,6 @@ const JobApplicationsPage = () => {
                 </div>
               </div>
 
-              <div className="bg-muted backdrop-blur-sm rounded-lg p-3 border border-success/20 shadow-sm">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">
-                  {t('header.price')}
-                </div>
-                <div className="font-bold text-lg bg-gradient-to-r from-success to-success bg-clip-text text-transparent">
-                  ${job?.jobPrice}
-                </div>
-              </div>
-
               <div className="bg-muted backdrop-blur-sm rounded-lg p-3 border border-primary/20 shadow-sm">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium mb-1">
                   {t('header.applicationsCount')}

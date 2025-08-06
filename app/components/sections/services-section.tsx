@@ -1,5 +1,7 @@
-import { getTranslations } from 'next-intl/server';
-import type { Service } from '@/app/types/services';
+import { getTranslations, getLocale } from 'next-intl/server';
+import type { Service } from '@/app/types/jobs';
+import { getServiceName, getServiceDescription } from '@/app/services/services';
+import Image from 'next/image';
 
 /* components */
 import Container from '../ui/container';
@@ -17,11 +19,12 @@ import {
 } from 'react-icons/fa';
 
 // Server utility to fetch services
-async function fetchServices(): Promise<Service[]> {
+async function fetchServices(locale?: string): Promise<Service[]> {
   try {
+    const queryParams = locale ? `?lang=${locale}` : '';
     const link = `${
       process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-    }/services`;
+    }/services${queryParams}`;
     const res = await fetch(link, {
       next: { revalidate: 60 },
     });
@@ -67,8 +70,9 @@ const getColorClasses = (color: string) => {
 };
 
 const ServicesSection = async () => {
+  const locale = await getLocale();
   const t = await getTranslations('homepage sections.services');
-  const servicesData = await fetchServices();
+  const servicesData = await fetchServices(locale);
 
   if (!servicesData) return null;
 
@@ -97,15 +101,25 @@ const ServicesSection = async () => {
                       getCategoryColor(index)
                     )}`}
                   >
-                    {getCategoryIcon(service.icon)}
+                    {service.image ? (
+                      <Image
+                        src={service.image}
+                        alt={getServiceName(service, locale)}
+                        width={48}
+                        height={48}
+                        className="object-cover rounded-lg"
+                      />
+                    ) : (
+                      getCategoryIcon('hammer-icon')
+                    )}
                   </div>
 
                   <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-                    {service.name}
+                    {getServiceName(service, locale)}
                   </h3>
 
                   <p className="text-muted-foreground mb-4">
-                    {service.description}
+                    {getServiceDescription(service, locale)}
                   </p>
                 </div>
               </div>

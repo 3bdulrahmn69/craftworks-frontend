@@ -14,6 +14,7 @@ import JobOptionsDropdown from '@/app/components/jobs/job-options-dropdown';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Job } from '@/app/types/jobs';
+import { getServiceName } from '@/app/services/services';
 import { formatDate, formatAddress, getStatusColor } from '@/app/utils/helpers';
 
 interface MyJobCardProps {
@@ -92,7 +93,7 @@ const MyJobCard = ({
                 </h3>
                 {job.service && (
                   <p className="text-sm text-muted-foreground font-medium">
-                    {job.service.name}
+                    {getServiceName(job.service, locale)}
                   </p>
                 )}
               </div>
@@ -161,19 +162,16 @@ const MyJobCard = ({
             </div>
           </div>
 
-          {/* Payment */}
+          {/* Payment Type */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl hover:bg-muted/70 transition-colors">
             <div className="p-2 bg-success/10 rounded-lg">
               <FaDollarSign className="w-4 h-4 text-success" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                {t('jobCard.payment')}
+                {t('jobCard.paymentType')}
               </p>
               <p className="text-sm font-semibold text-foreground">
-                {job.jobPrice} {t('jobCard.egp')}
-              </p>
-              <p className="text-xs text-muted-foreground">
                 {getPaymentTypeText(job.paymentType)}
               </p>
             </div>

@@ -1,7 +1,6 @@
-'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { useLocale } from 'next-intl';
 import { Job, Pagination, Service } from '@/app/types/jobs';
 import { jobsService } from '@/app/services/jobs';
 import servicesAPI from '@/app/services/services';
@@ -17,6 +16,7 @@ interface QuoteFormData {
 
 export const useJobs = ({ jobsPerPage = 9 }: UseJobsProps = {}) => {
   const { data: session } = useSession();
+  const locale = useLocale();
 
   // State
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -47,7 +47,7 @@ export const useJobs = ({ jobsPerPage = 9 }: UseJobsProps = {}) => {
   const fetchServices = useCallback(async () => {
     try {
       setServicesLoading(true);
-      const response = await servicesAPI.getAllServices();
+      const response = await servicesAPI.getAllServices(locale);
       if (response.data) {
         setServices(response.data);
       }
@@ -56,7 +56,7 @@ export const useJobs = ({ jobsPerPage = 9 }: UseJobsProps = {}) => {
     } finally {
       setServicesLoading(false);
     }
-  }, []);
+  }, [locale]);
 
   // Fetch jobs
   const fetchJobs = useCallback(

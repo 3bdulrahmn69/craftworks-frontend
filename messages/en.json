@@ -482,12 +482,10 @@
         "paymentType": {
           "label": "Payment Type",
           "cash": "Cash - Direct payment to craftsman",
-          "escrow": "Escrow - Protected payment held until completion",
-          "cashProtected": "Cash Protected - Protected cash payment",
+          "visa": "Visa - Secure card payment",
           "descriptions": {
             "cash": "Payment made directly to the craftsman",
-            "escrow": "Payment held securely until job completion",
-            "cashProtected": "Cash payment with platform protection"
+            "visa": "Secure payment through Visa card"
           }
         },
         "jobPrice": {
@@ -577,6 +575,7 @@
     "jobCard": {
       "location": "Location",
       "payment": "Payment",
+      "paymentType": "Payment Type",
       "posted": "Posted",
       "scheduled": "Scheduled",
       "applications": "Applications",
@@ -601,8 +600,7 @@
     },
     "paymentTypes": {
       "Cash": "Cash",
-      "Escrow": "Escrow",
-      "CashProtected": "Cash Protected"
+      "Visa": "Visa"
     },
     "recommendations": {
       "title": "Recommended Craftsmen",
@@ -826,8 +824,7 @@
       },
       "paymentTypes": {
         "cash": "cash",
-        "escrow": "escrow",
-        "cashProtected": "cash protected"
+        "visa": "visa"
       }
     },
     "status": {

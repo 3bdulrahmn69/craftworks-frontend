@@ -132,11 +132,12 @@ const UserDetails = () => {
                   </div>
 
                   {/* Verification Badge */}
-                  {user.role === 'craftsman' && user.isVerified && (
-                    <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground p-2.5 rounded-full shadow-lg z-10">
-                      <HiOutlineBadgeCheck className="h-6 w-6" />
-                    </div>
-                  )}
+                  {user.role === 'craftsman' &&
+                    user.verificationStatus === 'verified' && (
+                      <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground p-2.5 rounded-full shadow-lg z-10">
+                        <HiOutlineBadgeCheck className="h-6 w-6" />
+                      </div>
+                    )}
                 </div>
 
                 {/* Name and Meta Info */}

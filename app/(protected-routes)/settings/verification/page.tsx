@@ -225,6 +225,48 @@ const VerificationSettings = () => {
     );
   }
 
+  if (user?.verificationStatus === 'rejected') {
+    return (
+      <main
+        className="max-w-2xl mx-auto space-y-6"
+        role="main"
+        aria-labelledby="page-title"
+      >
+        <SettingsPageHeader
+          title="Account Verification"
+          description="Verify your identity to unlock all craftsman features and build trust with clients"
+        />
+        <div id="page-title" className="sr-only">
+          Account Verification Settings
+        </div>
+
+        <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <HiExclamationTriangle className="w-8 h-8 text-red-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">
+                Verification Rejected
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Unfortunately, your verification documents were rejected. Please
+                review your documents and submit new ones that meet our
+                requirements.
+              </p>
+            </div>
+            <Button
+              onClick={() => setSelectedStep('select')}
+              className="mx-auto"
+            >
+              Submit New Documents
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main
       className="max-w-2xl mx-auto space-y-6"
