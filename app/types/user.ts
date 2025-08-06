@@ -6,6 +6,7 @@ export interface User {
   fullName: string;
   profilePicture: string;
   createdAt: string;
+  verificationStatus: 'pending' | 'verified' | 'rejected' | 'none';
   address: {
     country: string;
     state: string;
@@ -21,11 +22,6 @@ export interface User {
     description: string;
     createdAt: string;
     updatedAt: string;
-  };
-  craftsmanInfo?: {
-    skills: string[];
-    verificationStatus: 'pending' | 'verified' | 'rejected';
-    verificationDocuments?: string[];
   };
 }
 

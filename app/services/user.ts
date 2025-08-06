@@ -105,4 +105,54 @@ export const userService = {
     );
     return response.data.data;
   },
+
+  // Submit verification documents (craftsman only)
+  submitVerification: async (
+    token: string,
+    files: File[],
+    data: {
+      docNames: string[];
+      docTypes: string[];
+      service?: string;
+      portfolioImageUrls?: string[];
+    }
+  ): Promise<void> => {
+    const formData = new FormData();
+
+    // Add files
+    files.forEach((file) => {
+      formData.append('verificationDocs', file);
+    });
+
+    // Add document names and types
+    data.docNames.forEach((name) => {
+      formData.append('docNames[]', name);
+    });
+
+    data.docTypes.forEach((type) => {
+      formData.append('docTypes[]', type);
+    });
+
+    // Add optional fields
+    if (data.service) {
+      formData.append('service', data.service);
+    }
+
+    if (data.portfolioImageUrls) {
+      data.portfolioImageUrls.forEach((url) => {
+        formData.append('portfolioImageUrls[]', url);
+      });
+    }
+
+    await api.post<ApiResponse<null>>(
+      '/users/craftsman/verification',
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  },
 };

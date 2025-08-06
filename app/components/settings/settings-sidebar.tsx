@@ -2,60 +2,79 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HiUser, HiLockClosed } from 'react-icons/hi2';
-
-const settingsItems = [
-  {
-    name: 'Personal Information',
-    href: '/settings/personal',
-    icon: HiUser,
-    description: 'Manage your profile and personal details',
-  },
-  {
-    name: 'Security',
-    href: '/settings/security',
-    icon: HiLockClosed,
-    description: 'Update your password and security settings',
-  },
-];
+import { HiArrowLeft } from 'react-icons/hi2';
+import { settingsOptions } from '@/app/(protected-routes)/settings/';
 
 export default function SettingsSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:block relative">
-      <h2 className="text-lg font-semibold text-foreground mb-6">Settings</h2>
-      <nav className="space-y-2 sticky top-6">
-        {settingsItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
+    <aside className="hidden lg:block relative w-72">
+      <div className="sticky top-5">
+        <div className="flex items-center gap-3 mb-8 pb-2 border-b border-border/40">
+          <Link
+            href="/settings"
+            replace
+            aria-label="Back to Settings"
+            className="p-2 rounded-lg hover:bg-muted/50 transition-colors group"
+            title="Back to Settings"
+          >
+            <HiArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+          <h2 className="text-xl font-bold text-foreground">Settings</h2>
+        </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              replace
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                isActive
-                  ? 'bg-primary/10 text-primary border border-primary/20'
-                  : 'text-foreground hover:bg-muted hover:text-primary'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <div>
-                <div className="font-medium">{item.name}</div>
+        <nav className="space-y-3">
+          {settingsOptions.map(({ href, title, description, icon: Icon }) => {
+            const isActive = pathname === href;
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                replace
+                className={`group flex items-start gap-4 px-4 py-4 rounded-2xl border-l-4 transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary/10 border-primary shadow-sm'
+                    : 'hover:bg-muted/50 border-transparent'
+                }`}
+              >
                 <div
-                  className={`text-xs mt-0.5 ${
-                    isActive ? 'text-primary/70' : 'text-muted-foreground'
+                  className={`p-2.5 rounded-lg mt-0.5 transition-colors ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
                   }`}
                 >
-                  {item.description}
+                  <Icon className="w-5 h-5" />
                 </div>
-              </div>
-            </Link>
-          );
-        })}
-      </nav>
+
+                <div className="flex-1 min-w-0">
+                  <div
+                    className={`font-medium transition-colors ${
+                      isActive
+                        ? 'text-primary'
+                        : 'text-foreground group-hover:text-primary'
+                    }`}
+                  >
+                    {title}
+                  </div>
+                  <p
+                    className={`text-xs mt-1.5 transition-colors truncate ${
+                      isActive
+                        ? 'text-primary/80'
+                        : 'text-muted-foreground group-hover:text-primary/70'
+                    }`}
+                    title={description}
+                  >
+                    {description}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </aside>
   );
 }

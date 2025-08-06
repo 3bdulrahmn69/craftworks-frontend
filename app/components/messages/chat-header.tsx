@@ -73,13 +73,18 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 
         <button
           onClick={handleUserDetailsClick}
-          className="flex-1 text-left hover:opacity-80 transition-opacity"
+          disabled={otherParticipant?.role === 'client'}
+          className={`flex-1 text-left ${
+            otherParticipant?.role === 'craftsman'
+              ? 'hover:opacity-80 transition-opacity'
+              : 'cursor-default'
+          }`}
         >
           <h2 className="text-lg font-semibold text-foreground">
             {otherParticipant?.fullName || 'Unknown User'}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {otherParticipant?.role === 'craftsman' ? 'Craftsman' : 'Client'}
+            {otherParticipant?.role}
           </p>
         </button>
       </div>

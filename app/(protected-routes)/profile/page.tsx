@@ -14,6 +14,8 @@ import {
   HiStar,
   HiCog,
   HiArrowLeft,
+  HiShieldCheck,
+  HiExclamationTriangle,
 } from 'react-icons/hi2';
 import { HiMail } from 'react-icons/hi';
 import Link from 'next/link';
@@ -153,9 +155,31 @@ const ProfilePage = () => {
               </h2>
 
               <div className="text-center md:text-left">
-                <h3 className="text-3xl font-bold text-foreground mb-2">
-                  {user.fullName}
-                </h3>
+                <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+                  <h3 className="text-3xl font-bold text-foreground">
+                    {user.fullName}
+                  </h3>
+
+                  {/* Verification Badge */}
+                  {user.role === 'craftsman' && (
+                    <>
+                      {user.verificationStatus === 'verified' ? (
+                        <div className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm font-medium">
+                          <HiShieldCheck className="w-4 h-4" />
+                          Verified
+                        </div>
+                      ) : (
+                        <Link
+                          href="/settings/verification"
+                          className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800 px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                        >
+                          <HiExclamationTriangle className="w-4 h-4" />
+                          Not Verified
+                        </Link>
+                      )}
+                    </>
+                  )}
+                </div>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 text-muted-foreground">
                   <span className="text-lg capitalize font-medium">
                     {user.role}

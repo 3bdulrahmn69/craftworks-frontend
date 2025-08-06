@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import SettingsCard from '@/app/components/settings/settings-card';
 import Container from '@/app/components/ui/container';
 import { Button } from '@/app/components/ui/button';
-import { HiUser, HiLockClosed, HiArrowLeft } from 'react-icons/hi2';
+import { HiArrowLeft } from 'react-icons/hi2';
+import { settingsOptions } from './';
 
 const SettingsPage = () => {
   const router = useRouter();
@@ -39,18 +40,15 @@ const SettingsPage = () => {
             Settings Options
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <SettingsCard
-              title="Personal Information"
-              description="Update your profile details, contact information, and address"
-              href="/settings/personal"
-              icon={HiUser}
-            />
-            <SettingsCard
-              title="Security"
-              description="Change your password and manage security preferences"
-              href="/settings/security"
-              icon={HiLockClosed}
-            />
+            {settingsOptions.map((option) => (
+              <SettingsCard
+                key={option.title}
+                title={option.title}
+                description={option.description}
+                href={option.href}
+                icon={option.icon}
+              />
+            ))}
           </div>
         </section>
       </main>

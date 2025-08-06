@@ -2,18 +2,16 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/button';
 import { userService, ChangePasswordData } from '@/app/services/user';
-import { HiLockClosed, HiArrowLeft } from 'react-icons/hi2';
+import { HiLockClosed } from 'react-icons/hi2';
 import Input from '@/app/components/ui/input';
 
 import SettingsPageHeader from '@/app/components/settings/settings-page-header';
 
 const SecuritySettings = () => {
   const { data: session } = useSession();
-  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ChangePasswordData>({
     currentPassword: '',
@@ -103,19 +101,6 @@ const SecuritySettings = () => {
       role="main"
       aria-labelledby="security-page-title"
     >
-      {/* Back Button */}
-      <nav aria-label="Breadcrumb">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.replace('/settings')}
-          className="flex items-center gap-2 mb-6"
-          aria-label="Go back to settings"
-        >
-          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
-        </Button>
-      </nav>
-
       <SettingsPageHeader
         title="Security Settings"
         description="Manage your password and security preferences"
