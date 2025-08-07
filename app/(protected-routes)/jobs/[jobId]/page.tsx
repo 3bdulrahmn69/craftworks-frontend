@@ -27,6 +27,7 @@ import {
   HiTrash,
   HiUserGroup,
 } from 'react-icons/hi';
+import { MdOpenInFull } from 'react-icons/md';
 
 const JobDetailsPage = () => {
   const { data: session } = useSession();
@@ -86,7 +87,7 @@ const JobDetailsPage = () => {
 
   // Handle job editing
   const handleEditJob = () => {
-    router.push(`/sc/job-manger?edit=${job?._id}`);
+    router.push(`/sc/job-manager?edit=${job?._id}`);
   };
 
   // View applications
@@ -371,21 +372,9 @@ const JobDetailsPage = () => {
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-20 rounded-full p-2">
-                          <svg
-                            className="w-6 h-6 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                            />
-                          </svg>
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-primary/80 rounded-full p-2">
+                          <MdOpenInFull size={24} />
                         </div>
                       </div>
                     </div>

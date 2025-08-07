@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HiArrowLeft } from 'react-icons/hi2';
 import { settingsOptions } from '@/app/(protected-routes)/settings/';
+import BackButton from '../ui/back-button';
 
 export default function SettingsSidebar() {
   const pathname = usePathname();
@@ -12,15 +12,7 @@ export default function SettingsSidebar() {
     <aside className="hidden lg:block relative w-72">
       <div className="sticky top-5">
         <div className="flex items-center gap-3 mb-8 pb-2 border-b border-border/40">
-          <Link
-            href="/settings"
-            replace
-            aria-label="Back to Settings"
-            className="p-2 rounded-lg hover:bg-muted/50 transition-colors group"
-            title="Back to Settings"
-          >
-            <HiArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-          </Link>
+          <BackButton />
           <h2 className="text-xl font-bold text-foreground">Settings</h2>
         </div>
 

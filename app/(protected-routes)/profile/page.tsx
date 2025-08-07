@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useLocale } from 'next-intl';
 import { userService } from '@/app/services/user';
+import { getServiceName, getServiceDescription } from '@/app/services/services';
 import { User } from '@/app/types/user';
 import { formatAddress } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
@@ -12,23 +14,21 @@ import {
   HiPhone,
   HiMapPin,
   HiStar,
-  HiCog,
-  HiArrowLeft,
   HiShieldCheck,
   HiExclamationTriangle,
 } from 'react-icons/hi2';
 import { HiMail } from 'react-icons/hi';
 import Link from 'next/link';
 import Image from 'next/image';
-import Button from '@/app/components/ui/button';
-import { useRouter } from 'next/navigation';
+import BackButton from '@/app/components/ui/back-button';
+import { FaRegEdit } from 'react-icons/fa';
 
 const ProfilePage = () => {
   const { data: session } = useSession();
+  const locale = useLocale();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -78,16 +78,7 @@ const ProfilePage = () => {
   return (
     <Container className="py-6 sm:py-8">
       <nav aria-label="Breadcrumb">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.back()}
-          className="flex items-center gap-2 mb-6"
-          aria-label="Go back to previous page"
-        >
-          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Back
-        </Button>
+        <BackButton showLabel className="mb-4" />
       </nav>
 
       <main className="space-y-6" role="main">
@@ -101,29 +92,39 @@ const ProfilePage = () => {
               View and manage your profile information
             </p>
           </div>
-          <Link
-            href="/settings/personal"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            aria-label="Edit your profile information"
-          >
-            <HiCog className="w-4 h-4" aria-hidden="true" />
-            Edit Profile
-          </Link>
         </header>
 
         {/* Profile Card */}
-        <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+        <div className="relative bg-card border border-border rounded-xl shadow-lg">
+          <Link
+            href="/settings/personal"
+            className={`absolute -top-4 ${
+              locale === 'ar' ? '-left-4' : '-right-4'
+            } z-10 inline-flex items-center justify-center gap-2 w-10 h-10 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
+            aria-label="Edit your profile information"
+          >
+            <FaRegEdit className="w-4 h-4" aria-hidden="true" />
+          </Link>
+          <div
+            className={`absolute rounded-xl inset-0 ${
+              locale === 'ar' ? 'bg-gradient-to-r' : 'bg-gradient-to-l'
+            } from-primary/10 via-primary/5 to-secondary/10`}
+          />
           {/* Cover Area */}
-          <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-secondary/20 relative">
+          <div
+            className={`h-32 ${
+              locale === 'ar' ? 'bg-gradient-to-r' : 'bg-gradient-to-l'
+            } from-primary/10 via-primary/5 to-secondary/10 relative`}
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent"></div>
           </div>
 
           {/* Profile Info */}
-          <div className="relative px-8 pb-8">
+          <div className="relative px-6 sm:px-8 pb-8">
             {/* Profile Picture */}
             <div className="relative -mt-16 mb-6">
               <div className="relative inline-block">
-                <div className="w-32 h-32 rounded-full border-4 border-card bg-muted overflow-hidden shadow-xl">
+                <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-card bg-muted overflow-hidden shadow-xl">
                   {user.profilePicture ? (
                     <Image
                       src={user.profilePicture}
@@ -139,7 +140,7 @@ const ProfilePage = () => {
                       aria-label="Default profile picture placeholder"
                     >
                       <HiUser
-                        className="w-18 h-18 text-muted-foreground"
+                        className="w-16 h-16 sm:w-18 sm:h-18 text-muted-foreground"
                         aria-hidden="true"
                       />
                     </div>
@@ -156,7 +157,7 @@ const ProfilePage = () => {
 
               <div className="text-center md:text-left">
                 <div className="flex flex-col md:flex-row md:items-center gap-3 mb-2">
-                  <h3 className="text-3xl font-bold text-foreground">
+                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground">
                     {user.fullName}
                   </h3>
 
@@ -171,7 +172,7 @@ const ProfilePage = () => {
                       ) : (
                         <Link
                           href="/settings/verification"
-                          className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 hover:bg-yellow-100 hover:text-yellow-800 px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer"
                         >
                           <HiExclamationTriangle className="w-4 h-4" />
                           Not Verified
@@ -190,11 +191,24 @@ const ProfilePage = () => {
                         •
                       </span>
                       <span className="text-primary font-medium">
-                        {user.service.name}
+                        {getServiceName(user.service, locale)}
                       </span>
                     </>
                   )}
                 </div>
+
+                {/* BIO SECTION */}
+                {user.bio && (
+                  <div className="mt-4 max-w-2xl">
+                    <p
+                      className={`text-foreground/90 leading-relaxed ${
+                        locale === 'ar' ? 'text-right' : 'text-left'
+                      }`}
+                    >
+                      {user.bio}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Quick Stats */}
@@ -248,7 +262,7 @@ const ProfilePage = () => {
                     Contact Information
                   </h3>
 
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border border-border">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                       <HiMail className="w-5 h-5 text-primary" />
                     </div>
@@ -262,7 +276,7 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border border-border">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                       <HiPhone className="w-5 h-5 text-primary" />
                     </div>
@@ -282,7 +296,7 @@ const ProfilePage = () => {
                     Location & Rating
                   </h3>
 
-                  <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-start gap-3 p-3 bg-muted/20 rounded-lg border border-border">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                       <HiMapPin className="w-5 h-5 text-primary" />
                     </div>
@@ -295,7 +309,7 @@ const ProfilePage = () => {
                   </div>
 
                   {(user.rating > 0 || user.ratingCount > 0) && (
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border border-border">
                       <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                         <HiStar className="w-5 h-5 text-primary" />
                       </div>
@@ -341,15 +355,25 @@ const ProfilePage = () => {
               Service Information
             </h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <span className="text-2xl">{user.service.icon}</span>
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center border border-border">
+                {user.service.image ? (
+                  <Image
+                    src={user.service.image}
+                    alt={getServiceName(user.service, locale)}
+                    width={48}
+                    height={48}
+                    className="object-cover rounded-lg"
+                  />
+                ) : (
+                  <span className="text-2xl">🔧</span>
+                )}
               </div>
               <div>
                 <h4 className="font-medium text-foreground">
-                  {user.service.name}
+                  {getServiceName(user.service, locale)}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  {user.service.description}
+                  {getServiceDescription(user.service, locale)}
                 </p>
               </div>
             </div>

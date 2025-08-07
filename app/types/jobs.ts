@@ -16,7 +16,7 @@ export interface Job {
     type: 'Point';
     coordinates: [number, number];
   };
-  paymentType: 'Cash' | 'Visa';
+  paymentType: 'cash' | 'visa';
   status: 'Posted' | 'Hired' | 'In Progress' | 'Completed' | 'Cancelled';
   client:
     | string

@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 export default getRequestConfig(async () => {
   const cookieLocale =
-    (await cookies()).get('CRAFTWORKS_LOCALE')?.value || 'en';
+    (await cookies()).get('CRAFTWORKS_LOCALE')?.value || 'ar';
 
   const locale = cookieLocale;
 

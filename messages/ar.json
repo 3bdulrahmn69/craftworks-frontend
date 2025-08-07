@@ -680,8 +680,8 @@
       "Cancelled": "ملغية"
     },
     "paymentTypes": {
-      "Cash": "نقدي",
-      "Visa": "فيزا"
+      "cash": "نقدي",
+      "visa": "فيزا"
     },
     "recommendations": {
       "title": "الحرفيون الموصى بهم",

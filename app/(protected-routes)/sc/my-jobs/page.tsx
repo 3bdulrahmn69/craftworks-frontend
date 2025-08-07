@@ -171,9 +171,7 @@ const ClientJobsPage = () => {
       <main role="main">
         {/* Header Section */}
         <header
-          className={`mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between ${
-            isRTL ? 'sm:flex-row-reverse' : ''
-          }`}
+          className={`mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between`}
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">

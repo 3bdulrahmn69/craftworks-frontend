@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { IoIosArrowForward, IoIosArrowBack, IoMdClose } from 'react-icons/io';
+import { LiaDownloadSolid } from 'react-icons/lia';
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -58,28 +60,16 @@ const ImageModal: React.FC<ImageModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-fadeIn"
       onClick={onClose}
     >
       <div className="relative max-w-5xl max-h-[95vh] w-full h-full flex items-center justify-center p-4">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
+          className="absolute top-4 right-4 z-10 bg-destructive bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <IoMdClose size={24} />
         </button>
 
         {/* Navigation arrows - only show if multiple images */}
@@ -90,21 +80,9 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 e.stopPropagation();
                 goToPrevious();
               }}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
+              className="absolute -left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <IoIosArrowBack size={24} />
             </button>
 
             <button
@@ -112,21 +90,9 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 e.stopPropagation();
                 goToNext();
               }}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
+              className="absolute -right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <IoIosArrowForward size={24} />
             </button>
           </>
         )}
@@ -168,28 +134,16 @@ const ImageModal: React.FC<ImageModalProps> = ({
             link.click();
             document.body.removeChild(link);
           }}
-          className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
+          className="absolute bottom-4 right-4 bg-primary bg-opacity-60 text-white rounded-full p-3 hover:bg-opacity-80 transition-colors backdrop-blur-sm"
           title="Download image"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
+          <LiaDownloadSolid size={24} />
         </button>
 
         {/* Thumbnail strip - only show if multiple images */}
         {imageArray.length > 1 && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-            <div className="flex gap-2 bg-black bg-opacity-60 p-3 rounded-lg backdrop-blur-sm max-w-xs overflow-x-auto">
+            <div className="flex gap-2 p-3 rounded-lg backdrop-blur-sm max-w-xs overflow-x-auto">
               {imageArray.map((img, index) => (
                 <button
                   key={index}

@@ -1,10 +1,12 @@
+import { Service } from './jobs';
+
 export interface User {
   id: string;
   email: string;
   phone: string;
-  role: 'client' | 'craftsman' | 'admin' | 'moderator';
+  role: 'client' | 'craftsman';
   fullName: string;
-  profilePicture: string;
+  profilePicture?: string;
   createdAt: string;
   verificationStatus: 'pending' | 'verified' | 'rejected' | 'none';
   address: {
@@ -13,16 +15,10 @@ export interface User {
     city: string;
     street: string;
   };
+  bio?: string;
   rating: number;
   ratingCount: number;
-  service?: {
-    _id: string;
-    name: string;
-    icon: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-  };
+  service?: Service;
 }
 
 // Recommended Craftsman interface based on the API response
@@ -38,9 +34,9 @@ export interface RecommendedCraftsman {
       icon: string;
       description: string;
     };
-    bio: string;
-    portfolioImageUrls: string[];
-    verificationStatus: 'pending' | 'verified' | 'rejected';
+    bio?: string;
+    portfolioImageUrls?: string[];
+    verificationStatus: 'pending' | 'verified' | 'rejected' | 'none';
     verificationDocs: string[];
   };
   rating: number;

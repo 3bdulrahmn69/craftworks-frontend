@@ -63,23 +63,13 @@ const MyJobCard = ({
   return (
     <div
       key={job._id}
-      className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 group ${
-        isRTL ? 'rtl' : 'ltr'
-      }`}
+      className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 group`}
     >
       {/* Card Header with Gradient */}
       <div className="relative bg-gradient-to-r from-primary/5 via-primary/3 to-transparent p-6 border-b border-border/30">
-        <div
-          className={`flex items-start justify-between ${
-            isRTL ? 'flex-row-reverse' : ''
-          }`}
-        >
+        <div className={`flex items-start justify-between`}>
           <div className="flex-1">
-            <div
-              className={`flex items-center gap-3 mb-3 ${
-                isRTL ? 'flex-row-reverse' : ''
-              }`}
-            >
+            <div className={`flex items-center gap-3 mb-3`}>
               <div className="p-2.5 bg-primary/10 rounded-xl">
                 <FaBriefcase className="w-5 h-5 text-primary" />
               </div>
@@ -109,11 +99,7 @@ const MyJobCard = ({
           </div>
 
           {/* Status Badge and Options */}
-          <div
-            className={`flex items-center gap-3 ${
-              isRTL ? 'flex-row-reverse' : ''
-            }`}
-          >
+          <div className={`flex items-center gap-3`}>
             <span
               className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(
                 job.status

@@ -46,10 +46,10 @@ interface JobFormData {
     type: 'Point';
     coordinates: [number, number]; // [longitude, latitude]
   };
-  paymentType: 'Cash' | 'Visa';
-  jobDate: string; // ISO date string for scheduled date
+  paymentType: 'cash' | 'visa';
+  jobDate: string;
   photos: File[];
-  existingPhotos?: string[]; // URLs of existing photos when editing
+  existingPhotos?: string[];
 }
 
 const JobManagerPage = () => {
@@ -93,14 +93,14 @@ const JobManagerPage = () => {
   const paymentTypeOptions = useMemo(
     () => [
       {
-        id: 'Cash',
+        id: 'cash',
         label: t('sections.pricing.paymentType.cash'),
-        value: 'Cash',
+        value: 'cash',
       },
       {
-        id: 'Visa',
+        id: 'visa',
         label: t('sections.pricing.paymentType.visa'),
-        value: 'Visa',
+        value: 'visa',
       },
     ],
     [t]
@@ -117,7 +117,7 @@ const JobManagerPage = () => {
       street: '',
     },
     location: undefined,
-    paymentType: 'Cash',
+    paymentType: 'cash',
     jobDate: '',
     photos: [],
     existingPhotos: [],
@@ -668,16 +668,15 @@ const JobManagerPage = () => {
         throw new Error('Invalid photo objects detected in FormData');
       }
 
+      console.log('Submitting job data:', jobFormData);
+
       const response = isEditing
         ? await jobsService.updateJob(
             editJobId!,
-            jobFormData, // Always pass FormData, never plain object
+            jobFormData,
             session.accessToken
           )
-        : await jobsService.createJob(
-            jobFormData, // Always pass FormData, never plain object
-            session.accessToken
-          );
+        : await jobsService.createJob(jobFormData, session.accessToken);
 
       if (response.success) {
         toast.success(
@@ -995,9 +994,9 @@ const JobManagerPage = () => {
                   value={formData.paymentType}
                   onChange={handleDropdownChange('paymentType')}
                   helpText={
-                    (formData.paymentType === 'Cash' &&
+                    (formData.paymentType === 'cash' &&
                       t('sections.pricing.paymentType.descriptions.cash')) ||
-                    (formData.paymentType === 'Visa' &&
+                    (formData.paymentType === 'visa' &&
                       t('sections.pricing.paymentType.descriptions.visa')) ||
                     undefined
                   }
