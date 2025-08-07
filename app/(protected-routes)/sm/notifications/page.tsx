@@ -1,3 +1,5 @@
+'use client';
+
 import NotificationsPage from '@/app/components/notifications/notifications-page';
 
 const CraftsmanNotifications = () => {

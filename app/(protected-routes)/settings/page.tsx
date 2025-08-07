@@ -1,38 +1,29 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import SettingsCard from '@/app/components/settings/settings-card';
 import Container from '@/app/components/ui/container';
-import { Button } from '@/app/components/ui/button';
-import { HiArrowLeft } from 'react-icons/hi2';
+import BackButton from '@/app/components/ui/back-button';
 import { settingsOptions } from './';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const SettingsPage = () => {
-  const router = useRouter();
+  const t = useTranslations('settings');
+  const { getUserRole } = useAuth();
+  const userRole = getUserRole();
 
   return (
     <Container>
       <nav aria-label="Breadcrumb">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.back()}
-          className="flex items-center gap-2 mb-6"
-          aria-label="Go back to previous page"
-        >
-          <HiArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Back
-        </Button>
+        <BackButton showLabel />
       </nav>
 
       <main role="main">
         <header className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Settings
+            {t('title')}
           </h1>
-          <p className="text-muted-foreground">
-            Manage your account preferences and security settings
-          </p>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </header>
 
         <section aria-labelledby="settings-options-heading">
@@ -40,15 +31,23 @@ const SettingsPage = () => {
             Settings Options
           </h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {settingsOptions.map((option) => (
-              <SettingsCard
-                key={option.title}
-                title={option.title}
-                description={option.description}
-                href={option.href}
-                icon={option.icon}
-              />
-            ))}
+            {settingsOptions.map((option) => {
+              if (
+                option.titleKey === 'verification' &&
+                userRole !== 'craftsman'
+              ) {
+                return null;
+              }
+              return (
+                <SettingsCard
+                  key={option.titleKey}
+                  title={t(`options.${option.titleKey}.title`)}
+                  description={t(`options.${option.titleKey}.description`)}
+                  href={option.href}
+                  icon={option.icon}
+                />
+              );
+            })}
           </div>
         </section>
       </main>

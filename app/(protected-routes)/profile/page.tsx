@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { userService } from '@/app/services/user';
-import { getServiceName, getServiceDescription } from '@/app/services/services';
+import { getServiceName } from '@/app/services/services';
 import { User } from '@/app/types/user';
 import { formatAddress } from '@/app/utils/helpers';
 import Container from '@/app/components/ui/container';
@@ -21,14 +21,19 @@ import { HiMail } from 'react-icons/hi';
 import Link from 'next/link';
 import Image from 'next/image';
 import BackButton from '@/app/components/ui/back-button';
+import ImageModal from '@/app/components/ui/image-modal';
 import { FaRegEdit } from 'react-icons/fa';
 
 const ProfilePage = () => {
   const { data: session } = useSession();
   const locale = useLocale();
+  const t = useTranslations('profile');
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,7 +59,7 @@ const ProfilePage = () => {
       <Container className="flex items-center justify-center py-20">
         <div role="status" aria-label="Loading profile data">
           <LoadingSpinner />
-          <span className="sr-only">Loading your profile information...</span>
+          <span className="sr-only">{t('loading')}</span>
         </div>
       </Container>
     );
@@ -65,7 +70,7 @@ const ProfilePage = () => {
       <Container className="flex items-center justify-center py-20">
         <div className="text-center" role="alert" aria-live="polite">
           <div className="text-destructive text-lg font-medium mb-2">
-            {error || 'Failed to load profile'}
+            {error || t('error')}
           </div>
           <p className="text-muted-foreground">
             Please try refreshing the page
@@ -86,11 +91,9 @@ const ProfilePage = () => {
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
-              Profile
+              {t('title')}
             </h1>
-            <p className="text-muted-foreground mt-1">
-              View and manage your profile information
-            </p>
+            <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
           </div>
         </header>
 
@@ -152,7 +155,7 @@ const ProfilePage = () => {
             {/* User Info */}
             <section className="space-y-6" aria-labelledby="user-info-heading">
               <h2 id="user-info-heading" className="sr-only">
-                User Information
+                {t('sections.userInfo')}
               </h2>
 
               <div className="text-center md:text-left">
@@ -167,7 +170,7 @@ const ProfilePage = () => {
                       {user.verificationStatus === 'verified' ? (
                         <div className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm font-medium">
                           <HiShieldCheck className="w-4 h-4" />
-                          Verified
+                          {t('status.verified')}
                         </div>
                       ) : (
                         <Link
@@ -175,7 +178,7 @@ const ProfilePage = () => {
                           className="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer"
                         >
                           <HiExclamationTriangle className="w-4 h-4" />
-                          Not Verified
+                          {t('status.pendingVerification')}
                         </Link>
                       )}
                     </>
@@ -183,7 +186,9 @@ const ProfilePage = () => {
                 </div>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 text-muted-foreground">
                   <span className="text-lg capitalize font-medium">
-                    {user.role}
+                    {user.role === 'craftsman'
+                      ? t('role.craftsman')
+                      : t('role.client')}
                   </span>
                   {user.service && (
                     <>
@@ -259,7 +264,7 @@ const ProfilePage = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-foreground">
-                    Contact Information
+                    {t('sections.contact')}
                   </h3>
 
                   <div className="flex items-center gap-3 p-3 bg-muted/20 rounded-lg border border-border">
@@ -268,7 +273,7 @@ const ProfilePage = () => {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground">
-                        Email Address
+                        {t('fields.email')}
                       </p>
                       <p className="text-foreground font-medium">
                         {user.email}
@@ -282,10 +287,10 @@ const ProfilePage = () => {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground">
-                        Phone Number
+                        {t('fields.phone')}
                       </p>
                       <p className="text-foreground font-medium">
-                        {user.phone || 'Not provided'}
+                        {user.phone || t('status.notProvided')}
                       </p>
                     </div>
                   </div>
@@ -293,7 +298,7 @@ const ProfilePage = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-foreground">
-                    Location & Rating
+                    {t('sections.address')}
                   </h3>
 
                   <div className="flex items-start gap-3 p-3 bg-muted/20 rounded-lg border border-border">
@@ -301,7 +306,9 @@ const ProfilePage = () => {
                       <HiMapPin className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Address</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('fields.address')}
+                      </p>
                       <p className="text-foreground font-medium">
                         {formatAddress(user.address)}
                       </p>
@@ -315,7 +322,7 @@ const ProfilePage = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-muted-foreground">
-                          Customer Rating
+                          {t('fields.rating')}
                         </p>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1">
@@ -336,7 +343,7 @@ const ProfilePage = () => {
                             </div>
                           </div>
                           <span className="text-sm text-muted-foreground">
-                            ({user.ratingCount} reviews)
+                            ({user.ratingCount} {t('fields.reviews')})
                           </span>
                         </div>
                       </div>
@@ -348,38 +355,47 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Service Information for non-craftsman with service */}
-        {user.role !== 'craftsman' && user.service && (
-          <div className="bg-card border border-border rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              Service Information
-            </h3>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center border border-border">
-                {user.service.image ? (
-                  <Image
-                    src={user.service.image}
-                    alt={getServiceName(user.service, locale)}
-                    width={48}
-                    height={48}
-                    className="object-cover rounded-lg"
-                  />
-                ) : (
-                  <span className="text-2xl">🔧</span>
-                )}
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">
-                  {getServiceName(user.service, locale)}
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  {getServiceDescription(user.service, locale)}
-                </p>
+        {/* Portfolio Images for craftsmen */}
+        {user.role === 'craftsman' &&
+          user.portfolioImageUrls &&
+          user.portfolioImageUrls.length > 0 && (
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                {t('sections.portfolio')}
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {user.portfolioImageUrls.map((imageUrl, index) => (
+                  <div
+                    key={index}
+                    className="relative rounded-lg overflow-hidden bg-muted border border-border hover:shadow-md transition-shadow group cursor-pointer"
+                    onClick={() => {
+                      setSelectedImages(user.portfolioImageUrls || []);
+                      setSelectedImageIndex(index);
+                      setShowImageModal(true);
+                    }}
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt={`Portfolio image ${index + 1} by ${user.fullName}`}
+                      width={200}
+                      height={200}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
       </main>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={showImageModal}
+        images={selectedImages}
+        initialIndex={selectedImageIndex}
+        onClose={() => setShowImageModal(false)}
+      />
     </Container>
   );
 };

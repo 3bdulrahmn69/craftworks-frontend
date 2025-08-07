@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/button';
 import { userService, ChangePasswordData } from '@/app/services/user';
@@ -12,6 +13,7 @@ import SettingsPageHeader from '@/app/components/settings/settings-page-header';
 
 const SecuritySettings = () => {
   const { data: session } = useSession();
+  const t = useTranslations('settings.security');
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ChangePasswordData>({
     currentPassword: '',
@@ -39,21 +41,19 @@ const SecuritySettings = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.currentPassword) {
-      newErrors.currentPassword = 'Current password is required';
+      newErrors.currentPassword = t('validation.currentPasswordRequired');
     }
 
     if (!formData.newPassword) {
-      newErrors.newPassword = 'New password is required';
+      newErrors.newPassword = t('validation.newPasswordRequired');
     } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = 'Password must be at least 8 characters long';
+      newErrors.newPassword = t('validation.passwordTooShort');
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.newPassword)) {
-      newErrors.newPassword =
-        'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+      newErrors.newPassword = t('validation.passwordWeak');
     }
 
     if (formData.currentPassword === formData.newPassword) {
-      newErrors.newPassword =
-        'New password must be different from current password';
+      newErrors.newPassword = t('validation.passwordSame');
     }
 
     setErrors(newErrors);
@@ -74,7 +74,7 @@ const SecuritySettings = () => {
         newPassword: '',
       });
 
-      toast.success('Password changed successfully!');
+      toast.success(t('messages.success'));
     } catch (error: any) {
       console.error('Failed to change password:', error);
 
@@ -83,12 +83,14 @@ const SecuritySettings = () => {
         if (
           error.response.data.message.toLowerCase().includes('current password')
         ) {
-          setErrors({ currentPassword: 'Current password is incorrect' });
+          setErrors({
+            currentPassword: t('messages.currentPasswordIncorrect'),
+          });
         } else {
           toast.error(error.response.data.message);
         }
       } else {
-        toast.error('Failed to change password. Please try again.');
+        toast.error(t('messages.error'));
       }
     } finally {
       setSaving(false);
@@ -101,12 +103,9 @@ const SecuritySettings = () => {
       role="main"
       aria-labelledby="security-page-title"
     >
-      <SettingsPageHeader
-        title="Security Settings"
-        description="Manage your password and security preferences"
-      />
+      <SettingsPageHeader title={t('title')} description={t('subtitle')} />
       <div id="security-page-title" className="sr-only">
-        Security Settings
+        {t('title')}
       </div>
 
       {/* Change Password Section */}
@@ -127,11 +126,9 @@ const SecuritySettings = () => {
               id="change-password-heading"
               className="text-lg font-semibold text-foreground"
             >
-              Change Password
+              {t('sections.changePassword')}
             </h2>
-            <p className="text-sm text-muted-foreground">
-              Update your password to keep your account secure
-            </p>
+            <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
 
@@ -149,15 +146,15 @@ const SecuritySettings = () => {
               name="currentPassword"
               value={formData.currentPassword}
               onChange={handleInputChange}
-              label="Current Password"
-              placeholder="Enter your current password"
+              label={t('fields.currentPassword')}
+              placeholder={t('placeholders.currentPassword')}
               required
               showPasswordToggle={true}
               error={errors.currentPassword}
               aria-describedby="current-password-help"
             />
             <p id="current-password-help" className="sr-only">
-              Enter your current password to verify your identity
+              {t('helpText.currentPasswordHelp')}
             </p>
           </div>
 
@@ -169,8 +166,8 @@ const SecuritySettings = () => {
               name="newPassword"
               value={formData.newPassword}
               onChange={handleInputChange}
-              label="New Password"
-              placeholder="Enter your new password"
+              label={t('fields.newPassword')}
+              placeholder={t('placeholders.newPassword')}
               required
               showPasswordToggle={true}
               error={errors.newPassword}
@@ -180,12 +177,12 @@ const SecuritySettings = () => {
               id="new-password-requirements"
               className="mt-2 text-xs text-muted-foreground"
             >
-              <p>Password requirements:</p>
+              <p>{t('helpText.passwordRequirements')}</p>
               <ul className="list-disc list-inside ml-2 space-y-1" role="list">
-                <li>At least 8 characters long</li>
-                <li>Contains at least one uppercase letter</li>
-                <li>Contains at least one lowercase letter</li>
-                <li>Contains at least one number</li>
+                <li>{t('helpText.requirements.length')}</li>
+                <li>{t('helpText.requirements.uppercase')}</li>
+                <li>{t('helpText.requirements.lowercase')}</li>
+                <li>{t('helpText.requirements.number')}</li>
               </ul>
             </div>
           </div>
@@ -198,11 +195,15 @@ const SecuritySettings = () => {
             >
               {saving ? (
                 <>
-                  <span className="sr-only">Changing password...</span>
-                  <span aria-hidden="true">Changing Password...</span>
+                  <span className="sr-only">
+                    {t('buttons.changingPassword')}
+                  </span>
+                  <span aria-hidden="true">
+                    {t('buttons.changingPassword')}
+                  </span>
                 </>
               ) : (
-                'Change Password'
+                t('buttons.changePassword')
               )}
             </Button>
             <span id="submit-button-description" className="sr-only">

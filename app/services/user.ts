@@ -11,6 +11,8 @@ export interface UpdateUserData {
     street: string;
   };
   serviceId?: string;
+  bio?: string; // Bio for craftsmen
+  portfolioImageUrls?: string[]; // For craftsmen portfolio images
 }
 
 export interface ChangePasswordData {
@@ -85,6 +87,46 @@ export const userService = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      }
+    );
+    return response.data.data;
+  },
+
+  // Upload portfolio images (craftsmen only)
+  uploadPortfolioImages: async (
+    token: string,
+    files: File[]
+  ): Promise<User> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('portfolioImages', file);
+    });
+
+    const response = await api.put<ApiResponse<User>>(
+      '/users/me/portfolio',
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data.data;
+  },
+
+  // Delete portfolio image (craftsmen only)
+  deletePortfolioImage: async (
+    token: string,
+    imageUrl: string
+  ): Promise<User> => {
+    const response = await api.delete<ApiResponse<User>>(
+      '/users/me/portfolio',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { imageUrl },
       }
     );
     return response.data.data;

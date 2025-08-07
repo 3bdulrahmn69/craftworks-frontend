@@ -2,8 +2,10 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { userService } from '@/app/services/user';
+import { getServiceName } from '@/app/services/services';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   HiOutlineMail,
   HiOutlinePhone,
@@ -11,19 +13,27 @@ import {
   HiOutlineLocationMarker,
   HiOutlineStar,
   HiOutlineCalendar,
-  HiArrowLeft,
   HiOutlineGlobe,
   HiOutlineBriefcase,
   HiOutlineBadgeCheck,
 } from 'react-icons/hi';
 import Image from 'next/image';
+import BackButton from '@/app/components/ui/back-button';
+import ImageModal from '@/app/components/ui/image-modal';
+import { User } from '@/app/types/user';
+import Container from '@/app/components/ui/container';
 
 const UserDetails = () => {
   const { data: session } = useSession();
   const { userId } = useParams();
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const locale = useLocale();
+  const t = useTranslations('userProfile');
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -57,7 +67,7 @@ const UserDetails = () => {
       <div className="min-h-screen bg-background flex justify-center items-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading user details...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -71,17 +81,14 @@ const UserDetails = () => {
             <HiOutlineUser className="w-10 h-10 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">
-            User not found
+            {t('notFound.title')}
           </h3>
-          <p className="text-muted-foreground mb-4">
-            The user you&apos;re looking for doesn&apos;t exist or has been
-            removed.
-          </p>
+          <p className="text-muted-foreground mb-4">{t('notFound.message')}</p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
-            Go Back
+            {t('notFound.button')}
           </button>
         </div>
       </div>
@@ -89,20 +96,12 @@ const UserDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-background py-8">
+      <Container className="px-4 sm:px-6">
         {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="fixed z-20 top-6 left-6 flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-3 rounded-full border border-border shadow-lg hover:bg-card transition-all group"
-        >
-          <HiArrowLeft className="h-5 w-5 text-muted-foreground group-hover:text-foreground" />
-          <span className="text-muted-foreground group-hover:text-foreground">
-            Back
-          </span>
-        </button>
+        <BackButton showLabel className="mb-8" />
 
-        <div className="pt-20 pb-12">
+        <div className="">
           {/* Profile Card */}
           <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all">
             {/* Header */}
@@ -147,10 +146,10 @@ const UserDetails = () => {
                   </h2>
 
                   <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
-                    {user.location && (
+                    {user.address && (
                       <span className="inline-flex items-center gap-1.5 text-sm bg-muted px-3 py-1.5 rounded-full">
                         <HiOutlineLocationMarker className="h-4 w-4" />
-                        {user.location}
+                        {user.address.city}, {user.address.state}
                       </span>
                     )}
                   </div>
@@ -175,7 +174,7 @@ const UserDetails = () => {
                       {user.rating}
                     </span>
                     <span className="text-sm text-muted-foreground ml-1">
-                      ({user.ratingCount} reviews)
+                      ({user.ratingCount} {t('fields.reviews')})
                     </span>
                   </div>
                 )}
@@ -186,20 +185,23 @@ const UserDetails = () => {
           {/* Detail Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
             {/* Contact Info */}
-            <DetailSection icon={<HiOutlineUser />} title="Contact Information">
+            <DetailSection
+              icon={<HiOutlineUser />}
+              title={t('sections.contact')}
+            >
               <DetailCard
                 icon={<HiOutlineMail />}
-                title="Email"
+                title={t('fields.email')}
                 value={user.email}
               />
               <DetailCard
                 icon={<HiOutlinePhone />}
-                title="Phone"
-                value={user.phone || 'Not provided'}
+                title={t('fields.phone')}
+                value={user.phone || t('status.notProvided')}
               />
               <DetailCard
                 icon={<HiOutlineCalendar />}
-                title="Member Since"
+                title={t('fields.memberSince')}
                 value={formatDate(user.createdAt)}
               />
             </DetailSection>
@@ -207,12 +209,12 @@ const UserDetails = () => {
             {/* Additional Info */}
             <DetailSection
               icon={<HiOutlineBriefcase />}
-              title="Additional Information"
+              title={t('sections.additional')}
             >
               {user.address && (
                 <DetailCard
                   icon={<HiOutlineLocationMarker />}
-                  title="Address"
+                  title={t('fields.address')}
                   value={
                     <div className="space-y-1.5">
                       {user.address.street && <div>{user.address.street}</div>}
@@ -232,21 +234,29 @@ const UserDetails = () => {
                 />
               )}
 
+              {user.bio && (
+                <DetailCard
+                  icon={<HiOutlineUser />}
+                  title={t('fields.about')}
+                  value={user.bio}
+                />
+              )}
+
               {user.role === 'craftsman' && user.service && (
                 <div className="bg-gradient-to-br from-card to-card/80 p-6 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow">
                   <h3 className="font-bold text-foreground mb-4 flex items-center gap-3 text-lg">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <HiOutlineBadgeCheck className="h-5 w-5 text-primary" />
                     </div>
-                    Craftsmanship Service
+                    {t('craftsman.service')}
                   </h3>
 
                   <div className="border-l-2 border-primary pl-4 py-1">
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                      Service
+                      {t('fields.service')}
                     </h4>
                     <p className="text-foreground font-bold text-lg">
-                      {user.service.name}
+                      {getServiceName(user.service, locale)}
                     </p>
                   </div>
                 </div>
@@ -254,7 +264,61 @@ const UserDetails = () => {
             </DetailSection>
           </div>
         </div>
-      </div>
+
+        {/* Portfolio Images for craftsmen */}
+        {user.role === 'craftsman' &&
+          user.portfolioImageUrls &&
+          user.portfolioImageUrls.length > 0 && (
+            <div className="mt-10 bg-card border border-border rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all">
+              <div className="px-6 sm:px-8 py-8">
+                <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                  <div className="bg-primary/10 p-3 rounded-lg">
+                    <HiOutlineBriefcase className="h-6 w-6 text-primary" />
+                  </div>
+                  {t('craftsman.portfolio')}
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {user.portfolioImageUrls.map((imageUrl, index) => (
+                    <div
+                      key={index}
+                      className="relative rounded-xl overflow-hidden bg-muted border border-border hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                      onClick={() => {
+                        setSelectedImages(user.portfolioImageUrls || []);
+                        setSelectedImageIndex(index);
+                        setShowImageModal(true);
+                      }}
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={`Portfolio work ${index + 1} by ${user.fullName}`}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute bottom-2 left-2 right-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                          <p className="text-xs font-medium text-gray-800">
+                            {t('craftsman.workLabel')}
+                            {index + 1}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+      </Container>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={showImageModal}
+        images={selectedImages}
+        initialIndex={selectedImageIndex}
+        onClose={() => setShowImageModal(false)}
+      />
     </div>
   );
 };

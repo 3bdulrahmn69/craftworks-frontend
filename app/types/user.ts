@@ -19,6 +19,7 @@ export interface User {
   rating: number;
   ratingCount: number;
   service?: Service;
+  portfolioImageUrls?: string[]; // Portfolio images for craftsmen
 }
 
 // Recommended Craftsman interface based on the API response

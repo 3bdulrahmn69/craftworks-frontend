@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/button';
 import SettingsPageHeader from '@/app/components/settings/settings-page-header';
@@ -23,12 +23,15 @@ import DropdownSelector from '@/app/components/ui/dropdown-selector';
 const PersonalSettings = () => {
   const { data: session } = useSession();
   const locale = useLocale();
+  const t = useTranslations('settings.personal');
   const [user, setUser] = useState<User | null>(null);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [deletingImage, setDeletingImage] = useState(false);
+  const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+  const [deletingPortfolio, setDeletingPortfolio] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -39,6 +42,7 @@ const PersonalSettings = () => {
       street: '',
     },
     serviceId: '',
+    bio: '',
   });
 
   useEffect(() => {
@@ -62,6 +66,7 @@ const PersonalSettings = () => {
             street: userData.address.street,
           },
           serviceId: userData.service?._id || '',
+          bio: userData.bio || '',
         });
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -75,7 +80,9 @@ const PersonalSettings = () => {
   }, [session?.accessToken, locale]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
 
@@ -119,12 +126,13 @@ const PersonalSettings = () => {
         fullName: formData.fullName,
         phone: formData.phone,
         address: {
-          country: user.address.country, // Keep original country from backend
+          country: user.address.country,
           state: formData.address.state,
           city: formData.address.city,
           street: formData.address.street,
         },
         serviceId: formData.serviceId || undefined,
+        bio: formData.bio || undefined,
       };
 
       const updatedUser = await userService.updateProfile(
@@ -133,10 +141,10 @@ const PersonalSettings = () => {
       );
       setUser(updatedUser);
       setHasChanges(false);
-      toast.success('Profile updated successfully!');
+      toast.success(t('messages.saveSuccess'));
     } catch (error) {
       console.error('Failed to update profile:', error);
-      toast.error('Failed to update profile. Please try again.');
+      toast.error(t('messages.saveError'));
     } finally {
       setSaving(false);
     }
@@ -153,10 +161,10 @@ const PersonalSettings = () => {
         file
       );
       setUser(updatedUser);
-      toast.success('Profile picture updated successfully!');
+      toast.success(t('messages.imageUploadSuccess'));
     } catch (error) {
       console.error('Failed to upload image:', error);
-      toast.error('Failed to upload image. Please try again.');
+      toast.error(t('messages.imageUploadError'));
     } finally {
       setUploadingImage(false);
     }
@@ -171,12 +179,59 @@ const PersonalSettings = () => {
         session.accessToken
       );
       setUser(updatedUser);
-      toast.success('Profile picture deleted successfully!');
+      toast.success(t('messages.imageDeleteSuccess'));
     } catch (error) {
       console.error('Failed to delete image:', error);
-      toast.error('Failed to delete image. Please try again.');
+      toast.error(t('messages.imageDeleteError'));
     } finally {
       setDeletingImage(false);
+    }
+  };
+
+  const handlePortfolioUpload = async (files: FileList) => {
+    if (!session?.accessToken || !files.length) return;
+
+    const maxFiles = 5;
+    const currentCount = user?.portfolioImageUrls?.length || 0;
+
+    if (currentCount + files.length > maxFiles) {
+      toast.error(t('messages.portfolioMaxLimit'));
+      return;
+    }
+
+    setUploadingPortfolio(true);
+    try {
+      const fileArray = Array.from(files);
+      const updatedUser = await userService.uploadPortfolioImages(
+        session.accessToken,
+        fileArray
+      );
+      setUser(updatedUser);
+      toast.success(t('messages.portfolioUploadSuccess'));
+    } catch (error) {
+      console.error('Failed to upload portfolio images:', error);
+      toast.error(t('messages.portfolioUploadError'));
+    } finally {
+      setUploadingPortfolio(false);
+    }
+  };
+
+  const handlePortfolioDelete = async (imageUrl: string) => {
+    if (!session?.accessToken) return;
+
+    setDeletingPortfolio(true);
+    try {
+      const updatedUser = await userService.deletePortfolioImage(
+        session.accessToken,
+        imageUrl
+      );
+      setUser(updatedUser);
+      toast.success(t('messages.portfolioDeleteSuccess'));
+    } catch (error) {
+      console.error('Failed to delete portfolio image:', error);
+      toast.error(t('messages.portfolioDeleteError'));
+    } finally {
+      setDeletingPortfolio(false);
     }
   };
 
@@ -224,18 +279,15 @@ const PersonalSettings = () => {
       role="main"
       aria-labelledby="page-title"
     >
-      <SettingsPageHeader
-        title="Personal Information"
-        description="Update your profile details and personal information"
-      />
+      <SettingsPageHeader title={t('title')} description={t('subtitle')} />
       <div id="page-title" className="sr-only">
-        Personal Information Settings
+        {t('title')} Settings
       </div>
 
       {/* Profile Picture Section */}
       <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
         <h2 className="text-lg font-semibold text-foreground mb-4">
-          Profile Picture
+          {t('sections.profilePicture')}
         </h2>
         <div className="flex items-center gap-6">
           <div className="relative">
@@ -302,7 +354,9 @@ const PersonalSettings = () => {
                 className="absolute inset-0 flex items-center justify-center bg-black/75 rounded-full"
                 aria-live="polite"
                 aria-label={
-                  uploadingImage ? 'Uploading image...' : 'Deleting image...'
+                  uploadingImage
+                    ? t('messages.uploading')
+                    : t('messages.deleting')
                 }
               >
                 <LoadingSpinner size="lg" />
@@ -311,10 +365,10 @@ const PersonalSettings = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">
-              Click on the image to upload a new profile picture
+              {t('helpText.profilePictureHelp')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              JPG, PNG. Max size of 5MB.
+              {t('helpText.profilePictureFormat')}
             </p>
           </div>
         </div>
@@ -323,7 +377,7 @@ const PersonalSettings = () => {
       {/* Personal Information Form */}
       <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
         <h2 className="text-lg font-semibold text-foreground mb-4">
-          Basic Information
+          {t('sections.basicInfo')}
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -339,12 +393,12 @@ const PersonalSettings = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                label="Full Name"
+                label={t('fields.fullName')}
                 required
                 aria-describedby="fullname-validation"
               />
               <div id="fullname-validation" className="sr-only">
-                {!formData.fullName && 'Full name is required'}
+                {!formData.fullName && t('validation.fullNameRequired')}
               </div>
             </div>
             <div>
@@ -354,12 +408,12 @@ const PersonalSettings = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                label="Phone Number"
+                label={t('fields.phone')}
                 required
                 aria-describedby="phone-validation"
               />
               <div id="phone-validation" className="sr-only">
-                {!formData.phone && 'Phone number is required'}
+                {!formData.phone && t('validation.phoneRequired')}
               </div>
             </div>
           </div>
@@ -370,7 +424,7 @@ const PersonalSettings = () => {
                 id="email-address"
                 type="email"
                 value={user.email}
-                label="Email"
+                label={t('fields.email')}
                 disabled
                 aria-describedby="email-help-text"
               />
@@ -378,7 +432,7 @@ const PersonalSettings = () => {
                 id="email-help-text"
                 className="text-xs text-muted-foreground mt-1"
               >
-                Email cannot be changed
+                {t('helpText.emailReadonly')}
               </p>
             </div>
             <div>
@@ -386,7 +440,7 @@ const PersonalSettings = () => {
                 id="user-role"
                 type="text"
                 value={user.role}
-                label="Role"
+                label={t('fields.role')}
                 aria-describedby="role-help-text"
                 disabled
               />
@@ -394,7 +448,7 @@ const PersonalSettings = () => {
                 id="role-help-text"
                 className="text-xs text-muted-foreground mt-1 sr-only"
               >
-                User role cannot be changed
+                {t('helpText.roleReadonly')}
               </p>
             </div>
           </div>
@@ -402,20 +456,20 @@ const PersonalSettings = () => {
           {/* Address Section */}
           <div className="border-t pt-4 mt-6">
             <h3 className="text-md font-semibold text-foreground mb-4">
-              Address
+              {t('sections.address')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <DropdownSelector
                   id="country-selector"
-                  label="Country"
+                  label={t('fields.country')}
                   options={[
                     { id: user.address.country, label: user.address.country },
                   ]}
                   value={user.address.country}
                   onChange={() => {}}
                   disabled={true}
-                  helpText="Country cannot be changed"
+                  helpText={t('helpText.countryReadonly')}
                   allowEmpty={false}
                 />
               </div>
@@ -426,12 +480,12 @@ const PersonalSettings = () => {
                   name="address.state"
                   value={formData.address.state}
                   onChange={handleInputChange}
-                  label="State"
+                  label={t('fields.state')}
                   required
                   aria-describedby="state-validation"
                 />
                 <div id="state-validation" className="sr-only">
-                  {!formData.address.state && 'State is required'}
+                  {!formData.address.state && t('validation.stateRequired')}
                 </div>
               </div>
               <div>
@@ -441,12 +495,12 @@ const PersonalSettings = () => {
                   name="address.city"
                   value={formData.address.city}
                   onChange={handleInputChange}
-                  label="City"
+                  label={t('fields.city')}
                   required
                   aria-describedby="city-validation"
                 />
                 <div id="city-validation" className="sr-only">
-                  {!formData.address.city && 'City is required'}
+                  {!formData.address.city && t('validation.cityRequired')}
                 </div>
               </div>
               <div>
@@ -456,12 +510,12 @@ const PersonalSettings = () => {
                   name="address.street"
                   value={formData.address.street}
                   onChange={handleInputChange}
-                  label="Street"
+                  label={t('fields.street')}
                   required
                   aria-describedby="street-validation"
                 />
                 <div id="street-validation" className="sr-only">
-                  {!formData.address.street && 'Street is required'}
+                  {!formData.address.street && t('validation.streetRequired')}
                 </div>
               </div>
             </div>
@@ -471,13 +525,13 @@ const PersonalSettings = () => {
           {user?.role === 'craftsman' && (
             <div className="border-t pt-4 mt-6">
               <h3 className="text-md font-semibold text-foreground mb-4">
-                Service Information
+                {t('sections.serviceInfo')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <DropdownSelector
                     id="service-selector"
-                    label="Choose Your Service"
+                    label={t('fields.service')}
                     options={services.map((service) => ({
                       id: service._id,
                       label: getServiceName(service, locale),
@@ -485,13 +539,124 @@ const PersonalSettings = () => {
                     }))}
                     value={formData.serviceId}
                     onChange={handleServiceChange}
-                    placeholder="Select a service"
-                    helpText="Select the service you provide to customers"
+                    placeholder={t('placeholders.selectService')}
+                    helpText={t('helpText.serviceHelp')}
                     allowEmpty={true}
-                    emptyLabel="No service selected"
+                    emptyLabel={t('emptyStates.noService')}
                   />
                 </div>
               </div>
+
+              {/* Bio Section */}
+              <div className="mt-4">
+                <label
+                  htmlFor="bio"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
+                  {t('fields.bio')}
+                </label>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  placeholder={t('placeholders.bioPlaceholder')}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-y min-h-[100px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('helpText.bioHelp')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Portfolio Section for Craftsmen */}
+          {user?.role === 'craftsman' && (
+            <div className="border-t pt-4 mt-6">
+              <h3 className="text-md font-semibold text-foreground mb-4">
+                {t('sections.portfolio')}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {t('helpText.portfolioHelp')}
+              </p>
+
+              {/* Upload Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t('buttons.uploadPortfolio')}
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={(e) =>
+                    e.target.files && handlePortfolioUpload(e.target.files)
+                  }
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  disabled={
+                    uploadingPortfolio ||
+                    (user?.portfolioImageUrls?.length || 0) >= 5
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('helpText.portfolioFormat')}
+                </p>
+              </div>
+
+              {/* Portfolio Images Grid */}
+              {user?.portfolioImageUrls &&
+                user.portfolioImageUrls.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {user.portfolioImageUrls.map((imageUrl, index) => (
+                      <div
+                        key={index}
+                        className="relative rounded-lg overflow-hidden bg-muted border border-border group"
+                      >
+                        <Image
+                          src={imageUrl}
+                          alt={`Portfolio image ${index + 1}`}
+                          width={200}
+                          height={200}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            onClick={() => handlePortfolioDelete(imageUrl)}
+                            disabled={deletingPortfolio}
+                            className="bg-destructive text-destructive-foreground p-2 rounded-full hover:bg-destructive/90 transition-colors"
+                            aria-label={`Delete portfolio image ${index + 1}`}
+                          >
+                            <HiTrash className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {deletingPortfolio && (
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+                            <div className="text-white">
+                              {t('messages.deleting')}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              {uploadingPortfolio && (
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner size="lg" />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {t('messages.uploadingPortfolio')}
+                  </span>
+                </div>
+              )}
+
+              {(!user?.portfolioImageUrls ||
+                user.portfolioImageUrls.length === 0) && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>{t('emptyStates.noPortfolio')}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -504,7 +669,7 @@ const PersonalSettings = () => {
                     aria-live="polite"
                     role="status"
                   >
-                    You have unsaved changes
+                    {t('messages.unsavedChanges')}
                   </span>
                   <Button
                     type="button"
@@ -521,13 +686,14 @@ const PersonalSettings = () => {
                             street: user.address.street,
                           },
                           serviceId: user.service?._id || '',
+                          bio: user.bio || '',
                         });
                         setHasChanges(false);
                       }
                     }}
                     aria-describedby="reset-button-description"
                   >
-                    Reset
+                    {t('buttons.reset')}
                   </Button>
                   <span id="reset-button-description" className="sr-only">
                     Reset all changes to original values
@@ -543,16 +709,16 @@ const PersonalSettings = () => {
             >
               {saving ? (
                 <>
-                  <span className="sr-only">Saving changes...</span>
-                  <span aria-hidden="true">Saving...</span>
+                  <span className="sr-only">{t('buttons.saving')}</span>
+                  <span aria-hidden="true">{t('buttons.saving')}</span>
                 </>
               ) : (
-                'Save Changes'
+                t('buttons.save')
               )}
             </Button>
             <span id="save-button-description" className="sr-only">
               {!hasChanges
-                ? 'No changes to save'
+                ? t('messages.noChanges')
                 : saving
                 ? 'Currently saving your changes'
                 : 'Save your profile changes'}

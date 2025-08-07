@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Button from '@/app/components/ui/button';
 import Input from '@/app/components/ui/input';
 import Modal from '@/app/components/ui/modal';
+import { useLocale } from 'next-intl';
+import Textarea from '../ui/textarea';
 
 interface QuoteFormData {
   price: number;
@@ -29,6 +31,7 @@ const JobsModal = ({
     price: 0,
     notes: '',
   });
+  const local = useLocale();
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -63,10 +66,9 @@ const JobsModal = ({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <Input
-            type="number"
+            type="text"
             id="quote-price"
-            label="Quote Price (EGP) *"
-            required
+            label={local === 'ar' ? 'سعر العرض' : 'Quote Price'}
             min="1"
             value={quoteForm.price || ''}
             onChange={(e) =>
@@ -75,20 +77,21 @@ const JobsModal = ({
                 price: Number(e.target.value),
               }))
             }
-            placeholder="Enter your quote price"
+            placeholder={
+              local === 'ar' ? 'أدخل سعر العرض' : 'Enter your quote price'
+            }
+            required
           />
         </div>
 
         <div>
-          <label
-            htmlFor="quote-notes"
-            className="block text-sm font-medium text-foreground mb-2"
-          >
-            Additional Notes (Optional)
-          </label>
-          <textarea
+          <Textarea
             id="quote-notes"
-            rows={4}
+            label={
+              local === 'ar'
+                ? 'ملاحظات إضافية (اختياري)'
+                : 'Additional Notes (Optional)'
+            }
             value={quoteForm.notes}
             onChange={(e) =>
               setQuoteForm((prev) => ({
@@ -96,8 +99,11 @@ const JobsModal = ({
                 notes: e.target.value,
               }))
             }
-            className="w-full px-4 py-3 border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors resize-none"
-            placeholder="Any additional details about your quote..."
+            placeholder={
+              local === 'ar'
+                ? 'أدخل ملاحظات إضافية حول عرضك...'
+                : 'Any additional details about your quote...'
+            }
           />
         </div>
 
@@ -109,16 +115,16 @@ const JobsModal = ({
             className="flex-1"
             disabled={submittingQuote}
           >
-            Cancel
+            {local === 'ar' ? 'إلغاء' : 'Cancel'}
           </Button>
           <Button
             type="submit"
             disabled={submittingQuote || !quoteForm.price}
             className="flex-1"
             isLoading={submittingQuote}
-            loadingText="Submitting..."
+            loadingText={local === 'ar' ? 'جاري الإرسال...' : 'Submitting...'}
           >
-            Submit Quote
+            {local === 'ar' ? 'إرسال عرض السعر' : 'Submit Quote'}
           </Button>
         </div>
       </form>

@@ -3,6 +3,7 @@
 import { useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
 import Button from './button';
+import { useLocale } from 'next-intl';
 
 interface ModalProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ const Modal = ({
   preventScroll = true,
   className = '',
 }: ModalProps) => {
+  const locale = useLocale();
+
   // Handle escape key
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
@@ -97,7 +100,11 @@ const Modal = ({
           {/* Header */}
           {(title || showCloseButton) && (
             <div className="sticky top-0 z-10 bg-card border-b border-border px-6 py-4 rounded-t-3xl">
-              <div className="flex items-center justify-between">
+              <div
+                className={`flex items-center justify-between ${
+                  locale === 'ar' ? 'flex-row-reverse' : ''
+                }`}
+              >
                 {title && (
                   <h2
                     id="modal-title"
@@ -106,6 +113,7 @@ const Modal = ({
                     {title}
                   </h2>
                 )}
+
                 {showCloseButton && (
                   <Button
                     variant="ghost"
@@ -114,7 +122,7 @@ const Modal = ({
                     className="ml-auto -mr-2 p-2 rounded-xl"
                     aria-label="Close modal"
                   >
-                    <HiX className="w-5 h-5" />
+                    <HiX className="w-5 h-5 text-destructive" />
                   </Button>
                 )}
               </div>
