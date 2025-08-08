@@ -3,6 +3,7 @@
 import React from 'react';
 import { Message } from '@/app/types/messages';
 import MessageBubble from './message-bubble';
+import { useTranslations } from 'next-intl';
 
 interface MessageListProps {
   messages: Message[];
@@ -21,12 +22,16 @@ const MessageList: React.FC<MessageListProps> = ({
   messagesContainerRef,
   messagesEndRef,
 }) => {
+  const t = useTranslations('messaging');
+
   if (messagesLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading messages...</p>
+          <p className="text-sm text-muted-foreground">
+            {t('loading.messages')}
+          </p>
         </div>
       </div>
     );
@@ -52,10 +57,10 @@ const MessageList: React.FC<MessageListProps> = ({
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            No messages yet
+            {t('message.noMessages')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Start the conversation by sending your first message
+            {t('message.startConversation')}
           </p>
         </div>
       </div>
@@ -63,7 +68,7 @@ const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto bg-red-400">
       <div className="space-y-3 p-4" ref={messagesContainerRef}>
         {messages
           .filter(

@@ -289,7 +289,7 @@ const CalendarPage = () => {
               className="bg-gradient-to-r from-primary to-primary hover:from-primary/90 hover:to-primary/90 px-3 sm:px-4 py-2 text-sm font-medium w-full sm:w-auto"
             >
               <FaPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Create Job
+              {t('navigation.createJob')}
             </Button>
           </div>
         </div>

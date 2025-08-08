@@ -4,6 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { Chat } from '@/app/types/messages';
 import ConnectionStatus from './connection-status';
+import BackButton from '../ui/back-button';
+import { useTranslations } from 'next-intl';
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -20,14 +22,21 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   isConnected,
   onChatSelect,
 }) => {
+  const t = useTranslations('messaging');
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-3 sm:p-4 border-b border-border bg-background">
-        <h1 className="text-lg sm:text-xl font-bold text-foreground">
-          Messages
-        </h1>
-        <p className="text-sm text-muted-foreground">Your conversations</p>
+        <div className="flex items-center gap-1">
+          <BackButton />
+          <h1 className="text-lg sm:text-xl font-bold text-foreground">
+            {t('title')}
+          </h1>
+        </div>
+
+        <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
+
         {/* Connection status */}
         <div className="mt-2">
           <ConnectionStatus isConnected={isConnected} />

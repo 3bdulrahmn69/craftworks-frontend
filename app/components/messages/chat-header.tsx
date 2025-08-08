@@ -4,6 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { Chat } from '@/app/types/messages';
 import { useRouter } from 'next/navigation';
+import { IoIosArrowBack } from 'react-icons/io';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface ChatHeaderProps {
   selectedChat: Chat;
@@ -16,6 +18,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   currentUserId,
   onBackClick,
 }) => {
+  const t = useTranslations('messaging');
+  const locale = useLocale();
   const router = useRouter();
 
   const otherParticipant = selectedChat.participants.find(
@@ -35,19 +39,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         onClick={onBackClick}
         className="sm:hidden p-2 -ml-2 mr-2 text-muted-foreground hover:text-foreground transition-colors"
       >
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
+        <IoIosArrowBack className="w-6 h-6" />
       </button>
 
       <div className="flex items-center gap-3 flex-1">
@@ -74,7 +66,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         <button
           onClick={handleUserDetailsClick}
           disabled={otherParticipant?.role === 'client'}
-          className={`flex-1 text-left ${
+          className={`flex-1 ${locale === 'ar' ? 'text-right' : 'text-left'} ${
             otherParticipant?.role === 'craftsman'
               ? 'hover:opacity-80 transition-opacity'
               : 'cursor-default'
@@ -84,7 +76,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             {otherParticipant?.fullName || 'Unknown User'}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {otherParticipant?.role}
+            {t(`role.${otherParticipant?.role}`)}
           </p>
         </button>
       </div>

@@ -28,7 +28,6 @@ export interface RecommendedCraftsman {
   fullName: string;
   profilePicture: string;
   craftsmanInfo: {
-    skills: string[];
     service: {
       _id: string;
       name: string;

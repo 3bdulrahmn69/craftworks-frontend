@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import MessagingLayout from '@/app/components/messages/messaging-layout';
 import LoadingSpinner from '@/app/components/ui/loading-spinner';
 import Redirect from '@/app/components/redirect';
-import BackButton from '@/app/components/ui/back-button';
 
 function ClientMessagesContent() {
   const searchParams = useSearchParams();
@@ -13,17 +12,7 @@ function ClientMessagesContent() {
 
   return (
     <div className="h-screen w-full bg-background">
-      {/* Back Button Header */}
-      <div className="bg-background border-b border-border px-4 py-3 flex items-center gap-3">
-        <BackButton showLabel />
-        <div className="h-4 w-px bg-border" />
-        <h1 className="text-lg font-semibold text-foreground">Messages</h1>
-      </div>
-
-      {/* Messages Layout */}
-      <div className="h-[calc(100vh-60px)]">
-        <MessagingLayout initialChatId={chatId} />
-      </div>
+      <MessagingLayout initialChatId={chatId} />
     </div>
   );
 }

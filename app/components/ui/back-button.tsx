@@ -1,8 +1,11 @@
+'use client';
+
 import { HiArrowLeft } from 'react-icons/hi';
 import Button from './button';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 
 interface BackButtonProps {
   showLabel?: boolean;
@@ -12,6 +15,15 @@ interface BackButtonProps {
 const BackButton = ({ showLabel = false, className }: BackButtonProps) => {
   const locale = useLocale();
   const router = useRouter();
+  const [canGOBack, setCanGoBack] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCanGoBack(window.history.length > 1);
+    }
+  }, [router]);
+
+  if (!canGOBack) return null;
 
   return (
     <Button

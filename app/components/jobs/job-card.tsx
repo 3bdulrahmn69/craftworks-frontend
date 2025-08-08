@@ -29,31 +29,19 @@ const JobCard = ({ job }: JobCardProps) => {
   return (
     <Link href={`/jobs/${job._id}`} className="w-full block">
       <div
-        className={`bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border group cursor-pointer w-full hover:border-primary/30 relative overflow-hidden ${
-          locale === 'ar' ? 'rtl' : 'ltr'
-        }`}
+        className={`bg-card rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border group cursor-pointer w-full hover:border-primary/30 relative overflow-hidden`}
       >
         {/* Gradient overlay for enhanced visual appeal */}
         <div
-          className={`absolute top-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px] pointer-events-none ${
-            locale === 'ar'
-              ? 'left-0 rounded-br-[100px] rounded-bl-none bg-gradient-to-br'
-              : 'right-0'
-          }`}
+          className={`absolute top-0 w-32 h-32 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px] pointer-events-none rounded-br-[100px]`}
         />
 
         {/* Header Section */}
         <div
-          className={`flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 relative ${
-            locale === 'ar' ? 'lg:flex-row-reverse' : ''
-          }`}
+          className={`flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 relative`}
         >
           <div className="flex-1">
-            <div
-              className={`flex items-start gap-3 mb-3 ${
-                locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'
-              }`}
-            >
+            <div className={`flex items-start gap-3 mb-3`}>
               <div className="p-3 bg-primary/10 rounded-xl shrink-0 group-hover:bg-primary/20 transition-colors">
                 <HiTag className="w-6 h-6 text-primary" />
               </div>
@@ -95,7 +83,9 @@ const JobCard = ({ job }: JobCardProps) => {
                 locale === 'ar' ? 'text-right' : 'text-left'
               }`}
             >
-              <p className="text-sm font-semibold text-foreground">Location</p>
+              <p className="text-sm font-semibold text-foreground">
+                {locale === 'ar' ? 'الموقع' : 'Location'}
+              </p>
               <p className="text-sm text-muted-foreground truncate">
                 {formatAddress(job.address)}
               </p>
@@ -107,7 +97,9 @@ const JobCard = ({ job }: JobCardProps) => {
               <HiCash className="w-5 h-5 text-primary shrink-0" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">Payment</p>
+              <p className="text-sm font-semibold text-foreground">
+                {locale === 'ar' ? 'الدفع' : 'Payment'}
+              </p>
               <p className="text-sm text-muted-foreground">{job.paymentType}</p>
             </div>
           </div>
@@ -117,7 +109,9 @@ const JobCard = ({ job }: JobCardProps) => {
               <HiClock className="w-5 h-5 text-primary shrink-0" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">Posted</p>
+              <p className="text-sm font-semibold text-foreground">
+                {locale === 'ar' ? 'الوقت' : 'Time'}
+              </p>
               <p className="text-sm text-muted-foreground">
                 {new Date(job.createdAt).toLocaleDateString()}
               </p>
@@ -130,7 +124,9 @@ const JobCard = ({ job }: JobCardProps) => {
                 <HiClock className="w-5 h-5 text-primary shrink-0" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-primary">Scheduled</p>
+                <p className="text-sm font-semibold text-primary">
+                  {locale === 'ar' ? 'تاريخ مجدول' : 'Scheduled Date'}
+                </p>
                 <p className="text-sm text-primary/70">
                   {new Date(job.jobDate).toLocaleDateString()}
                 </p>
@@ -138,21 +134,23 @@ const JobCard = ({ job }: JobCardProps) => {
             </div>
           )}
 
-          {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
+          {job.appliedCraftsmen && (
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-success/5 to-success/10 border border-success/20 rounded-xl hover:shadow-md transition-shadow">
               <div className="p-2 bg-success/10 rounded-lg">
                 <HiUsers className="w-5 h-5 text-success shrink-0" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-success">
-                  Applications
+                  {locale === 'ar' ? 'الحرفيين المتقدمين' : 'Craftsmen Applied'}
                 </p>
                 <p className="text-sm text-success/70">
-                  {job.appliedCraftsmen.length} craftsmen applied
+                  {job.appliedCraftsmen.length}{' '}
+                  {locale === 'ar' ? 'حرفي' : 'craftsmen'}{' '}
+                  {locale === 'ar' ? 'تقدموا' : 'applied'}
                 </p>
               </div>
               <div className="px-2 py-1 bg-success/10 text-success text-xs rounded-full font-medium border border-success/20">
-                Active
+                {locale === 'ar' ? 'نشط' : 'Active'}
               </div>
             </div>
           )}

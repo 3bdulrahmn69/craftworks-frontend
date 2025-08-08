@@ -102,7 +102,7 @@ const Modal = ({
             <div className="sticky top-0 z-10 bg-card border-b border-border px-6 py-4 rounded-t-3xl">
               <div
                 className={`flex items-center justify-between ${
-                  locale === 'ar' ? 'flex-row-reverse' : ''
+                  locale === 'ar' ? 'flex-row' : ''
                 }`}
               >
                 {title && (
@@ -119,7 +119,7 @@ const Modal = ({
                     variant="ghost"
                     size="sm"
                     onClick={onClose}
-                    className="ml-auto -mr-2 p-2 rounded-xl"
+                    className="p-2 rounded-xl"
                     aria-label="Close modal"
                   >
                     <HiX className="w-5 h-5 text-destructive" />

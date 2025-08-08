@@ -505,7 +505,9 @@
         "upload": {
           "label": "Upload Photos (Max 5, 5MB each)",
           "supported": "Supported formats: JPEG, PNG, WebP. Max size: 5MB per image.",
-          "preview": "Preview"
+          "preview": "Preview",
+          "buttonText": "Upload Photos",
+          "maxReached": "Maximum 5 photos reached"
         }
       }
     },
@@ -928,7 +930,8 @@
       "invitations": "Invitations"
     },
     "navigation": {
-      "today": "Today"
+      "today": "Today",
+      "createJob": "Create Job"
     },
     "days": {
       "sun": "Sun",
@@ -1060,9 +1063,14 @@
   },
   "messaging": {
     "title": "Messages",
-    "subtitle": "Chat with clients and craftsmen",
+    "subtitle": "Chat with Others",
+    "role": {
+      "craftsman": "Craftsman",
+      "client": "Client"
+    },
     "loading": {
       "chats": "Loading conversations...",
+      "pleaseWait": "Please wait while we load your messages...",
       "messages": "Loading messages...",
       "sending": "Sending..."
     },
@@ -1077,9 +1085,10 @@
     "chat": {
       "newConversation": "New Conversation",
       "searchPlaceholder": "Search conversations...",
+      "selectConversation": "Select a conversation",
       "noConversations": "No conversations",
-      "startFirstChat": "Start your first conversation with a client or craftsman",
-      "selectChat": "Select a conversation to start messaging",
+      "startFirstChat": "Start your first conversation",
+      "selectChat": "Choose a Chat to start chatting",
       "online": "Online",
       "offline": "Offline",
       "typing": "Someone is typing...",

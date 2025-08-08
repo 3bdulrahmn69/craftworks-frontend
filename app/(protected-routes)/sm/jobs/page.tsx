@@ -106,9 +106,7 @@ const JobsPage = () => {
           }`}
         >
           {/* Filters Sidebar */}
-          <div
-            className={`lg:col-span-1 ${locale === 'ar' ? 'lg:order-2' : ''}`}
-          >
+          <div className="lg:col-span-1">
             <div className="sticky top-20">
               <JobFilters
                 searchQuery={searchQuery}

@@ -15,12 +15,14 @@ const navLinks = [
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   const getPath = usePathname();
-  const isMessagesPage = getPath.startsWith('/sc/messages');
+  const hideThem =
+    getPath.startsWith('/sc/messages') || getPath.startsWith('/sc/job-manager');
+
   return (
     <Redirect requireAuth={true} allowedRoles={['client']}>
-      {!isMessagesPage && <Header navLinks={navLinks} />}
+      {!hideThem && <Header navLinks={navLinks} />}
       {children}
-      {!isMessagesPage && <Footer />}
+      {!hideThem && <Footer />}
     </Redirect>
   );
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from 'next-intl';
 import { useState, useEffect, useRef } from 'react';
 import { HiChevronDown } from 'react-icons/hi2';
 
@@ -43,6 +44,7 @@ const DropdownSelector = ({
 }: DropdownSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const locale = useLocale();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -164,7 +166,9 @@ const DropdownSelector = ({
               <button
                 type="button"
                 onClick={() => handleSelect('')}
-                className="w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b border-border focus:outline-none focus:bg-muted"
+                className={`w-full px-4 py-3 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                } hover:bg-muted transition-colors border-b border-border focus:outline-none focus:bg-muted`}
                 role="option"
                 aria-selected={!value}
               >
@@ -176,7 +180,9 @@ const DropdownSelector = ({
                 key={option.id}
                 type="button"
                 onClick={() => handleSelect(option.id)}
-                className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors border-b border-border last:border-b-0 focus:outline-none focus:bg-muted ${
+                className={`w-full px-4 py-3 ${
+                  locale === 'ar' ? 'text-right' : 'text-left'
+                } hover:bg-muted transition-colors border-b border-border last:border-b-0 focus:outline-none focus:bg-muted ${
                   value === option.id ? 'bg-primary/10 text-primary' : ''
                 }`}
                 role="option"

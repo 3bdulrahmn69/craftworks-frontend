@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 
 interface EmptyStateProps {
   hasChats: boolean;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ hasChats }) => {
+  const t = useTranslations('messaging.chat');
+
   return (
     <div className="flex-1 flex items-center justify-center p-8">
       <div className="text-center max-w-md">
@@ -26,12 +29,10 @@ const EmptyState: React.FC<EmptyStateProps> = ({ hasChats }) => {
           </svg>
         </div>
         <h3 className="text-lg font-semibold text-foreground mb-2">
-          {hasChats ? 'Select a conversation' : 'No conversations yet'}
+          {hasChats ? t('selectConversation') : t('noConversations')}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {hasChats
-            ? 'Choose a chat to start messaging'
-            : 'Start your first conversation'}
+          {hasChats ? t('selectChat') : t('startFirstChat')}
         </p>
       </div>
     </div>

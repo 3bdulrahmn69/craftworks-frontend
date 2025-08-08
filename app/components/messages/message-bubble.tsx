@@ -22,7 +22,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   onImageClick,
 }) => {
   const locale = useLocale();
-  const isRTL = locale === 'ar';
   const dateLocale = locale === 'ar' ? ar : enUS;
 
   // Safety check for message structure
@@ -74,11 +73,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   };
 
   return (
-    <div
-      className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'} ${
-        isRTL && !isOwn ? 'flex-row-reverse' : ''
-      }`}
-    >
+    <div className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
       {/* Avatar for other's messages */}
       {!isOwn && showAvatar && (
         <div className="flex-shrink-0">
@@ -120,8 +115,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             relative px-3 py-2 rounded-2xl max-w-full break-words
             ${
               isOwn
-                ? 'bg-primary text-primary-foreground rounded-br-md'
-                : 'bg-muted text-foreground rounded-bl-md'
+                ? `bg-primary text-primary-foreground ${
+                    locale === 'en' ? 'rounded-br-md' : 'rounded-bl-md'
+                  }`
+                : `bg-muted text-foreground ${
+                    locale === 'en' ? 'rounded-bl-md' : 'rounded-br-md'
+                  }`
             }
           `}
         >
@@ -155,9 +154,6 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           {isOwn && getMessageStatus()}
         </div>
       </div>
-
-      {/* Spacer for own messages to maintain alignment */}
-      {isOwn && !showAvatar && <div className="w-8" />}
     </div>
   );
 };

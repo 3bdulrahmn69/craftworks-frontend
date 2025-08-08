@@ -211,6 +211,14 @@ const UserDetails = () => {
               icon={<HiOutlineBriefcase />}
               title={t('sections.additional')}
             >
+              {user.bio && (
+                <DetailCard
+                  icon={<HiOutlineUser />}
+                  title={t('fields.about')}
+                  value={user.bio}
+                />
+              )}
+
               {user.address && (
                 <DetailCard
                   icon={<HiOutlineLocationMarker />}
@@ -231,14 +239,6 @@ const UserDetails = () => {
                       )}
                     </div>
                   }
-                />
-              )}
-
-              {user.bio && (
-                <DetailCard
-                  icon={<HiOutlineUser />}
-                  title={t('fields.about')}
-                  value={user.bio}
                 />
               )}
 

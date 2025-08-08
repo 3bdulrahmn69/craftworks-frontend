@@ -28,9 +28,9 @@ import {
   FaFileAlt,
   FaImage,
   FaTrash,
-  FaArrowLeft,
   FaCalendarAlt,
 } from 'react-icons/fa';
+import BackButton from '@/app/components/ui/back-button';
 
 interface JobFormData {
   title: string;
@@ -739,18 +739,7 @@ const JobManagerPage = () => {
       <main role="main">
         {/* Header */}
         <header className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className={`mb-4 p-2 hover:bg-accent ${
-              isRTL ? 'flex-row-reverse' : ''
-            }`}
-          >
-            <FaArrowLeft
-              className={`w-4 h-4 ${isRTL ? 'ml-2 scale-x-reverse' : 'mr-2'}`}
-            />
-            {t('navigation.back')}
-          </Button>
+          <BackButton showLabel className="mb-4" />
 
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 flex items-center">
             <FaBriefcase
@@ -1043,15 +1032,33 @@ const JobManagerPage = () => {
                 <label className="text-sm font-medium text-foreground block mb-2">
                   {t('sections.photos.upload.label')}
                 </label>
+
+                {/* Hidden native file input */}
                 <input
                   ref={fileInputRef}
                   type="file"
                   multiple
                   accept="image/jpeg,image/jpg,image/png,image/webp"
                   onChange={handlePhotoUpload}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  className="hidden"
+                  id="customFileInput"
                   disabled={photoPreviews.length >= 5}
                 />
+
+                {/* Custom file picker button */}
+                <label
+                  htmlFor="customFileInput"
+                  className={`inline-block cursor-pointer px-4 py-2 rounded-full ${
+                    photoPreviews.length >= 5
+                      ? 'bg-muted text-muted-foreground cursor-not-allowed!'
+                      : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                  }  text-sm font-semibold disabled:opacity-50`}
+                >
+                  {photoPreviews.length >= 5
+                    ? t('sections.photos.upload.maxReached')
+                    : t('sections.photos.upload.buttonText')}
+                </label>
+
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('sections.photos.upload.supported')}
                 </p>

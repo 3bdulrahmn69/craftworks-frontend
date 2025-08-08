@@ -27,7 +27,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const { data: session } = useSession();
   const locale = useLocale();
   const t = useTranslations('messaging');
-  const isRTL = locale === 'ar';
 
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -197,9 +196,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
       )}
 
       {/* Input area */}
-      <div
-        className={`flex items-end gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
-      >
+      <div className={`flex items-center gap-2`}>
         {/* Image upload button */}
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -211,25 +208,23 @@ const MessageInput: React.FC<MessageInputProps> = ({
         </button>
 
         {/* Text input */}
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder={t('message.typeMessage')}
-            disabled={disabled}
-            className={`
+        <textarea
+          ref={textareaRef}
+          value={message}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          placeholder={t('message.typeMessage')}
+          disabled={disabled}
+          className={`
               w-full px-3 py-2 border border-border rounded-xl bg-background text-foreground
               focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
               resize-none max-h-[120px] overflow-y-auto
-              disabled:opacity-50 disabled:cursor-not-allowed
-              ${isRTL ? 'text-right' : 'text-left'}
+              disabled:opacity-50 disabled:cursor-not-allowed!
+              ${locale === 'ar' ? 'text-right' : 'text-left'}
             `}
-            rows={1}
-            style={{ minHeight: '40px' }}
-          />
-        </div>
+          rows={1}
+          style={{ minHeight: '40px' }}
+        />
 
         {/* Send button */}
         <Button
@@ -239,7 +234,10 @@ const MessageInput: React.FC<MessageInputProps> = ({
           className="p-2 h-10 w-10 rounded-xl"
           isLoading={isUploading}
         >
-          <HiPaperAirplane className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+          <HiPaperAirplane
+            className={locale === 'ar' ? 'rotate-180' : ''}
+            size={20}
+          />
         </Button>
       </div>
 

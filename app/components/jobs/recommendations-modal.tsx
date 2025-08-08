@@ -11,6 +11,7 @@ import { userService } from '@/app/services/user';
 import { jobsService } from '@/app/services/jobs';
 import { toast } from 'react-toastify';
 import { FaUsers, FaStar, FaUserPlus, FaCheckCircle } from 'react-icons/fa';
+import Link from 'next/link';
 
 interface RecommendationsModalProps {
   isOpen: boolean;
@@ -132,7 +133,7 @@ const RecommendationsModal = ({
       title={t('recommendations.title')}
       className="max-w-4xl"
     >
-      <div className={`py-4 ${isRTL ? 'rtl' : 'ltr'}`}>
+      <div className="py-4">
         <div className={`mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
           <h3 className="text-lg font-semibold text-foreground mb-2">
             {jobTitle}
@@ -168,24 +169,20 @@ const RecommendationsModal = ({
             {recommendations.map((craftsman) => (
               <div
                 key={craftsman._id}
-                className={`bg-muted/30 rounded-xl p-6 hover:bg-muted/50 transition-colors border border-border ${
-                  isRTL ? 'rtl' : 'ltr'
-                }`}
+                className={`bg-muted/30 rounded-xl p-6 hover:bg-muted/50 transition-colors border border-border`}
               >
-                <div
-                  className={`flex items-start gap-4 ${
-                    isRTL ? 'flex-row-reverse' : ''
-                  }`}
-                >
+                <div className={`flex items-start gap-4`}>
                   <div className="relative w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 overflow-hidden shrink-0">
                     {craftsman.profilePicture ? (
-                      <Image
-                        src={craftsman.profilePicture}
-                        alt={craftsman.fullName}
-                        width={64}
-                        height={64}
-                        className="w-full h-full rounded-full object-cover"
-                      />
+                      <Link href={`/user/${craftsman._id}`} target="_blank">
+                        <Image
+                          src={craftsman.profilePicture}
+                          alt={craftsman.fullName}
+                          width={64}
+                          height={64}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </Link>
                     ) : (
                       <FaUsers className="text-primary w-8 h-8" />
                     )}
@@ -198,24 +195,22 @@ const RecommendationsModal = ({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div
-                      className={`flex items-start justify-between mb-3 ${
-                        isRTL ? 'flex-row-reverse' : ''
-                      }`}
-                    >
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
                         <div
                           className={`flex items-center gap-2 mb-2 ${
                             isRTL ? 'flex-row-reverse justify-end' : ''
                           }`}
                         >
-                          <h4
-                            className={`text-lg font-bold text-foreground truncate ${
-                              isRTL ? 'text-right' : 'text-left'
-                            }`}
-                          >
-                            {craftsman.fullName}
-                          </h4>
+                          <Link href={`/user/${craftsman._id}`} target="_blank">
+                            <h4
+                              className={`text-lg font-bold text-foreground truncate ${
+                                isRTL ? 'text-right' : 'text-left'
+                              }`}
+                            >
+                              {craftsman.fullName}
+                            </h4>
+                          </Link>
                           {craftsman.craftsmanInfo.verificationStatus ===
                             'verified' && (
                             <FaCheckCircle className="text-success w-5 h-5 shrink-0" />
@@ -235,34 +230,6 @@ const RecommendationsModal = ({
                             ({craftsman.ratingCount}{' '}
                             {t('recommendations.rating')})
                           </span>
-                        </div>
-
-                        <div
-                          className={`mb-3 ${
-                            isRTL ? 'text-right' : 'text-left'
-                          }`}
-                        >
-                          <p className="text-sm font-semibold text-foreground mb-1">
-                            {t('recommendations.skills')}:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {craftsman.craftsmanInfo.skills
-                              .slice(0, 3)
-                              .map((skill, index) => (
-                                <span
-                                  key={index}
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            {craftsman.craftsmanInfo.skills.length > 3 && (
-                              <span className="text-xs text-muted-foreground">
-                                +{craftsman.craftsmanInfo.skills.length - 3}{' '}
-                                more
-                              </span>
-                            )}
-                          </div>
                         </div>
 
                         {craftsman.craftsmanInfo.bio && (

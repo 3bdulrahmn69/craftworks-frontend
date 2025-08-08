@@ -12,6 +12,7 @@ import MessageInput from './message-input';
 import EmptyState from './empty-state';
 import TypingIndicator from './typing-indicator';
 import ImageModal from '@/app/components/ui/image-modal';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface MessagingLayoutProps {
   initialChatId?: string;
@@ -19,6 +20,9 @@ interface MessagingLayoutProps {
 
 const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
   const { data: session } = useSession();
+
+  const t = useTranslations('messaging');
+  const locale = useLocale();
 
   // State management
   const [chats, setChats] = useState<Chat[]>([]);
@@ -399,10 +403,10 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            Loading Conversations
+            {t('messaging.loading.chats')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Please wait while we load your messages...
+            {t('messaging.loading.pleaseWait')}
           </p>
         </div>
       </div>
@@ -435,7 +439,7 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
-            Refresh Page
+            {t('messaging.error.retry')}
           </button>
         </div>
       </div>
@@ -448,7 +452,9 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
       <div
         className={`${
           selectedChat && showMobileChat ? 'hidden' : 'block'
-        } w-full sm:w-80 sm:block border-r border-border`}
+        } w-full sm:w-80 sm:block ${
+          locale == 'en' ? 'border-r' : 'border-l'
+        } border-border`}
       >
         <ChatSidebar
           chats={chats}
@@ -520,7 +526,6 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
                   if (messageType === 'text') {
                     handleSendMessage(content);
                   }
-                  // Image messages are handled directly in MessageInput
                 }}
                 onTypingStart={() => {
                   if (selectedChat && startTyping) {
