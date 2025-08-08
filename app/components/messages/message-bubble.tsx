@@ -75,23 +75,28 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   return (
     <div className={`flex gap-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
       {/* Avatar for other's messages */}
-      {!isOwn && showAvatar && (
-        <div className="flex-shrink-0">
-          {message.sender.profilePicture ? (
-            <Image
-              src={message.sender.profilePicture}
-              alt={message.sender.fullName}
-              width={32}
-              height={32}
-              className="rounded-full object-cover"
-              style={{ width: '32px', height: '32px' }}
-            />
+      {!isOwn && (
+        <div className="flex-shrink-0 w-8">
+          {showAvatar ? (
+            message.sender.profilePicture ? (
+              <Image
+                src={message.sender.profilePicture}
+                alt={message.sender.fullName}
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
+                style={{ width: '32px', height: '32px' }}
+              />
+            ) : (
+              <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {message.sender.fullName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )
           ) : (
-            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-              <span className="text-xs font-semibold text-muted-foreground">
-                {message.sender.fullName.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            // Empty space to maintain alignment
+            <div className="w-8 h-8"></div>
           )}
         </div>
       )}

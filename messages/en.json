@@ -1095,7 +1095,9 @@
       "userTyping": "{name} is typing...",
       "usersTyping": "{names} are typing...",
       "lastSeen": "Last seen {time}",
-      "unreadCount": "{count} unread"
+      "unreadCount": "{count} unread",
+      "you": "You",
+      "noMessages": "No messages"
     },
     "message": {
       "typeMessage": "Type a message...",

@@ -68,8 +68,8 @@ const MessageList: React.FC<MessageListProps> = ({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-red-400">
-      <div className="space-y-3 p-4" ref={messagesContainerRef}>
+    <div className="flex-1 overflow-y-auto">
+      <div className="space-y-1 p-4" ref={messagesContainerRef}>
         {messages
           .filter(
             (message) =>
@@ -78,27 +78,39 @@ const MessageList: React.FC<MessageListProps> = ({
           .map((message, filteredIndex, filteredMessages) => {
             const isOwn = message.sender._id === currentUserId;
 
-            // Use filtered array for avatar logic
+            const prevMessage =
+              filteredIndex > 0 ? filteredMessages[filteredIndex - 1] : null;
+            const timeDiff = prevMessage
+              ? new Date(message.createdAt).getTime() -
+                new Date(prevMessage.createdAt).getTime()
+              : 0;
+
+            // Show avatar logic
             const showAvatar =
               !isOwn &&
               (filteredIndex === 0 ||
-                !filteredMessages[filteredIndex - 1]?.sender?._id ||
-                filteredMessages[filteredIndex - 1]?.sender._id !==
-                  message.sender._id ||
-                new Date(message.createdAt).getTime() -
-                  new Date(
-                    filteredMessages[filteredIndex - 1]?.createdAt || 0
-                  ).getTime() >
-                  300000); // 5 minutes
+                !prevMessage?.sender?._id ||
+                prevMessage.sender._id !== message.sender._id ||
+                timeDiff > 60000); // 1 minute
+
+            // Add extra spacing for different senders or time gaps
+            const needsExtraSpacing =
+              filteredIndex > 0 &&
+              (prevMessage?.sender._id !== message.sender._id ||
+                timeDiff > 300000); // 5 minutes
 
             return (
-              <MessageBubble
+              <div
                 key={message._id}
-                message={message}
-                isOwn={isOwn}
-                showAvatar={showAvatar}
-                onImageClick={onImageClick}
-              />
+                className={needsExtraSpacing ? 'mt-4' : ''}
+              >
+                <MessageBubble
+                  message={message}
+                  isOwn={isOwn}
+                  showAvatar={showAvatar}
+                  onImageClick={onImageClick}
+                />
+              </div>
             );
           })}
         <div ref={messagesEndRef} />

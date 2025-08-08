@@ -51,6 +51,20 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
           );
           const isSelected = selectedChat?._id === chat._id;
 
+          // Calculate unread count for current user
+          const unreadCount = chat.unreadCount?.[currentUserId || ''] || 0;
+
+          // Check if last message was sent by current user
+          const isLastMessageFromMe =
+            chat.lastMessageSenderId === currentUserId;
+
+          // Format last message with "You:" prefix if needed
+          const formattedLastMessage = chat.lastMessage
+            ? isLastMessageFromMe
+              ? `${t('chat.you')}: ${chat.lastMessage}`
+              : chat.lastMessage
+            : t('chat.noMessages');
+
           return (
             <div
               key={chat._id}
@@ -63,7 +77,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
             >
               <div className="flex items-center gap-3">
                 {/* Profile Picture */}
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex-shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex-shrink-0 relative">
                   {otherParticipant?.profilePicture ? (
                     <Image
                       src={otherParticipant.profilePicture}
@@ -81,13 +95,34 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                       </span>
                     </div>
                   )}
+
+                  {/* Unread count badge */}
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </div>
+                  )}
                 </div>
+
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-foreground truncate">
-                    {otherParticipant?.fullName || 'Unknown User'}
-                  </h4>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {chat.lastMessage || 'No messages'}
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-foreground truncate">
+                      {otherParticipant?.fullName || 'Unknown User'}
+                    </h4>
+                    {unreadCount > 0 && (
+                      <span className="text-xs text-destructive font-medium ml-2">
+                        {t('chat.unreadCount', { count: unreadCount })}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className={`text-sm truncate ${
+                      unreadCount > 0
+                        ? 'font-medium text-foreground'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {formattedLastMessage}
                   </p>
                 </div>
               </div>

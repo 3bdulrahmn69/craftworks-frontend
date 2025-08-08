@@ -148,9 +148,53 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
         setMessages((prev) => {
           const exists = prev.some((msg) => msg._id === transformedMessage._id);
           if (exists) return prev;
-          return [...prev, transformedMessage];
+
+          // Remove any temporary messages with similar content and timestamp
+          const filteredPrev = prev.filter((msg) => {
+            if (
+              msg._id.startsWith('temp-') &&
+              msg.content === transformedMessage.content &&
+              Math.abs(
+                new Date(msg.createdAt).getTime() -
+                  new Date(transformedMessage.createdAt).getTime()
+              ) < 5000
+            ) {
+              return false; // Remove temp message
+            }
+            return true;
+          });
+
+          return [...filteredPrev, transformedMessage];
         });
       }
+
+      // Update chat list with new message
+      setChats((prevChats) => {
+        return prevChats.map((chat) => {
+          if (chat._id === transformedMessage.chatId) {
+            const isFromCurrentUser =
+              transformedMessage.sender._id === session?.user?.id;
+            const currentUnreadCount =
+              chat.unreadCount?.[session?.user?.id || ''] || 0;
+
+            return {
+              ...chat,
+              lastMessage: transformedMessage.content,
+              lastMessageAt: transformedMessage.createdAt,
+              lastMessageSenderId: transformedMessage.sender._id,
+              unreadCount: {
+                ...chat.unreadCount,
+                [session?.user?.id || '']:
+                  // Don't increment unread count if it's from current user or if current chat is selected
+                  isFromCurrentUser || currentSelectedChat?._id === chat._id
+                    ? currentUnreadCount
+                    : currentUnreadCount + 1,
+              },
+            };
+          }
+          return chat;
+        });
+      });
     },
     // onMessageRead callback
     (data: { chatId: string; messageId: string; readBy: string }) => {
@@ -177,6 +221,7 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
               ...chat,
               lastMessage: updatedChat.lastMessage,
               lastMessageAt: updatedChat.lastMessageAt,
+              lastMessageSenderId: updatedChat.lastMessageSenderId,
               unreadCount: updatedChat.unreadCount,
             };
           }
@@ -294,14 +339,41 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
     if (markAsRead) {
       markAsRead(chat._id);
     }
+
+    // Also mark as read via API
+    if (session?.accessToken) {
+      try {
+        await messageService.markMessagesAsRead(chat._id, session.accessToken);
+        console.log('✅ Messages marked as read via API for chat:', chat._id);
+
+        // Reset unread count for this chat
+        setChats((prevChats) => {
+          return prevChats.map((prevChat) => {
+            if (prevChat._id === chat._id) {
+              return {
+                ...prevChat,
+                unreadCount: {
+                  ...prevChat.unreadCount,
+                  [session?.user?.id || '']: 0,
+                },
+              };
+            }
+            return prevChat;
+          });
+        });
+      } catch (error) {
+        console.error('❌ Failed to mark messages as read via API:', error);
+      }
+    }
   };
 
   // Handle sending messages
   const handleSendMessage = (content: string) => {
     if (!content.trim() || !selectedChat || !socketSendMessage) return;
 
+    const tempMessageId = `temp-${Date.now()}-${Math.random()}`;
     const tempMessage: Message = {
-      _id: `temp-${Date.now()}`,
+      _id: tempMessageId,
       content: content.trim(),
       messageType: 'text',
       sender: {
@@ -326,16 +398,51 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
       content: content.trim(),
       messageType: 'text',
     });
+
+    // Remove temp message after a delay if real message hasn't arrived
+    setTimeout(() => {
+      setMessages((prev) => prev.filter((msg) => msg._id !== tempMessageId));
+    }, 10000); // Remove after 10 seconds
   };
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom and mark messages as read
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+
+    // Mark messages as read when they are loaded and visible
+    if (
+      selectedChat &&
+      messages.length > 0 &&
+      markAsRead &&
+      session?.user?.id
+    ) {
+      const timeoutId = setTimeout(() => {
+        markAsRead(selectedChat._id);
+
+        // Reset unread count for this chat
+        setChats((prevChats) => {
+          return prevChats.map((chat) => {
+            if (chat._id === selectedChat._id) {
+              return {
+                ...chat,
+                unreadCount: {
+                  ...chat.unreadCount,
+                  [session.user?.id || '']: 0,
+                },
+              };
+            }
+            return chat;
+          });
+        });
+      }, 1000); // Mark as read after 1 second
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, selectedChat, markAsRead, session?.user?.id, setChats]);
 
   // Handle image modal
   const handleImageClick = (imageUrl: string) => {
@@ -403,10 +510,10 @@ const MessagingLayout: React.FC<MessagingLayoutProps> = ({ initialChatId }) => {
         <div className="text-center">
           <div className="w-12 h-12 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
-            {t('messaging.loading.chats')}
+            {t('loading.chats')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t('messaging.loading.pleaseWait')}
+            {t('loading.pleaseWait')}
           </p>
         </div>
       </div>

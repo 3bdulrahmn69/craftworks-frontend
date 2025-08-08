@@ -1176,7 +1176,9 @@
       "userTyping": "{name} يكتب...",
       "usersTyping": "{names} يكتبون...",
       "lastSeen": "آخر ظهور {time}",
-      "unreadCount": "{count} غير مقروءة"
+      "unreadCount": "{count} غير مقروءة",
+      "you": "أنت",
+      "noMessages": "لا توجد رسائل"
     },
     "message": {
       "typeMessage": "اكتب رسالة...",
