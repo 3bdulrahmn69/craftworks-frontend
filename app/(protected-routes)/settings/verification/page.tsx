@@ -35,6 +35,11 @@ const VerificationSettings = () => {
   const [frontImage, setFrontImage] = useState<FileWithPreview | null>(null);
   const [backImage, setBackImage] = useState<FileWithPreview | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [justSubmitted, setJustSubmitted] = useState(false);
+  const [dragOver, setDragOver] = useState<{ front: boolean; back: boolean }>({
+    front: false,
+    back: false,
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,6 +49,11 @@ const VerificationSettings = () => {
         setLoading(true);
         const userData = await userService.getMe(session.accessToken);
         setUser(userData);
+
+        // Set initial step based on verification status
+        if (userData.verificationStatus === 'rejected') {
+          setSelectedStep('submitted'); // Show rejected message first
+        }
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       } finally {
@@ -54,11 +64,8 @@ const VerificationSettings = () => {
     fetchUserData();
   }, [session?.accessToken]);
 
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back') => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
+  const processFile = useCallback(
+    (file: File, type: 'front' | 'back') => {
       // Validate file type
       if (!file.type.startsWith('image/')) {
         toastService.error(t('messages.invalidFileType'));
@@ -91,6 +98,45 @@ const VerificationSettings = () => {
       }
     },
     [frontImage, backImage, t]
+  );
+
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, type: 'front' | 'back') => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      processFile(file, type);
+    },
+    [processFile]
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent, type: 'front' | 'back') => {
+      e.preventDefault();
+      setDragOver((prev) => ({ ...prev, [type]: true }));
+    },
+    []
+  );
+
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent, type: 'front' | 'back') => {
+      e.preventDefault();
+      setDragOver((prev) => ({ ...prev, [type]: false }));
+    },
+    []
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent, type: 'front' | 'back') => {
+      e.preventDefault();
+      setDragOver((prev) => ({ ...prev, [type]: false }));
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length > 0) {
+        processFile(files[0], type);
+      }
+    },
+    [processFile]
   );
 
   const removeImage = useCallback(
@@ -132,6 +178,13 @@ const VerificationSettings = () => {
       setFrontImage(null);
       setBackImage(null);
       setSelectedStep('submitted');
+      setJustSubmitted(true);
+
+      // Update user status to pending after successful submission
+      setUser((prev) =>
+        prev ? { ...prev, verificationStatus: 'pending' } : null
+      );
+
       toastService.success(t('messages.success'));
     } catch (error: any) {
       console.error('Verification submission error:', error);
@@ -239,7 +292,8 @@ const VerificationSettings = () => {
     );
   }
 
-  if (user?.verificationStatus === 'rejected') {
+  // Show rejected status only if user hasn't started resubmission process
+  if (user?.verificationStatus === 'rejected' && selectedStep === 'submitted') {
     return (
       <main
         className="max-w-2xl mx-auto space-y-6"
@@ -341,7 +395,16 @@ const VerificationSettings = () => {
               <label className="block text-sm font-medium text-foreground">
                 {t('fields.frontSide')} *
               </label>
-              <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary transition-colors">
+              <div
+                className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+                  dragOver.front
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary'
+                }`}
+                onDragOver={(e) => handleDragOver(e, 'front')}
+                onDragLeave={(e) => handleDragLeave(e, 'front')}
+                onDrop={(e) => handleDrop(e, 'front')}
+              >
                 {frontImage ? (
                   <div className="space-y-4">
                     <div className="relative inline-block">
@@ -407,7 +470,16 @@ const VerificationSettings = () => {
               <label className="block text-sm font-medium text-foreground">
                 {t('fields.backSide')} *
               </label>
-              <div className="border-2 border-dashed border-border rounded-xl p-6 text-center hover:border-primary transition-colors">
+              <div
+                className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
+                  dragOver.back
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary'
+                }`}
+                onDragOver={(e) => handleDragOver(e, 'back')}
+                onDragLeave={(e) => handleDragLeave(e, 'back')}
+                onDrop={(e) => handleDrop(e, 'back')}
+              >
                 {backImage ? (
                   <div className="space-y-4">
                     <div className="relative inline-block">
@@ -515,10 +587,14 @@ const VerificationSettings = () => {
             </div>
             <div>
               <h2 className="text-xl font-semibold text-foreground mb-2">
-                {t('status.submitted.title')}
+                {justSubmitted
+                  ? t('status.submitted.title')
+                  : t('status.submitted.title')}
               </h2>
               <p className="text-muted-foreground">
-                {t('status.submitted.message')}
+                {justSubmitted
+                  ? t('status.submitted.message')
+                  : t('status.submitted.message')}
               </p>
             </div>
             <Button onClick={() => window.location.reload()} variant="outline">

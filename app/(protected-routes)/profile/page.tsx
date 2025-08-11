@@ -178,7 +178,7 @@ const ProfilePage = () => {
                           className="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer"
                         >
                           <HiExclamationTriangle className="w-4 h-4" />
-                          {t('status.pendingVerification')}
+                          {t('status.none')}
                         </Link>
                       )}
                     </>
