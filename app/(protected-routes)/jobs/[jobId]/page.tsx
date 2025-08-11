@@ -322,11 +322,7 @@ const JobInformation = ({
       )}
 
       {job.appliedCraftsmen && job.appliedCraftsmen.length > 0 && (
-        <div
-          className={`flex items-center text-sm ${
-            locale === 'ar' ? 'flex-row-reverse text-right' : 'text-left'
-          }`}
-        >
+        <div className={`flex items-center text-sm`}>
           <HiUsers
             className={`w-4 h-4 text-amber-600 flex-shrink-0 ${
               locale === 'ar' ? 'ml-3' : 'mr-3'

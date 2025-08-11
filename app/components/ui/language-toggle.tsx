@@ -5,7 +5,7 @@ import { useEffect, useState, memo, useCallback } from 'react';
 import { LuLanguages } from 'react-icons/lu';
 
 const LanguageToggle = memo(function LanguageToggle() {
-  const [currentLang, setCurrentLang] = useState<'en' | 'ar'>('en');
+  const [currentLang, setCurrentLang] = useState<'en' | 'ar'>('ar');
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
@@ -21,7 +21,7 @@ const LanguageToggle = memo(function LanguageToggle() {
     if (cookies) {
       setCurrentLang(cookies as 'en' | 'ar');
     } else if (typeof navigator !== 'undefined') {
-      const browserLang = navigator.language.slice(0, 2);
+      const browserLang = 'ar';
       setCurrentLang(browserLang as 'en' | 'ar');
       document.cookie = `CRAFTWORKS_LOCALE=${browserLang};`;
       router.refresh();

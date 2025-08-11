@@ -108,7 +108,7 @@ export const jobsService = {
     quoteId: string,
     token: string
   ): Promise<any> {
-    const response = await api.post(
+    const response = await api.put(
       `/jobs/${jobId}/quotes/${quoteId}/accept`,
       {},
       {
@@ -123,7 +123,7 @@ export const jobsService = {
     quoteId: string,
     token: string
   ): Promise<any> {
-    const response = await api.post(
+    const response = await api.put(
       `/jobs/${jobId}/quotes/${quoteId}/reject`,
       {},
       {
