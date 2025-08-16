@@ -45,7 +45,7 @@ export const userService = {
     token: string,
     userData: UpdateUserData
   ): Promise<User> => {
-    const response = await api.put<ApiResponse<User>>('/users/me', userData, {
+    const response = await api.patch<ApiResponse<User>>('/users/me', userData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ export const userService = {
     const formData = new FormData();
     formData.append('profilePicture', file);
 
-    const response = await api.put<ApiResponse<User>>('/users/me', formData, {
+    const response = await api.patch<ApiResponse<User>>('/users/me', formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',

@@ -56,6 +56,21 @@
     "cookies": "Cookies",
     "accessibility": "Accessibility"
   },
+  "completeProfile": {
+    "title": "Complete Your Profile",
+    "message": "Please complete your profile by adding your {fields} to get the most out of our platform.",
+    "and": "and",
+    "button": {
+      "complete": "Complete Profile"
+    },
+    "fields": {
+      "profilePicture": "Profile Picture",
+      "phone": "Phone Number",
+      "address": "Address",
+      "bio": "Bio",
+      "portfolio": "Portfolio"
+    }
+  },
   "homepage sections": {
     "hero section": {
       "headline": "Find Trusted Craftsmen for Your Projects",
@@ -596,7 +611,7 @@
     "status": {
       "Posted": "Posted",
       "Hired": "Hired",
-      "In Progress": "In Progress",
+      "On The Way": "On The Way",
       "Completed": "Completed",
       "Cancelled": "Cancelled"
     },
@@ -901,8 +916,17 @@
         "hire": "Hire",
         "decline": "Decline",
         "accepting": "Accepting...",
-        "startChat": "Start Chat"
+        "startChat": "Start Chat",
+        "startingChat": "Starting Chat..."
       }
+    },
+    "sorting": {
+      "sortBy": "Sort by",
+      "price": "Price",
+      "rating": "Rating",
+      "ascending": "Ascending",
+      "descending": "Descending",
+      "clear": "Clear Sorting"
     },
     "currency": "EGP"
   },
@@ -1256,6 +1280,7 @@
       "buttons": {
         "save": "Save Changes",
         "saving": "Saving...",
+        "updatingField": "Updating {field}...",
         "reset": "Reset",
         "uploadPortfolio": "Add Portfolio Images"
       },
@@ -1278,11 +1303,13 @@
         "uploadingPortfolio": "Uploading portfolio images..."
       },
       "validation": {
+        "formErrors": "Please fix the errors below",
         "fullNameRequired": "Full name is required",
         "phoneRequired": "Phone number is required",
         "stateRequired": "State is required",
         "cityRequired": "City is required",
-        "streetRequired": "Street is required"
+        "streetRequired": "Street is required",
+        "bioSpacesOnly": "Bio cannot contain only spaces. It will be saved as empty."
       },
       "emptyStates": {
         "noService": "No service selected",
@@ -1429,6 +1456,69 @@
       "service": "Craftsmanship Service",
       "portfolio": "Portfolio",
       "workLabel": "Work #"
+    }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "modal": {
+      "title": "Reviews for {name}",
+      "subtitle": "See what others have to say"
+    },
+    "empty": {
+      "title": "No Reviews Yet",
+      "message": "{userName} hasn't received any reviews yet."
+    },
+    "showing": "Showing the last {count} reviews",
+    "actions": {
+      "tryAgain": "Try again"
+    },
+    "errors": {
+      "loadFailed": "Failed to load reviews",
+      "fetchFailed": "Failed to load reviews",
+      "validation": "Please provide a rating and comment",
+      "createFailed": "Failed to create review"
+    },
+    "job": "Job",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {current} of {total}"
+    },
+    "create": {
+      "title": "Write a Review",
+      "job": "Job",
+      "reviewingUser": "Reviewing",
+      "rating": "Rating",
+      "comment": "Comment",
+      "commentPlaceholder": "Share your experience with this job...",
+      "cancel": "Cancel",
+      "submit": "Submit Review",
+      "submitting": "Submitting..."
+    },
+    "success": {
+      "created": "Review submitted successfully!"
+    }
+  },
+  "jobStatus": {
+    "title": "Job Status Management",
+    "actions": {
+      "onTheWay": "I'm On The Way",
+      "markCompleted": "Mark as Completed",
+      "reschedule": "Reschedule Job",
+      "cancelJob": "Cancel Job",
+      "leaveReview": "Leave Review",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "updateDate": {
+      "label": "Update Job Date"
+    },
+    "success": {
+      "statusUpdated": "Job status updated successfully",
+      "dateUpdated": "Job date updated successfully"
+    },
+    "errors": {
+      "updateFailed": "Failed to update job"
     }
   }
 }

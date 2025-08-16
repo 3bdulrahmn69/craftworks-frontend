@@ -192,6 +192,9 @@ export const getStatusColor = (status: string): string => {
       return 'bg-primary/10 text-primary border-primary/20';
     case 'hired':
       return 'bg-success/10 text-success border-success/20';
+    case 'on the way':
+    case 'ontheway':
+      return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
     case 'in progress':
     case 'inprogress':
       return 'bg-warning/10 text-warning border-warning/20';
@@ -200,6 +203,10 @@ export const getStatusColor = (status: string): string => {
     case 'cancelled':
     case 'canceled':
       return 'bg-destructive/10 text-destructive border-destructive/20';
+    case 'disputed':
+      return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
+    case 'rescheduled':
+      return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
     case 'pending':
       return 'bg-info/10 text-info border-info/20';
     default:
@@ -213,6 +220,9 @@ export const getStatusIcon = (status: string): string => {
       return '📋';
     case 'hired':
       return '✅';
+    case 'on the way':
+    case 'ontheway':
+      return '🚗';
     case 'in progress':
     case 'inprogress':
       return '🔄';
@@ -221,6 +231,10 @@ export const getStatusIcon = (status: string): string => {
     case 'cancelled':
     case 'canceled':
       return '❌';
+    case 'disputed':
+      return '⚖️';
+    case 'rescheduled':
+      return '📅';
     case 'pending':
       return '⏳';
     default:
@@ -235,6 +249,9 @@ export const getJobStatusBackground = (status: string): string => {
       return 'bg-gradient-to-r from-primary to-primary/80';
     case 'hired':
       return 'bg-gradient-to-r from-info to-info/80';
+    case 'on the way':
+    case 'ontheway':
+      return 'bg-gradient-to-r from-orange-500 to-orange-500/80';
     case 'in progress':
     case 'inprogress':
       return 'bg-gradient-to-r from-warning to-warning/80';
@@ -243,6 +260,10 @@ export const getJobStatusBackground = (status: string): string => {
     case 'cancelled':
     case 'canceled':
       return 'bg-gradient-to-r from-destructive to-destructive/80';
+    case 'disputed':
+      return 'bg-gradient-to-r from-purple-500 to-purple-500/80';
+    case 'rescheduled':
+      return 'bg-gradient-to-r from-amber-500 to-amber-500/80';
     case 'pending':
       return 'bg-gradient-to-r from-info to-info/80';
     default:

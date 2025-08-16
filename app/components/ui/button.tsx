@@ -3,7 +3,14 @@ import { cn } from '@/app/utils/cn';
 import LoadingSpinner from './loading-spinner';
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'outline'
+    | 'ghost'
+    | 'link'
+    | 'destructive'
+    | 'custom';
   size?: 'default' | 'sm' | 'lg';
   isLoading?: boolean;
   loadingText?: string;
@@ -15,6 +22,9 @@ const variantClasses = {
   outline: 'border border-border bg-transparent hover:bg-accent',
   ghost: 'bg-transparent hover:bg-accent',
   link: 'underline text-primary hover:text-primary/80 p-0 h-auto',
+  destructive:
+    'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+  custom: '',
 };
 
 const sizeClasses = {

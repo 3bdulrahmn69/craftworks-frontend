@@ -21,12 +21,14 @@ import {
   HiUsers,
   HiExclamationCircle,
   HiPhotograph,
-  HiPencilAlt,
   HiTrash,
-  HiUserGroup,
 } from 'react-icons/hi';
 import { MdOpenInFull } from 'react-icons/md';
 import BackButton from '@/app/components/ui/back-button';
+import { JobStatusManager } from '@/app/components/jobs/job-status-manager';
+import { CreateReviewModal } from '@/app/components/ui/reviews-modal';
+import Modal from '@/app/components/ui/modal';
+import JobActions from '@/app/components/jobs/job-actions';
 
 // ==================== Job Header Component ====================
 const JobHeader = ({ job, locale }: { job: Job; locale: string; t: any }) => (
@@ -49,86 +51,6 @@ const JobHeader = ({ job, locale }: { job: Job; locale: string; t: any }) => (
     </div>
   </div>
 );
-
-// ==================== Job Actions Component ====================
-const JobActions = ({
-  job,
-  session,
-  locale,
-  t,
-  onEdit,
-  onViewApplications,
-  onDelete,
-}: {
-  job: Job;
-  session: any;
-  locale: string;
-  t: any;
-  onEdit: () => void;
-  onViewApplications: () => void;
-  onDelete: () => void;
-}) => {
-  const isJobOwner = job?.client === session?.user?.id;
-
-  if (!isJobOwner) return null;
-
-  return (
-    <div
-      className={`lg:flex-shrink-0 ${locale === 'ar' ? 'lg:order-first' : ''}`}
-    >
-      <div
-        className={`flex flex-wrap gap-2 ${
-          locale === 'ar' ? 'flex-row-reverse' : ''
-        }`}
-      >
-        {(job.appliedCraftsmen?.length || 0) > 0 && (
-          <Button
-            onClick={onViewApplications}
-            variant="outline"
-            size="sm"
-            className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
-          >
-            <HiUserGroup
-              className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
-            />
-            {t('buttons.viewApplications')} ({job.appliedCraftsmen?.length || 0}
-            )
-          </Button>
-        )}
-
-        {['Posted', 'Hired'].includes(job.status) && (
-          <Button
-            onClick={onEdit}
-            variant="outline"
-            size="sm"
-            className={`${locale === 'ar' ? 'flex-row-reverse' : ''}`}
-          >
-            <HiPencilAlt
-              className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
-            />
-            {t('buttons.editJob')}
-          </Button>
-        )}
-
-        {job.status === 'Posted' && (
-          <Button
-            onClick={onDelete}
-            variant="outline"
-            size="sm"
-            className={`border-destructive/30 text-destructive hover:bg-destructive/10 ${
-              locale === 'ar' ? 'flex-row-reverse' : ''
-            }`}
-          >
-            <HiTrash
-              className={`w-4 h-4 ${locale === 'ar' ? 'ml-2' : 'mr-2'}`}
-            />
-            {t('buttons.deleteJob')}
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-};
 
 // ==================== Job Description Component ====================
 const JobDescription = ({
@@ -404,33 +326,27 @@ const DeleteConfirmationModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md mx-4 w-full">
-        <div className="text-center">
-          <HiTrash className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            {t('deleteModal.title')}
-          </h3>
-          <p className="text-muted-foreground mb-6">
-            {t('deleteModal.message')}
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
-              {t('deleteModal.cancel')}
-            </Button>
-            <Button
-              onClick={onConfirm}
-              disabled={isDeleting}
-              className="bg-destructive hover:bg-destructive/80 text-destructive-foreground"
-            >
-              {isDeleting
-                ? t('deleteModal.deleting')
-                : t('deleteModal.confirm')}
-            </Button>
-          </div>
+    <Modal isOpen={isOpen} onClose={onCancel}>
+      <div className="text-center">
+        <HiTrash className="w-12 h-12 text-destructive mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          {t('deleteModal.title')}
+        </h3>
+        <p className="text-muted-foreground mb-6">{t('deleteModal.message')}</p>
+        <div className="flex gap-3 justify-center">
+          <Button variant="outline" onClick={onCancel} disabled={isDeleting}>
+            {t('deleteModal.cancel')}
+          </Button>
+          <Button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            variant="destructive"
+          >
+            {isDeleting ? t('deleteModal.deleting') : t('deleteModal.confirm')}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -454,6 +370,7 @@ const JobDetailsPage = () => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   // Helper function to translate payment types
   const translatePaymentType = useCallback(
@@ -628,9 +545,7 @@ const JobDetailsPage = () => {
             >
               {t('notFound.message')}
             </p>
-            <Button onClick={() => router.back()}>
-              {t('notFound.button')}
-            </Button>
+            <BackButton showLabel />
           </div>
         </div>
       </Container>
@@ -654,7 +569,16 @@ const JobDetailsPage = () => {
           onDelete={() => setShowDeleteConfirm(true)}
         />
 
-        <div className={`grid gap-8 lg:grid-cols-3`}>
+        {/* Job Status Management */}
+        <JobStatusManager
+          job={job}
+          userRole={session?.user?.role as 'client' | 'craftsman'}
+          userId={session?.user?.id || ''}
+          onStatusUpdate={(updatedJob) => setJob(updatedJob)}
+          onReviewRequest={() => setShowReviewModal(true)}
+        />
+
+        <div className={`grid gap-8 lg:grid-cols-3 mt-8`}>
           {/* Main content */}
           <div className={`lg:col-span-2 space-y-8`}>
             <JobDescription job={job} locale={locale} t={t} />
@@ -712,6 +636,16 @@ const JobDetailsPage = () => {
           onConfirm={handleDeleteJob}
           isDeleting={deleting}
         />
+
+        {/* Review Modal */}
+        {showReviewModal && job && (
+          <CreateReviewModal
+            isOpen={showReviewModal}
+            onClose={() => setShowReviewModal(false)}
+            jobId={job._id}
+            jobTitle={job.title}
+          />
+        )}
       </main>
     </Container>
   );

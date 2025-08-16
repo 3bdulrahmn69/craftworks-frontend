@@ -56,6 +56,21 @@
     "cookies": "الكوكيز",
     "accessibility": "المتاح للجميع"
   },
+  "completeProfile": {
+    "title": "أكمل ملفك الشخصي",
+    "message": "يرجى إكمال ملفك الشخصي بإضافة {fields} للحصول على أقصى استفادة من منصتنا.",
+    "and": "و",
+    "button": {
+      "complete": "أكمل الملف"
+    },
+    "fields": {
+      "profilePicture": "الصورة الشخصية",
+      "phone": "رقم الهاتف",
+      "address": "العنوان",
+      "bio": "السيرة الذاتية",
+      "portfolio": "معرض الأعمال"
+    }
+  },
   "homepage sections": {
     "hero section": {
       "headline": "اعثر على الحرفيين الموثوقين لمشاريعك",
@@ -677,7 +692,7 @@
     "status": {
       "Posted": "منشورة",
       "Hired": "تم التوظيف",
-      "In Progress": "قيد التنفيذ",
+      "On The Way": "في الطريق",
       "Completed": "مكتملة",
       "Cancelled": "ملغية"
     },
@@ -982,8 +997,17 @@
         "hire": "توظيف",
         "decline": "رفض",
         "accepting": "جاري القبول...",
-        "startChat": "بدء الدردشة"
+        "startChat": "بدء الدردشة",
+        "startingChat": "جاري بدء الدردشة..."
       }
+    },
+    "sorting": {
+      "sortBy": "ترتيب حسب",
+      "price": "السعر",
+      "rating": "التقييم",
+      "ascending": "تصاعدي",
+      "descending": "تنازلي",
+      "clear": "إلغاء الترتيب"
     },
     "currency": "جنيه"
   },
@@ -1337,6 +1361,7 @@
       "buttons": {
         "save": "حفظ التغييرات",
         "saving": "جاري الحفظ...",
+        "updatingField": "جاري تحديث {field}...",
         "reset": "إعادة تعيين",
         "uploadPortfolio": "إضافة صور معرض الأعمال"
       },
@@ -1359,11 +1384,13 @@
         "uploadingPortfolio": "جاري رفع صور معرض الأعمال..."
       },
       "validation": {
+        "formErrors": "يرجى إصلاح الأخطاء أدناه",
         "fullNameRequired": "الاسم الكامل مطلوب",
         "phoneRequired": "رقم الهاتف مطلوب",
         "stateRequired": "المحافظة مطلوبة",
         "cityRequired": "المدينة مطلوبة",
-        "streetRequired": "الشارع مطلوب"
+        "streetRequired": "الشارع مطلوب",
+        "bioSpacesOnly": "السيرة الذاتية لا يمكن أن تحتوي على مسافات فقط. سيتم حفظها كفارغة."
       },
       "emptyStates": {
         "noService": "لم يتم اختيار خدمة",
@@ -1510,6 +1537,69 @@
       "service": "خدمة الحرفة",
       "portfolio": "معرض الأعمال",
       "workLabel": "عمل #"
+    }
+  },
+  "reviews": {
+    "title": "التقييمات",
+    "modal": {
+      "title": "تقييمات {name}",
+      "subtitle": "شاهد ما يقوله الآخرون"
+    },
+    "empty": {
+      "title": "لا توجد تقييمات بعد",
+      "message": "لم يحصل {userName} على أي تقييمات بعد."
+    },
+    "showing": "عرض آخر {count} تقييم",
+    "actions": {
+      "tryAgain": "حاول مرة أخرى"
+    },
+    "errors": {
+      "loadFailed": "فشل في تحميل التقييمات",
+      "fetchFailed": "فشل في تحميل التقييمات",
+      "validation": "يرجى تقديم تقييم وتعليق",
+      "createFailed": "فشل في إنشاء التقييم"
+    },
+    "job": "المهمة",
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageInfo": "صفحة {current} من {total}"
+    },
+    "create": {
+      "title": "كتابة تقييم",
+      "job": "المهمة",
+      "reviewingUser": "تقييم",
+      "rating": "التقييم",
+      "comment": "التعليق",
+      "commentPlaceholder": "شارك تجربتك مع هذه المهمة...",
+      "cancel": "إلغاء",
+      "submit": "إرسال التقييم",
+      "submitting": "جاري الإرسال..."
+    },
+    "success": {
+      "created": "تم إرسال التقييم بنجاح!"
+    }
+  },
+  "jobStatus": {
+    "title": "إدارة حالة المهمة",
+    "actions": {
+      "onTheWay": "أنا في الطريق",
+      "markCompleted": "وضع علامة مكتمل",
+      "reschedule": "إعادة جدولة المهمة",
+      "cancelJob": "إلغاء المهمة",
+      "leaveReview": "اترك تقييم",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء"
+    },
+    "updateDate": {
+      "label": "تحديث تاريخ المهمة"
+    },
+    "success": {
+      "statusUpdated": "تم تحديث حالة المهمة بنجاح",
+      "dateUpdated": "تم تحديث تاريخ المهمة بنجاح"
+    },
+    "errors": {
+      "updateFailed": "فشل في تحديث المهمة"
     }
   }
 }

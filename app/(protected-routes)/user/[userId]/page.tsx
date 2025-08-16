@@ -22,6 +22,7 @@ import BackButton from '@/app/components/ui/back-button';
 import ImageModal from '@/app/components/ui/image-modal';
 import { User } from '@/app/types/user';
 import Container from '@/app/components/ui/container';
+import { ReviewsSection } from '@/app/components/ui/reviews-section';
 
 const UserDetails = () => {
   const { data: session } = useSession();
@@ -263,53 +264,65 @@ const UserDetails = () => {
               )}
             </DetailSection>
           </div>
-        </div>
 
-        {/* Portfolio Images for craftsmen */}
-        {user.role === 'craftsman' &&
-          user.portfolioImageUrls &&
-          user.portfolioImageUrls.length > 0 && (
-            <div className="mt-10 bg-card border border-border rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all">
-              <div className="px-6 sm:px-8 py-8">
-                <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-                  <div className="bg-primary/10 p-3 rounded-lg">
-                    <HiOutlineBriefcase className="h-6 w-6 text-primary" />
-                  </div>
-                  {t('craftsman.portfolio')}
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {user.portfolioImageUrls.map((imageUrl, index) => (
-                    <div
-                      key={index}
-                      className="relative rounded-xl overflow-hidden bg-muted border border-border hover:shadow-lg transition-all duration-300 group cursor-pointer"
-                      onClick={() => {
-                        setSelectedImages(user.portfolioImageUrls || []);
-                        setSelectedImageIndex(index);
-                        setShowImageModal(true);
-                      }}
-                    >
-                      <Image
-                        src={imageUrl}
-                        alt={`Portfolio work ${index + 1} by ${user.fullName}`}
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute bottom-2 left-2 right-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-                        <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
-                          <p className="text-xs font-medium text-gray-800">
-                            {t('craftsman.workLabel')}
-                            {index + 1}
-                          </p>
+          {/* Portfolio Images for craftsmen */}
+          {user.role === 'craftsman' &&
+            user.portfolioImageUrls &&
+            user.portfolioImageUrls.length > 0 && (
+              <div className="mt-10 bg-card border border-border rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all">
+                <div className="px-6 sm:px-8 py-8">
+                  <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+                    <div className="bg-primary/10 p-3 rounded-lg">
+                      <HiOutlineBriefcase className="h-6 w-6 text-primary" />
+                    </div>
+                    {t('craftsman.portfolio')}
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {user.portfolioImageUrls.map((imageUrl, index) => (
+                      <div
+                        key={index}
+                        className="relative rounded-xl overflow-hidden bg-muted border border-border hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                        onClick={() => {
+                          setSelectedImages(user.portfolioImageUrls || []);
+                          setSelectedImageIndex(index);
+                          setShowImageModal(true);
+                        }}
+                      >
+                        <Image
+                          src={imageUrl}
+                          alt={`Portfolio work ${index + 1} by ${
+                            user.fullName
+                          }`}
+                          width={200}
+                          height={200}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute bottom-2 left-2 right-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                          <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                            <p className="text-xs font-medium text-gray-800">
+                              {t('craftsman.workLabel')}
+                              {index + 1}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+          {/* Reviews Section */}
+          <div className="mt-10">
+            <ReviewsSection
+              userId={user.id}
+              userName={user.fullName}
+              showTitle={true}
+              maxReviews={20}
+            />
+          </div>
+        </div>
       </Container>
 
       {/* Image Modal */}

@@ -17,7 +17,14 @@ export interface Job {
     coordinates: [number, number];
   };
   paymentType: 'cash' | 'visa';
-  status: 'Posted' | 'Hired' | 'In Progress' | 'Completed' | 'Cancelled';
+  status:
+    | 'Posted'
+    | 'Hired'
+    | 'On The Way'
+    | 'Completed'
+    | 'Cancelled'
+    | 'Disputed'
+    | 'Rescheduled';
   client:
     | string
     | {

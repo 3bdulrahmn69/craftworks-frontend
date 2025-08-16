@@ -28,11 +28,19 @@ const PersonalSettings = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [currentUpdatingField, setCurrentUpdatingField] = useState<
+    string | null
+  >(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [deletingImage, setDeletingImage] = useState(false);
   const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
   const [deletingPortfolio, setDeletingPortfolio] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    fullName?: string;
+    phone?: string;
+    [key: string]: string | undefined;
+  }>({});
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -79,12 +87,70 @@ const PersonalSettings = () => {
     fetchUserData();
   }, [session?.accessToken, locale]);
 
+  // Helper function to check if there are actual changes
+  const hasActualChanges = () => {
+    if (!user) return false;
+
+    return (
+      formData.fullName !== user.fullName ||
+      formData.phone !== user.phone ||
+      formData.address.state !== user.address.state ||
+      formData.address.city !== user.address.city ||
+      formData.address.street !== user.address.street ||
+      (user.role === 'craftsman' &&
+        formData.serviceId !== (user.service?._id || '')) ||
+      (user.role === 'craftsman' &&
+        formData.bio.trim() !== (user.bio || '').trim())
+    );
+  };
+
+  // Helper function to get user-friendly field names
+  const getFieldDisplayName = (field: string): string => {
+    switch (field) {
+      case 'fullName':
+        return t('fields.fullName');
+      case 'phone':
+        return t('fields.phone');
+      case 'address':
+        return t('sections.address');
+      case 'serviceId':
+        return t('fields.service');
+      case 'bio':
+        return t('fields.bio');
+      default:
+        return field;
+    }
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const errors: typeof validationErrors = {};
+
+    if (!formData.fullName.trim()) {
+      errors.fullName = t('validation.fullNameRequired');
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = t('validation.phoneRequired');
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
     const { name, value } = e.target;
+
+    // Clear validation error for this field
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
 
     if (name.startsWith('address.')) {
       const addressField = name.split('.')[1];
@@ -105,7 +171,10 @@ const PersonalSettings = () => {
       }));
     }
 
-    setHasChanges(true);
+    // Update hasChanges based on actual comparison
+    setTimeout(() => {
+      setHasChanges(hasActualChanges());
+    }, 0);
   };
 
   const handleServiceChange = (serviceId: string) => {
@@ -113,40 +182,134 @@ const PersonalSettings = () => {
       ...prev,
       serviceId,
     }));
-    setHasChanges(true);
+
+    // Update hasChanges based on actual comparison
+    setTimeout(() => {
+      setHasChanges(hasActualChanges());
+    }, 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.accessToken || !user) return;
 
+    // Validate form
+    if (!validateForm()) {
+      toast.error(t('validation.formErrors'));
+      return;
+    }
+
+    // Check if there are actual changes
+    if (!hasActualChanges()) {
+      toast.info(t('messages.noChanges'));
+      return;
+    }
+
     setSaving(true);
     try {
-      const updateData: UpdateUserData = {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        address: {
-          country: user.address.country,
-          state: formData.address.state,
-          city: formData.address.city,
-          street: formData.address.street,
-        },
-        serviceId: formData.serviceId || undefined,
-        bio: formData.bio || undefined,
-      };
+      // Collect all changed fields for sequential updates
+      const updates: Array<{ field: string; data: any }> = [];
 
-      const updatedUser = await userService.updateProfile(
-        session.accessToken,
-        updateData
-      );
+      // Check individual field changes
+      if (formData.fullName !== user.fullName) {
+        updates.push({
+          field: 'fullName',
+          data: { fullName: formData.fullName },
+        });
+      }
+      if (formData.phone !== user.phone) {
+        updates.push({ field: 'phone', data: { phone: formData.phone } });
+      }
+
+      // Check address changes
+      const hasAddressChanges =
+        formData.address.state !== user.address.state ||
+        formData.address.city !== user.address.city ||
+        formData.address.street !== user.address.street;
+
+      if (hasAddressChanges) {
+        updates.push({
+          field: 'address',
+          data: {
+            address: {
+              country: user.address.country, // Keep original country
+              state: formData.address.state,
+              city: formData.address.city,
+              street: formData.address.street,
+            },
+          },
+        });
+      }
+
+      // Check service change (for craftsmen only)
+      if (
+        user.role === 'craftsman' &&
+        formData.serviceId !== (user.service?._id || '')
+      ) {
+        // Handle empty serviceId (user wants to remove service)
+        updates.push({
+          field: 'serviceId',
+          data: { serviceId: formData.serviceId || undefined },
+        });
+      }
+
+      // Check bio change (for craftsmen only)
+      if (
+        user.role === 'craftsman' &&
+        formData.bio.trim() !== (user.bio || '').trim()
+      ) {
+        // Handle empty bio (user wants to remove bio) - trim spaces and convert to empty string
+        const trimmedBio = formData.bio.trim();
+        updates.push({
+          field: 'bio',
+          data: { bio: trimmedBio || '' },
+        });
+      }
+
+      if (updates.length === 0) {
+        toast.info(t('messages.noChanges'));
+        return;
+      }
+
+      console.log('Updating fields sequentially:', updates);
+
+      // Send updates sequentially (one field per request)
+      let updatedUser = user;
+      for (let i = 0; i < updates.length; i++) {
+        const update = updates[i];
+        console.log(`Updating ${update.field}:`, update.data);
+
+        // Show which field is currently being updated
+        setCurrentUpdatingField(update.field);
+
+        try {
+          updatedUser = await userService.updateProfile(
+            session.accessToken,
+            update.data as UpdateUserData
+          );
+          console.log(`Successfully updated ${update.field}`);
+        } catch (fieldError: any) {
+          console.error(`Failed to update ${update.field}:`, fieldError);
+          toast.error(
+            `Failed to update ${getFieldDisplayName(
+              update.field
+            )}. Please try again.`
+          );
+          // Continue with other updates even if one fails
+        }
+      }
+
+      setCurrentUpdatingField(null);
       setUser(updatedUser);
       setHasChanges(false);
+      setValidationErrors({});
       toast.success(t('messages.saveSuccess'));
     } catch (error) {
       console.error('Failed to update profile:', error);
       toast.error(t('messages.saveError'));
     } finally {
       setSaving(false);
+      setCurrentUpdatingField(null);
     }
   };
 
@@ -394,12 +557,10 @@ const PersonalSettings = () => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 label={t('fields.fullName')}
+                error={validationErrors.fullName}
                 required
                 aria-describedby="fullname-validation"
               />
-              <div id="fullname-validation" className="sr-only">
-                {!formData.fullName && t('validation.fullNameRequired')}
-              </div>
             </div>
             <div>
               <Input
@@ -409,12 +570,10 @@ const PersonalSettings = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 label={t('fields.phone')}
+                error={validationErrors.phone}
                 required
                 aria-describedby="phone-validation"
               />
-              <div id="phone-validation" className="sr-only">
-                {!formData.phone && t('validation.phoneRequired')}
-              </div>
             </div>
           </div>
 
@@ -567,6 +726,11 @@ const PersonalSettings = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   {t('helpText.bioHelp')}
                 </p>
+                {formData.bio && !formData.bio.trim() && (
+                  <p className="text-xs text-warning mt-1">
+                    {t('validation.bioSpacesOnly')}
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -689,6 +853,7 @@ const PersonalSettings = () => {
                           bio: user.bio || '',
                         });
                         setHasChanges(false);
+                        setValidationErrors({});
                       }
                     }}
                     aria-describedby="reset-button-description"
@@ -709,8 +874,20 @@ const PersonalSettings = () => {
             >
               {saving ? (
                 <>
-                  <span className="sr-only">{t('buttons.saving')}</span>
-                  <span aria-hidden="true">{t('buttons.saving')}</span>
+                  <span className="sr-only">
+                    {currentUpdatingField
+                      ? `Updating ${getFieldDisplayName(
+                          currentUpdatingField
+                        )}...`
+                      : t('buttons.saving')}
+                  </span>
+                  <span aria-hidden="true">
+                    {currentUpdatingField
+                      ? `Updating ${getFieldDisplayName(
+                          currentUpdatingField
+                        )}...`
+                      : t('buttons.saving')}
+                  </span>
                 </>
               ) : (
                 t('buttons.save')

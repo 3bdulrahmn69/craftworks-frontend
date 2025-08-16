@@ -22,7 +22,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import BackButton from '@/app/components/ui/back-button';
 import ImageModal from '@/app/components/ui/image-modal';
+import { ReviewsModal } from '@/app/components/ui/reviews-modal';
+import CompleteProfileBanner from '@/app/components/ui/complete-profile-banner';
 import { FaRegEdit } from 'react-icons/fa';
+import { ReviewsSection } from '@/app/components/ui/reviews-section';
 
 const ProfilePage = () => {
   const { data: session } = useSession();
@@ -34,6 +37,7 @@ const ProfilePage = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showReviewsModal, setShowReviewsModal] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -87,6 +91,9 @@ const ProfilePage = () => {
       </nav>
 
       <main className="space-y-6" role="main">
+        {/* Complete Profile Banner */}
+        <CompleteProfileBanner />
+
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -242,9 +249,12 @@ const ProfilePage = () => {
                         <p className="text-sm text-muted-foreground">Rating</p>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-foreground">
+                        <button
+                          onClick={() => setShowReviewsModal(true)}
+                          className="text-2xl font-bold text-foreground hover:text-primary transition-colors"
+                        >
                           {user.ratingCount}
-                        </div>
+                        </button>
                         <p className="text-sm text-muted-foreground">Reviews</p>
                       </div>
                     </>
@@ -342,9 +352,12 @@ const ProfilePage = () => {
                               ))}
                             </div>
                           </div>
-                          <span className="text-sm text-muted-foreground">
+                          <button
+                            onClick={() => setShowReviewsModal(true)}
+                            className="text-sm text-primary hover:underline"
+                          >
                             ({user.ratingCount} {t('fields.reviews')})
-                          </span>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -387,6 +400,14 @@ const ProfilePage = () => {
               </div>
             </div>
           )}
+
+        {/* Reviews Section */}
+        <ReviewsSection
+          userId={user.id}
+          userName={user.fullName}
+          showTitle={true}
+          maxReviews={20}
+        />
       </main>
 
       {/* Image Modal */}
@@ -395,6 +416,15 @@ const ProfilePage = () => {
         images={selectedImages}
         initialIndex={selectedImageIndex}
         onClose={() => setShowImageModal(false)}
+      />
+
+      {/* Reviews Modal */}
+      <ReviewsModal
+        isOpen={showReviewsModal}
+        onClose={() => setShowReviewsModal(false)}
+        userId={user.id}
+        userName={user.fullName}
+        userImage={user.profilePicture}
       />
     </Container>
   );

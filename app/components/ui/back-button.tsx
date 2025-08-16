@@ -15,7 +15,7 @@ interface BackButtonProps {
 const BackButton = ({ showLabel = false, className }: BackButtonProps) => {
   const locale = useLocale();
   const router = useRouter();
-  const [canGOBack, setCanGoBack] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -23,7 +23,7 @@ const BackButton = ({ showLabel = false, className }: BackButtonProps) => {
     }
   }, [router]);
 
-  if (!canGOBack) return null;
+  if (!canGoBack) return null;
 
   return (
     <Button

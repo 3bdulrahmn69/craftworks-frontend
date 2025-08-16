@@ -3,6 +3,7 @@
 import Redirect from '@/app/components/redirect';
 import Footer from '@/app/components/footer';
 import Header from '@/app/components/header';
+import CompleteProfileBanner from '@/app/components/ui/complete-profile-banner';
 import { usePathname } from 'next/navigation';
 
 const navLinks = [
@@ -21,6 +22,7 @@ const CraftsmanLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Redirect requireAuth={true} allowedRoles={['craftsman']}>
       {!isMessagesPage && <Header navLinks={navLinks} />}
+      {!isMessagesPage && <CompleteProfileBanner className="mx-4 mt-4" />}
       {children}
       {!isMessagesPage && <Footer />}
     </Redirect>

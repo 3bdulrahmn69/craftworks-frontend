@@ -214,6 +214,37 @@ export const jobsService = {
     return flattenResponse(response.data);
   },
 
+  // Update job status (Enhanced with role-based transitions)
+  async updateJobStatus(
+    jobId: string,
+    statusData: {
+      status: 'On The Way' | 'Completed' | 'Cancelled' | 'Rescheduled';
+      newJobDate?: string; // Required for Rescheduled status
+    },
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const response = await api.patch(`/jobs/${jobId}/status`, statusData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return flattenResponse(response.data);
+  },
+
+  // Update job date (Client only)
+  async updateJobDate(
+    jobId: string,
+    jobDate: string,
+    token: string
+  ): Promise<{ success: boolean; message: string }> {
+    const response = await api.patch(
+      `/jobs/${jobId}/date`,
+      { jobDate },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return flattenResponse(response.data);
+  },
+
   // Invite a craftsman to a job (client only)
   async inviteCraftsman(
     jobId: string,
